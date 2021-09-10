@@ -2,6 +2,7 @@ clear; clc; close all;
 xlsfile = readcell('ForActinPostprocessing.xlsx','NumHeaderLines',1); % This is the file contains all the information about the later processing.
 
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
+ExpDate = xlsfile(:, 1);  % Path of the data to be processed.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 savePath = xlsfile(:, 4);  % Saving path.
@@ -90,15 +91,12 @@ for no_Group = 1: NumGroup
             end
         end
         
-        Info(no_Group).centroidxy_plot{no_Case} = centroidxy(1,centroidxy_plot_ind);
+        Info(no_Group).centroidxy_plotX{no_Case} = centroidxy(1,centroidxy_plot_ind);
+        Info(no_Group).centroidxy_plotY{no_Case} = centroidxy(2,centroidxy_plot_ind);
         
     end
     
 end
-
-
-
-Info(1).filelist.name
 
 
 
@@ -106,126 +104,124 @@ Info(1).filelist.name
 % This part is used to polt the elasto-viscous number /mu vs. end-to-end
 % length L_ee_norm.
 
-clearvars -except Info
+clearvars -except Info xlsfile
+NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
+ExpDate = xlsfile(:, 1);  % Path of the data to be processed.
+storePath = xlsfile(:, 2);  % Path of the data to be processed.
+PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
+savePath = xlsfile(:, 4);  % Saving path.
+ChannelH = xlsfile(:, 5);  % Channel height (um)
+ChannelW = xlsfile(:, 6);  % Channel width (um)
+FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
+Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
+Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
 
-figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
-
-fooo = 1; ffff = 1;
+plot_counter1 = 1; counter1 = 1;  % plot_counter1: for the final plot. 
 for no_Group = 1: NumGroup  
     
     for no_Case = 1:length(Info(no_Group).filelist)
         
-        tmp_L_ee_norm = Info(no_Group).L_ee_norm{1, no_Group};
-        
-%         h = histogram(tmp_L_ee, 10);  
-%         values = h.Values;   BinEdges = h.BinEdges;
-        
-        [values,BinEdges] = histcounts(tmp_L_ee_norm, 10);
-        tmp_ind = find(values==max(values));
-        if numel(tmp_ind) > 1
-            yyyyy{ffff} = [num2str(no_Group), num2str(no_Group)];
-            ffff = ffff + 1;
+        tmp_L_ee_norm = Info(no_Group).L_ee_norm{1, no_Case};  % The L_ee_norm for one trajectory.
+         
+        [values,BinEdges] = histcounts(tmp_L_ee_norm, 10);  % Histogram bin counts. The number of bins is 10.
+        tmp_ind = find(values==max(values));  % The maximum after histogram.
+        if numel(tmp_ind) > 1  % The cases which don't only have one maximum value.
+            MultiMaxCases{counter1} = Info(no_Group).filelist(no_Case).name;
+            counter1 = counter1 + 1;
         end
-        L_ee_plot(fooo) = (BinEdges(tmp_ind(1)+1) + BinEdges(tmp_ind(1)))/2;
-%         L_ee_plot(fooo) = (BinEdges(1) + BinEdges(2))/2;
-        mu_0_plot(fooo) = Info(no_Group).elastoviscousNum(no_Group);
-        fooo = fooo + 1;
+        L_ee_plot(plot_counter1) = (BinEdges(tmp_ind(1)+1) + BinEdges(tmp_ind(1)))/2;  % Most probable L_ee_norm.
+%         L_ee_plot(plot_counter1) = (BinEdges(1) + BinEdges(2))/2;  % Minimum L_ee_norm.
+        mu_0_plot(plot_counter1) = Info(no_Group).elastoviscousNum(no_Case);  % The elasto viscous number.
+        plot_counter1 = plot_counter1 + 1;
         
     end
 end
 
-
+figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
 semilogx(mu_0_plot, L_ee_plot, 'b*')
-% scatter(mu_0_plot, L_ee_plot);
 % title('$CoM\ Distribution$','FontSize', 18,'Interpreter', 'latex')
-
 xlabel('$\mu_0$','FontSize', 18,'Interpreter', 'latex');
 ylabel('$L_{ee}/L_0$','FontSize', 18,'Interpreter', 'latex');
 % axis equal;
 % xlim([0 2]);  ylim([0 1]);
-% export_fig(['F:\PhD, PMMH, ESPCI\Processing\20210430-Actin\results\Figures\mostprob_Lee_vs_mu0'],'-tif')
+% export_fig([savePath{no_Group},filesep,'mostprob_Lee_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
+% savefig([savePath{no_Group},filesep,'mostprob_Lee_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group),'.fig'])
 
 
 
+%%  Plot elastoviscousNum vs. L_ee_morm
+% Draw Lee/L0 vs mu0, meanwhile divide into different parts according to
+% the initial position.
 
-for no_Group = 1: NumGroup 
+
+
+%% Plot pdf of CoM
+% This part is used to polt the pdf of CoM in a cell.
+
+clearvars -except Info xlsfile
+NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
+ExpDate = xlsfile(:, 1);  % Path of the data to be processed.
+storePath = xlsfile(:, 2);  % Path of the data to be processed.
+PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
+savePath = xlsfile(:, 4);  % Saving path.
+ChannelH = xlsfile(:, 5);  % Channel height (um)
+ChannelW = xlsfile(:, 6);  % Channel width (um)
+FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
+Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
+Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
+
+for no_Group = 1: NumGroup
     
-    if no_Group == 1
-        
-        the_chosen_folder = '20210413-Actin';
-        filelist=dir(fullfile('F:\PhD, PMMH, ESPCI\Processing',the_chosen_folder,'results','*.mat'));
-        load('F:\PhD, PMMH, ESPCI\Processing\20210413-Actin\circlesforPAs1_S10.mat')
-        ave_R = mean(radii);
-        sorted_centers = sort(centers(:,1));
-        Jumps = find(diff(sorted_centers) > 100); Jumps = [0;Jumps;size(sorted_centers,1)];
-        for ii = 1:size(Jumps, 1)-1
-            pillar_column(ii) = mean(sorted_centers(Jumps(ii)+1: Jumps(ii + 1)));
-        end
-        DD = mean(diff(pillar_column));   % the distance betweeen two columns
-        pillar_column = [pillar_column(1)-DD, pillar_column];
-        
-%         sorted_centersY = sort(centers(:,2));
-%         JumpsY = find(diff(sorted_centersY) > 80); JumpsY = [0;JumpsY;size(sorted_centersY,1)];
-%         for ii = 1:size(JumpsY, 1)-1
-%             pillar_row(ii) = mean(sorted_centers(JumpsY(ii)+1: JumpsY(ii + 1)));
-%         end
-%         Y_shift = pillar_row(1)/2;   % shift the plot up or down to make it in a 'cell'
-        
-        for jj = 1:length(filelist)    % choose the cases to draw
-            for kk = 1:2:numel(pillar_column)-2  % in one period
-                tmp_ind = Info(no_Group).centroidxy_plotX{1,jj} >= pillar_column(kk) & Info(no_Group).centroidxy_plotX{1,jj} <= pillar_column(kk+2);  % in one period
-                %         plot((centroidxy_plotX{1,jj}(tmp_ind)-pillar_column(kk))/DD, (mod(centroidxy_plotY{1,jj}(tmp_ind)-Y_shift,DD))/DD,'Color','b','marker','.','LineStyle', 'none'); hold on    % in one period
-                scatter1 = scatter((Info(no_Group).centroidxy_plotX{1,jj}(tmp_ind)-pillar_column(kk))/DD, (mod(Info(no_Group).centroidxy_plotY{1,jj}(tmp_ind)-Y_shift,DD))/DD,'filled', 'b');
-                alpha(scatter1,0.2);  hold on
-                hold on;
-            end
-        end
-        
-    else
-        
-        clearvars pillar_column pillar_row
-        the_chosen_folder = '20210430-Actin';
-        filelist=dir(fullfile('F:\PhD, PMMH, ESPCI\Processing',the_chosen_folder,'results','*.mat'));
-        load('F:\PhD, PMMH, ESPCI\Processing\20210430-Actin\circlesforPAs2_S10.mat')
-        ave_R = mean(radii);
-        sorted_centers = sort(centers(:,1));
-        Jumps = find(diff(sorted_centers) > 100); Jumps = [0;Jumps;size(sorted_centers,1)];
-        for ii = 1:size(Jumps, 1)-1
-            pillar_column(ii) = mean(sorted_centers(Jumps(ii)+1: Jumps(ii + 1)));
-        end
-        DD = mean(diff(pillar_column));   % the distance betweeen two columns
-        pillar_column = [pillar_column(1)-DD, pillar_column];
-        
-%         sorted_centersY = sort(centers(:,2));
-%         JumpsY = find(diff(sorted_centersY) > 80); JumpsY = [0;JumpsY;size(sorted_centersY,1)];
-%         for ii = 1:size(JumpsY, 1)-1
-%             pillar_row(ii) = mean(sorted_centers(JumpsY(ii)+1: JumpsY(ii + 1)));
-%         end
-%         Y_shift = pillar_row(1)/2;   % shift the plot up or down to make it in a 'cell'
-
-        for jj = 1:21   % choose the cases to draw
-            for kk = 1:2:numel(pillar_column)-2  % in one period
-                tmp_ind = Info(no_Group).centroidxy_plotX{1,jj} >= pillar_column(kk) & Info(no_Group).centroidxy_plotX{1,jj} <= pillar_column(kk+2);  % in one period
-                %         plot((centroidxy_plotX{1,jj}(tmp_ind)-pillar_column(kk))/DD, (mod(centroidxy_plotY{1,jj}(tmp_ind)-Y_shift,DD))/DD,'Color','b','marker','.','LineStyle', 'none'); hold on    % in one period
-                scatter1 = scatter((Info(no_Group).centroidxy_plotX{1,jj}(tmp_ind)-pillar_column(kk))/DD, (mod(Info(no_Group).centroidxy_plotY{1,jj}(tmp_ind)-Y_shift,DD))/DD,'filled', 'b');
-                alpha(scatter1,0.2);  hold on
-                hold on;
-            end
+    filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
+    load(PAsPath{no_Group});  % Load the PAs information.
+    ave_PA_Ra = mean(radii);  % The averaged the radius.
+    sorted_centers = sort(centers(:,1));  % Calculate the interval along x-direction.
+    Jumps = find(diff(sorted_centers) > 100); Jumps = [0;Jumps;size(sorted_centers,1)];  % Please change the value '100' accordingly.
+    for ii = 1:size(Jumps, 1)-1
+        pillar_column(ii) = mean(sorted_centers(Jumps(ii)+1: Jumps(ii + 1)));
+    end
+    DD = mean(diff(pillar_column));   % the distance betweeen two columns
+    pillar_column = [pillar_column(1)-DD, pillar_column];
+    
+    sorted_centersY = sort(centers(:,2));  % Calculate the interval along y-direction.
+    JumpsY = find(diff(sorted_centersY) > 80); JumpsY = [0;JumpsY;size(sorted_centersY,1)];   % Please change the value '80' accordingly.
+    for ii = 1:size(JumpsY, 1)-1
+        pillar_row(ii) = mean(sorted_centersY(JumpsY(ii)+1: JumpsY(ii + 1)));
+    end
+    Y_shift =  2048-pillar_row(end);   % shift the plot up or down to make it in a 'cell'. Need to be flipped and 2048 is the size of the image.
+    
+    for jj = 1:length(filelist)    % choose the cases to draw
+        for kk = 1:2:numel(pillar_column)-2   % every two columns. 
+            tmp_ind = Info(no_Group).centroidxy_plotX{1,jj} >= pillar_column(kk) & Info(no_Group).centroidxy_plotX{1,jj} <= pillar_column(kk+2);  % every two columns.
+            scatter1 = scatter((Info(no_Group).centroidxy_plotX{1,jj}(tmp_ind)-pillar_column(kk))/DD, (mod(Info(no_Group).centroidxy_plotY{1,jj}(tmp_ind)-Y_shift,DD))/DD,'filled', 'b');
+            alpha(scatter1,0.2);  hold on
+            hold on;
         end
     end
+    
+    clearvars pillar_column pillar_row
+    
 end
 
+figure('color', 'w'); %set(gcf, 'Position', [100 300 1000 500]);
 title('$CoM\ Distribution$','FontSize', 18,'Interpreter', 'latex')
-viscircles([1,0; 1,1; 0,0.5; 2,0.5],[ave_R/DD; ave_R/DD; ave_R/DD; ave_R/DD]);
+viscircles([1,0; 1,1; 0,0.5; 2,0.5],[ave_PA_Ra/DD; ave_PA_Ra/DD; ave_PA_Ra/DD; ave_PA_Ra/DD]);  % plot the pillar array according to the layout.
 xlabel('$x/D_{C2C}$','FontSize', 18,'Interpreter', 'latex');
 ylabel('$y/D_{C2C}$','FontSize', 18,'Interpreter', 'latex');
 axis equal;
 xlim([0 2]);  ylim([0 1]);
+% export_fig(['F:\PhD, PMMH, ESPCI\Processing\20210430-Actin\results\Figures\CoM_1nL'],'-tif')
+% export_fig([savePath{no_Group},filesep,'CoM_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
+% savefig([savePath{no_Group},filesep,'CoM_',datestr(ExpDate{no_Group}),'-',num2str(no_Group),'.fig'])
 
 
 
+%% 
+% Draw Lee/L0 vs mu0, meanwhile divide into different parts according to
+% the initial position.
 
-%%
+
+%% Function to calculate the mu_0
 
 function mu_0 = Get_elastoviscousNum(L, u_0)
 % This is to calculate the elasto-viscous number
