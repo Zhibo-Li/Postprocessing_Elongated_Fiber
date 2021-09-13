@@ -38,7 +38,7 @@ for no_Group = 1: NumGroup
         for no_Goodcas = 1:size(Good_case,2)
             
             if no_Goodcas > 1
-                if Good_case(no_Goodcas) - TheLastOne >= 4  % Equal interval sampling. If put 4, it will be 5 and so on.      
+                if Good_case(no_Goodcas) - TheLastOne >= 0  % Equal interval sampling. If put 4, it will be 5 and so on.      
                     centroidxy_plot_ind(end+1) = no_Goodcas;
                     
                     crd = xy.crd{1,Good_case(no_Goodcas)};
@@ -60,6 +60,8 @@ for no_Group = 1: NumGroup
                     
                     Lambda1 = eigenD(2,2); Lambda2 =  eigenD(1,1);
                     Info(no_Group).aniso{no_Case}(count) = 1 - 4*Lambda1*Lambda2/(Lambda1+Lambda2)^2;
+                    
+                    Info(no_Group).SelectCaseNo{no_Case}(count) = Good_case(no_Goodcas);  % The indexes of the Goodcases. Mostly for the frequency calculation.
                     
                     count = count + 1;
                     TheLastOne = Good_case(no_Goodcas);
@@ -85,8 +87,9 @@ for no_Group = 1: NumGroup
                 Lambda1 = eigenD(2,2); Lambda2 =  eigenD(1,1);
                 Info(no_Group).aniso{no_Case}(no_Goodcas) = 1 - 4*Lambda1*Lambda2/(Lambda1+Lambda2)^2;
                 
-                count = count + 1;
+                Info(no_Group).SelectCaseNo{no_Case}(count) = Good_case(no_Goodcas);  % The indexes of the Goodcases. Mostly for the frequency calculation.
                 
+                count = count + 1;
                 TheLastOne = Good_case(no_Goodcas);
             end
         end
