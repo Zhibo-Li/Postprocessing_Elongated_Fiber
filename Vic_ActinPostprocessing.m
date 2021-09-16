@@ -2,7 +2,7 @@ clear; clc; close all;
 xlsfile = readcell('ForActinPostprocessing.xlsx','NumHeaderLines',1); % This is the file contains all the information about the later processing.
 
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
-ExpDate = xlsfile(:, 1);  % Path of the data to be processed.
+ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 savePath = xlsfile(:, 4);  % Saving path.
@@ -108,7 +108,7 @@ end
 
 clearvars -except Info xlsfile
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
-ExpDate = xlsfile(:, 1);  % Path of the data to be processed.
+ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 savePath = xlsfile(:, 4);  % Saving path.
@@ -185,7 +185,7 @@ end
 
 clearvars -except Info xlsfile
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
-ExpDate = xlsfile(:, 1);  % Path of the data to be processed.
+ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 savePath = xlsfile(:, 4);  % Saving path.
@@ -252,7 +252,7 @@ end
 
 clearvars -except Info xlsfile
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
-ExpDate = xlsfile(:, 1);  % Path of the data to be processed.
+ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 savePath = xlsfile(:, 4);  % Saving path.
@@ -306,7 +306,7 @@ ylabel('$L_{ee}/L_0$','FontSize', 18,'Interpreter', 'latex');
 
 clearvars -except Info xlsfile
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
-ExpDate = xlsfile(:, 1);  % Path of the data to be processed.
+ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 savePath = xlsfile(:, 4);  % Saving path.
@@ -355,6 +355,55 @@ xlim([0 2]);  ylim([0 1]);
 % Draw Lee/L0 vs mu0, meanwhile divide into different parts according to
 % the initial position.
 
+
+
+%% About the periodicity (Orientation & Deformation)
+
+clearvars -except Info xlsfile
+NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
+ExpDate = xlsfile(:, 1);  % The experiment date.
+storePath = xlsfile(:, 2);  % Path of the data to be processed.
+PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
+savePath = xlsfile(:, 4);  % Saving path.
+ChannelH = xlsfile(:, 5);  % Channel height (um)
+ChannelW = xlsfile(:, 6);  % Channel width (um)
+FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
+Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
+Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
+
+plot_counter1 = 1;
+for no_Group = 3
+    
+    filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
+    for no_Case = 1:length(filelist)    % choose the cases to draw
+        [pxx,f] = plomb(Info(no_Group).Chi_norm{1, no_Case}, Info(no_Group).SelectCaseNo{1, no_Case},'power');
+%         figure; plot(pxx, f);
+        [pk,f0] = findpeaks(pxx,f,'MinPeakProminence',0.01);
+%         figure; plot(f, pxx, f0, pk,'ro');
+        if numel(f0) > 1 || isempty(f0)
+            Period_plot(plot_counter1) = 0;            
+        else
+            Period_plot(plot_counter1) = 1/f0(pk == max(pk)); 
+            if 1/f0(pk == max(pk)) > 90
+                disp(Info(no_Group).filelist(no_Case).name)
+            end
+        end
+        
+        mu_0_plot(plot_counter1) = Info(no_Group).elastoviscousNum(no_Case);  % The elasto viscous number.
+        plot_counter1 = plot_counter1 + 1;
+    end
+    
+end
+
+figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
+semilogx(mu_0_plot, Period_plot, 'b*')
+% title('$CoM\ Distribution$','FontSize', 18,'Interpreter', 'latex')
+xlabel('$\mu_0$','FontSize', 18,'Interpreter', 'latex');
+ylabel('$Period$','FontSize', 18,'Interpreter', 'latex');
+% axis equal;
+% xlim([0 2]);  ylim([0 1]);
+% export_fig([savePath{no_Group},filesep,'mostprob_Lee_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
+% savefig([savePath{no_Group},filesep,'mostprob_Lee_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group),'.fig'])
 
 
 %% Function to calculate the mu_0
