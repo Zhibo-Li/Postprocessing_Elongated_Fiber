@@ -203,7 +203,7 @@ for no_Group = 1: NumGroup
     DD = mean(diff(pillar_column));   % the distance betweeen two columns
     pillar_column_add = [pillar_column(1)-DD, pillar_column];
     
-    figure('color', 'w'); set(gcf, 'Position', [100 300 1800 600]);
+    figure('color', 'w'); set(gcf, 'Position', [100 300 1500 300]);
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
     Info(no_Group).filelist = filelist;
     
@@ -371,38 +371,80 @@ FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
 Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
 
+The_GAP = 3e-5; % The c2c distance between pillars.
 plot_counter1 = 1;
-for no_Group = 3
+for no_Group = 1: NumGroup
     
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
     for no_Case = 1:length(filelist)    % choose the cases to draw
-        [pxx,f] = plomb(Info(no_Group).Chi_norm{1, no_Case}, Info(no_Group).SelectCaseNo{1, no_Case},'power');
-%         figure; plot(pxx, f);
-        [pk,f0] = findpeaks(pxx,f,'MinPeakProminence',0.01);
-%         figure; plot(f, pxx, f0, pk,'ro');
-        if numel(f0) > 1 || isempty(f0)
-            Period_plot(plot_counter1) = 0;            
+        [pxx,f] = plomb(Info(no_Group).Chi_norm{1, no_Case}, Info(no_Group).SelectCaseNo{1, no_Case},'power'); % Chi_norm
+        [pxx1,f1] = plomb(Info(no_Group).L_ee_norm{1, no_Case}, Info(no_Group).SelectCaseNo{1, no_Case},'power'); % L_ee_norm
+%         figure; plomb(Info(no_Group).L_ee_norm{1, no_Case}, Info(no_Group).SelectCaseNo{1, no_Case},'power');
+        TMP = diff(Info(no_Group).Chi_norm{1, no_Case});
+        if min(cos(TMP)) < 0.9  % Select the smooth cases.
+            %         figure; plot(Info(no_Group).Chi_norm{1, no_Case});
+            %         figure; plot(cos(TMP)); ylim([0.5 1]);
+            Period_plot(plot_counter1) = 0;
+            Period_plot1(plot_counter1) = 0;
         else
-            Period_plot(plot_counter1) = 1/f0(pk == max(pk)); 
-            if 1/f0(pk == max(pk)) > 90
-                disp(Info(no_Group).filelist(no_Case).name)
+            %         figure; plot(pxx, f);
+            [pk,f0] = findpeaks(pxx,f); % Chi_norm
+            [pk1,f01] = findpeaks(pxx1,f1); % L_ee_norm
+            if  isempty(f0)
+                Period_plot(plot_counter1) = 0;  % Chi_norm
+                Period_plot1(plot_counter1) = 0;   % L_ee_norm
+            else
+% % %                 figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
+% % %                 plot(Info(no_Group).SelectCaseNo{1, no_Case}, Info(no_Group).Chi_norm{1, no_Case});set(gca,'FontSize',12)
+% % %                 xlabel('$Time\ (frame)$','FontSize', 18,'Interpreter', 'latex');
+% % %                 ylabel('${\chi} / {\pi}$','FontSize', 18,'Interpreter', 'latex');
+% % % %                 export_fig([savePath{no_Group},filesep,'Orientation_vs_Position_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
+% % %                 
+% % %                 figure('color', 'w'); set(gcf, 'Position', [100 300 600 500]);
+% % %                 plomb(Info(no_Group).Chi_norm{1, no_Case}, Info(no_Group).SelectCaseNo{1, no_Case},'power');set(gca,'FontSize',12)
+% % % %                 export_fig([savePath{no_Group},filesep,'PSD_vs_Frequency_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
+% % %                 
+% % %                 figure('color', 'w'); set(gcf, 'Position', [100 300 600 500]);
+% % %                 plot(f, pxx, f0, pk,'ro'); set(gca,'FontSize',12)
+% % %                 xlabel('$Frequency\ (Hz)$','FontSize', 18,'Interpreter', 'latex');
+% % %                 ylabel('$Power\ Spectral\ Density\ (PSD)$','FontSize', 18,'Interpreter', 'latex');
+%                 export_fig([savePath{no_Group},filesep,'PSD_vs_Frequency2_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
+
+
+                Period_plot(plot_counter1) = 1/f0(pk == max(pk)) * 0.02 * Init_U{no_Group, 1} / The_GAP; % Chi_norm.    Normalized  by the initial velocity and the c2c distanse between two pillars.
+                Period_plot1(plot_counter1) = 1/f01(pk1 == max(pk1)) * 0.02 * Init_U{no_Group, 1} / The_GAP; % L_ee_norm
+%                 if 1/f0(pk == max(pk)) > 90
+%                     disp(Info(no_Group).filelist(no_Case).name)
+%                 end
             end
         end
-        
         mu_0_plot(plot_counter1) = Info(no_Group).elastoviscousNum(no_Case);  % The elasto viscous number.
         plot_counter1 = plot_counter1 + 1;
     end
     
 end
 
+
+PLOT = [mu_0_plot; Period_plot; Period_plot1];
+PLOT(:,PLOT(2,:)==0)=[];
 figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
-semilogx(mu_0_plot, Period_plot, 'b*')
+semilogx(PLOT(1,:), PLOT(2,:), 'b*', 'MarkerSize', 10); hold on
+% semilogx(PLOT(1,:), PLOT(3,:), 'ro', 'MarkerSize', 10); hold on
+% legend('$\chi$','FontSize', 18,'Interpreter', 'latex');
+
+
+% semilogx(mu_0_plot, Period_plot, 'b*', 'MarkerSize', 10); hold on
+% semilogx(mu_0_plot, Period_plot1, 'ro', 'MarkerSize', 10); hold on
+set(gca,'FontSize',12)
 % title('$CoM\ Distribution$','FontSize', 18,'Interpreter', 'latex')
 xlabel('$\mu_0$','FontSize', 18,'Interpreter', 'latex');
-ylabel('$Period$','FontSize', 18,'Interpreter', 'latex');
+ylabel('$U_0/(\lambda{a} \times f_p)$','FontSize', 18,'Interpreter', 'latex');
 % axis equal;
-% xlim([0 2]);  ylim([0 1]);
-% export_fig([savePath{no_Group},filesep,'mostprob_Lee_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
+% xlim([0 2]);  
+line([100 1e6], [1 1],'Color','red','LineStyle','--')
+% legend('$\chi$','','FontSize', 18,'Interpreter', 'latex');
+% ylim([0.4 1.4]);
+% export_fig([savePath{no_Group},filesep,'Orientation_periodicity_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
 % savefig([savePath{no_Group},filesep,'mostprob_Lee_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group),'.fig'])
 
 
