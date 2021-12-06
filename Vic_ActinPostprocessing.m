@@ -25,7 +25,7 @@ for no_Group = 1:5%1: NumGroup
         
         sorted_lengths = sort(xy.arclen_spl(Good_case));  % Good_case: index of the 'good' cases
 %         contour_length = mean(sorted_lengths(round(numel(sorted_lengths)/20):end)) * Obj_Mag{no_Group};  % Select the 10% lengest filaments and averaged as the contour length. (UNIT: um)
-        contour_length = max(sorted_lengths) * Obj_Mag{no_Group};  % Select the 10% lengest filaments and averaged as the contour length. (UNIT: um)
+        contour_length = max(sorted_lengths) * Obj_Mag{no_Group};  % Select the 10% lengest filaments and averaged as the contour length (UNIT: um).
         Info(no_Group).contour_length(no_Case) = contour_length; 
         Info(no_Group).elastoviscousNum(no_Case) = Get_elastoviscousNum(contour_length*1e-6, Init_U{no_Group});  % Calculate the 'global' elastoviscous number for one trajectory.  (*1e-6: convert the unit to m)
         
@@ -33,6 +33,21 @@ for no_Group = 1:5%1: NumGroup
         centroidxy = centroidxy(:, Good_case); 
 %         centroidxy = centroidxy + lzero;  % The real CoM in the image!! BUT cannot add lzero here because following 'centroidxy_k' need it (NOT in IMAGE)!!!     
 %         Amp(no_Case) = max(centroidxy(2,:)) -  min(centroidxy(2,:));  % This is to calculate the amplitude of the trajectory.
+
+
+        centroidcom = complex(centroidxy(1,:), centroidxy(2,:)); % This is added on 03/12/2021 for calculating the minimum distance between CoM and pillar centres.
+        centroidcom_shift = complex(lzero, lzero) + centroidcom;  % shift the coordinate  % Should notice here that need to shift both along x and y direction.
+        StartPoint = centroidcom_shift(1);
+        load(PAsPath{no_Group}); % Load the pillar array information.
+        [~,idx] = sort(centers(:,1));
+        sortedcenters = centers(idx,:);  % Sort the centres
+        sortedcenters(:,2) = 2048 - sortedcenters(:,2); % Flip the coordinate because these are gotten from image coordinate system.
+        sortedcenterscom = complex(sortedcenters(:,1), sortedcenters(:, 2));
+        DistancesC2C_xy = StartPoint - sortedcenterscom; % The distances between the centers of the pillars and the COM of the filaments.
+        [Ra,Ind] = min(DistancesC2C_xy);  % Ra: the minimum distance to one of the pillars (P), including x & y directions.     Ind: the index of the pillar (P).      Index of 'Ind': the index of the filaments.
+        Info(no_Group).mini_Dis(no_Case) = abs(Ra) * Obj_Mag{no_Group};  % mini_Dis is the minimum distance between CoM and pillar centres (UNIT: um).
+        
+
         
         centroidxy_plot_ind = 1;  % Plot -- x axis.
         count = 1;  % for plot
@@ -201,7 +216,7 @@ FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
 Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
 
-% figure('color', 'w'); set(gcf, 'Position', [100 300 1500 300]);
+figure('color', 'w'); set(gcf, 'Position', [100 300 1500 600]);
 for no_Group = 1:3%NumGroup
     
     % This is to calculate the average positions of the pillars.
@@ -231,7 +246,7 @@ for no_Group = 1:3%NumGroup
 %             yyaxis left
 % %             plot((Info(no_Group).centroidxy_plotX{1,no_Case}(tmp_ind)-pillar_column_add(kk))/mean(diff(pillar_column_add))/2, Info(no_Group).aniso{1,no_Case}(tmp_ind),'marker','*','LineStyle', 'none'); hold on    % every two columns
 %             plot((Info(no_Group).centroidxy_plotX{1,no_Case}(tmp_ind)-pillar_column_add(kk))/mean(diff(pillar_column_add)), Info(no_Group).aniso{1,no_Case}(tmp_ind),'marker','*','LineStyle', 'none'); hold on  % every column
-%             xlabel('$Position$','FontSize', 14,'Interpreter', 'latex')
+%             xlabel('$Normalized\ Position\ during\ One\ Period$','FontSize', 14,'Interpreter', 'latex')
 %             ylabel('$\omega = 1 - 4{\lambda}_1{\lambda}_2/({\lambda}_1+{\lambda}_2)^2$','FontSize', 14,'Interpreter', 'latex');
             
 %             yyaxis left
@@ -258,12 +273,21 @@ for no_Group = 1:3%NumGroup
         Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case} = sortrows(FOO')';  % Save the sorted 'position', 'Lee', 'Chi' for each case into Info.
 
         fit_gauss = fit(Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(1,:).',Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(3,:).','gauss1');
-%         figure,plot(fit_gauss,Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(1,:),Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(3,:))
-        Info(no_Group).fit_centroid(1,no_Case) = fit_gauss.b1;
+
+%         plot(fit_gauss,Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(1,:),Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(3,:)); %hold on; legend off;
+%         set(gca,'FontSize',24);
+%         xlabel('$Normalized\ Position\ during\ Half\ Period$','FontSize', 28,'Interpreter', 'latex');
+%         ylabel('${\chi} / {\pi}$','FontSize', 28,'Interpreter', 'latex');
+%         title('$Deformation\ and\ Orientation\ in\ Half\ Period\ (one\ case)$','FontSize', 32,'Interpreter', 'latex');  % Draw the fitting for one case.
+
+        Info(no_Group).fit_centroid(1,no_Case) = fit_gauss.b1;  % the centroid (location)
+        Info(no_Group).fit_amplitude(1,no_Case) = fit_gauss.a1;  %  the amplitude  
+        Info(no_Group).fit_shape(1,no_Case) = fit_gauss.c1;  % related to the peak width
         Con = confint(fit_gauss,0.95); Con_b1 = Con(: ,2);
         Info(no_Group).fit_centroid_confint(1,no_Case) = Con_b1(2)-Con_b1(1);
 
-        title('$Deformation\ and\ Orientation\ of\ the\ Filaments\ in\ One\ Period\ (all\ cases)$','FontSize', 18,'Interpreter', 'latex')
+
+%         title('$Deformation\ and\ Orientation\ of\ the\ Filaments\ in\ One\ Period\ (all\ cases)$','FontSize', 18,'Interpreter', 'latex')
         
 %         export_fig([savePath{no_Group},filesep,'Deformation_of_the_Filaments_every_column_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
 %         savefig([savePath{no_Group},filesep,'Deformation_of_the_Filaments_every_column_',datestr(ExpDate{no_Group}),'-',num2str(no_Group),'.fig'
