@@ -13,7 +13,7 @@ Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
  
 
-for no_Group = 1:5%1: NumGroup 
+for no_Group = 7:9%1: NumGroup 
     
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
     Info(no_Group).filelist = filelist;
@@ -24,8 +24,8 @@ for no_Group = 1:5%1: NumGroup
         lzero = max(lobject,ceil(5*lnoise));   % This is so important!!!!!!!!!!! Came from when we do the filaments detection.
         
         sorted_lengths = sort(xy.arclen_spl(Good_case));  % Good_case: index of the 'good' cases
-%         contour_length = mean(sorted_lengths(round(numel(sorted_lengths)/20):end)) * Obj_Mag{no_Group};  % Select the 10% lengest filaments and averaged as the contour length. (UNIT: um)
-        contour_length = max(sorted_lengths) * Obj_Mag{no_Group};  % Select the 10% lengest filaments and averaged as the contour length (UNIT: um).
+%         contour_length = mean(sorted_lengths(round(numel(sorted_lengths)/10):end)) * Obj_Mag{no_Group};  % Select the 10% lengest filaments and averaged as the contour length. (UNIT: um)
+        contour_length = max(sorted_lengths) * Obj_Mag{no_Group};  % Select the lengest filaments as the contour length (UNIT: um).
         Info(no_Group).contour_length(no_Case) = contour_length; 
         Info(no_Group).elastoviscousNum(no_Case) = Get_elastoviscousNum(contour_length*1e-6, Init_U{no_Group});  % Calculate the 'global' elastoviscous number for one trajectory.  (*1e-6: convert the unit to m)
         
@@ -61,7 +61,8 @@ for no_Group = 1:5%1: NumGroup
                     centroidxy_k = centroidxy(:, no_Goodcas);
                     
                     L_ee = sqrt((crd(1,1)-crd(end,1))^2 + (crd(1,2)-crd(end,2))^2) * Obj_Mag{no_Group};  % Calculate the L_ee. (end-to-end distance)
-                    Info(no_Group).L_ee_norm{no_Case}(count) = L_ee / contour_length;  % Normalized by the contour length calculated above.  NOTE: Lee/L0 might obviously larger than 1.
+                    Info(no_Group).L_ee_norm{no_Case}(count) = min(L_ee / contour_length, 1);  % Normalized by the contour length calculated above. 
+                    % NOTE: if Lee/L0 is larger than 1 then Lee/L0 = 1. 
                     
                     Gyr = 1/size(crd,1) * [sum((crd(:, 1)-centroidxy_k(1)).^2),  sum((crd(:, 1)-centroidxy_k(1)) .* (crd(:, 2)-centroidxy_k(2)));
                         sum((crd(:, 2)-centroidxy_k(2)) .* (crd(:, 1)-centroidxy_k(1))), sum((crd(:, 2)-centroidxy_k(2)).^2)];
@@ -88,7 +89,8 @@ for no_Group = 1:5%1: NumGroup
                 centroidxy_k = centroidxy(:, no_Goodcas);
                 
                 L_ee = sqrt((crd(1,1)-crd(end,1))^2 + (crd(1,2)-crd(end,2))^2) * Obj_Mag{no_Group};  % Calculate the L_ee. (end-to-end distance)
-                Info(no_Group).L_ee_norm{no_Case}(count) = L_ee / contour_length;  % Normalized by the contour length calculated above.  NOTE: Lee/L0 might obviously larger than 1.
+                Info(no_Group).L_ee_norm{no_Case}(count) = min(L_ee / contour_length, 1);  % Normalized by the contour length calculated above.  
+                % NOTE: if Lee/L0 is larger than 1 then Lee/L0 = 1. 
                 
                 Gyr = 1/size(crd,1) * [sum((crd(:, 1)-centroidxy_k(1)).^2),  sum((crd(:, 1)-centroidxy_k(1)) .* (crd(:, 2)-centroidxy_k(2)));
                     sum((crd(:, 2)-centroidxy_k(2)) .* (crd(:, 1)-centroidxy_k(1))), sum((crd(:, 2)-centroidxy_k(2)).^2)];
@@ -217,7 +219,7 @@ Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
 
 figure('color', 'w'); set(gcf, 'Position', [100 300 1500 600]);
-for no_Group = 1:3%NumGroup
+for no_Group = 7:9%NumGroup
     
     % This is to calculate the average positions of the pillars.
     [~, pillar_column, ~] = Get_PAsInfo(PAsPath{no_Group});
@@ -239,7 +241,7 @@ for no_Group = 1:3%NumGroup
 %         if minRa(no_Case)<11.4050; continue; end    % The 'minRa' comes from the code 'Vic_Compare_Streamlines_to_Simulation.m'. To be continued...
         
 %         for kk = 1:2:numel(pillar_column_add)-2  % every two columns
-        for kk = 2:2:numel(pillar_column_add)-2  % every column
+        for kk = 1:numel(pillar_column_add)-1  % every column
 %             tmp_ind = Info(no_Group).centroidxy_plotX{1,no_Case} >= pillar_column_add(kk) & Info(no_Group).centroidxy_plotX{1,no_Case} <= pillar_column_add(kk+2);  % every two columns
             tmp_ind = Info(no_Group).centroidxy_plotX{1,no_Case} >= pillar_column_add(kk) & Info(no_Group).centroidxy_plotX{1,no_Case} <= pillar_column_add(kk+1);  % every column
             
@@ -249,18 +251,18 @@ for no_Group = 1:3%NumGroup
 %             xlabel('$Normalized\ Position\ during\ One\ Period$','FontSize', 14,'Interpreter', 'latex')
 %             ylabel('$\omega = 1 - 4{\lambda}_1{\lambda}_2/({\lambda}_1+{\lambda}_2)^2$','FontSize', 14,'Interpreter', 'latex');
             
-%             yyaxis left
+            yyaxis left
 %             plot((Info(no_Group).centroidxy_plotX{1,no_Case}(tmp_ind)-pillar_column_add(kk))/mean(diff(pillar_column_add))/2, Info(no_Group).L_ee_norm{1,no_Case}(tmp_ind),'marker','*','LineStyle', 'none'); hold on    % every two columns
-% %             plot((Info(no_Group).centroidxy_plotX{1,no_Case}(tmp_ind)-pillar_column_add(kk))/mean(diff(pillar_column_add)), Info(no_Group).L_ee_norm{1,no_Case}(tmp_ind),'marker','*','LineStyle', 'none'); hold on  % every column
-%             xlabel('$Normalized\ Position\ during\ One\ Period$','FontSize', 14,'Interpreter', 'latex') 
-%             ylabel('$L_{ee}/L_0$','FontSize', 14,'Interpreter', 'latex');
+            plot((Info(no_Group).centroidxy_plotX{1,no_Case}(tmp_ind)-pillar_column_add(kk))/mean(diff(pillar_column_add)), Info(no_Group).L_ee_norm{1,no_Case}(tmp_ind),'marker','*','LineStyle', 'none'); hold on  % every column
+            xlabel('$Normalized\ Position\ during\ One\ Period$','FontSize', 14,'Interpreter', 'latex') 
+            ylabel('$L_{ee}/L_0$','FontSize', 14,'Interpreter', 'latex');
             
-%             yyaxis right
-% %             plot((Info(no_Group).centroidxy_plotX{1,no_Case}(tmp_ind)-pillar_column_add(kk))/mean(diff(pillar_column_add))/2, Info(no_Group).Chi_norm{1,no_Case}(tmp_ind),'marker','o','LineStyle', 'none');hold on    % every two columns
+            yyaxis right
+%             plot((Info(no_Group).centroidxy_plotX{1,no_Case}(tmp_ind)-pillar_column_add(kk))/mean(diff(pillar_column_add))/2, Info(no_Group).Chi_norm{1,no_Case}(tmp_ind),'marker','o','LineStyle', 'none');hold on    % every two columns
 %             plot((Info(no_Group).centroidxy_plotX{1,no_Case}(tmp_ind)-pillar_column_add(kk))/mean(diff(pillar_column_add)), Info(no_Group).Chi_norm{1,no_Case}(tmp_ind),'marker','o','LineStyle', 'none');hold on  % every column
-%             plot((Info(no_Group).centroidxy_plotX{1,no_Case}(tmp_ind)-pillar_column_add(kk))/mean(diff(pillar_column_add)), abs(Info(no_Group).Chi_norm{1,no_Case}(tmp_ind)),'marker','o','LineStyle', 'none');hold on  % every column & absolute value
-%             xlim([0 1]); ylim([0 0.5]);
-%             ylabel('${\chi} / {\pi}$','FontSize', 14,'Interpreter', 'latex');
+            plot((Info(no_Group).centroidxy_plotX{1,no_Case}(tmp_ind)-pillar_column_add(kk))/mean(diff(pillar_column_add)), abs(Info(no_Group).Chi_norm{1,no_Case}(tmp_ind)),'marker','o','LineStyle', 'none');hold on  % every column & absolute value
+            xlim([0 1]); ylim([0 0.5]);
+            ylabel('${\chi} / {\pi}$','FontSize', 14,'Interpreter', 'latex');
 
             % The following is to fit the data (Lee and Chi) in one/half
             % cell and check the reason for the 'streaks' occurring in the plot.
@@ -269,10 +271,10 @@ for no_Group = 1:3%NumGroup
             Cell_Chi_Case = [abs(Info(no_Group).Chi_norm{1,no_Case}(tmp_ind)), Cell_Chi_Case];    
 
         end
-        FOO = [Cell_Position_Case; Cell_Lee_Case; Cell_Chi_Case];
-        Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case} = sortrows(FOO')';  % Save the sorted 'position', 'Lee', 'Chi' for each case into Info.
-
-        fit_gauss = fit(Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(1,:).',Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(3,:).','gauss1');
+%         FOO = [Cell_Position_Case; Cell_Lee_Case; Cell_Chi_Case];
+%         Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case} = sortrows(FOO')';  % Save the sorted 'position', 'Lee', 'Chi' for each case into Info.
+% 
+%         fit_gauss = fit(Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(1,:).',Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(3,:).','gauss1');
 
 %         plot(fit_gauss,Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(1,:),Info(no_Group).Cell_Position_Lee_Chi_Case{1,no_Case}(3,:)); %hold on; legend off;
 %         set(gca,'FontSize',24);
@@ -280,11 +282,11 @@ for no_Group = 1:3%NumGroup
 %         ylabel('${\chi} / {\pi}$','FontSize', 28,'Interpreter', 'latex');
 %         title('$Deformation\ and\ Orientation\ in\ Half\ Period\ (one\ case)$','FontSize', 32,'Interpreter', 'latex');  % Draw the fitting for one case.
 
-        Info(no_Group).fit_centroid(1,no_Case) = fit_gauss.b1;  % the centroid (location)
-        Info(no_Group).fit_amplitude(1,no_Case) = fit_gauss.a1;  %  the amplitude  
-        Info(no_Group).fit_shape(1,no_Case) = fit_gauss.c1;  % related to the peak width
-        Con = confint(fit_gauss,0.95); Con_b1 = Con(: ,2);
-        Info(no_Group).fit_centroid_confint(1,no_Case) = Con_b1(2)-Con_b1(1);
+%         Info(no_Group).fit_centroid(1,no_Case) = fit_gauss.b1;  % the centroid (location)
+%         Info(no_Group).fit_amplitude(1,no_Case) = fit_gauss.a1;  %  the amplitude  
+%         Info(no_Group).fit_shape(1,no_Case) = fit_gauss.c1;  % related to the peak width
+%         Con = confint(fit_gauss,0.95); Con_b1 = Con(: ,2);
+%         Info(no_Group).fit_centroid_confint(1,no_Case) = Con_b1(2)-Con_b1(1);
 
 
 %         title('$Deformation\ and\ Orientation\ of\ the\ Filaments\ in\ One\ Period\ (all\ cases)$','FontSize', 18,'Interpreter', 'latex')
@@ -293,7 +295,7 @@ for no_Group = 1:3%NumGroup
 %         savefig([savePath{no_Group},filesep,'Deformation_of_the_Filaments_every_column_',datestr(ExpDate{no_Group}),'-',num2str(no_Group),'.fig'
     end    
 end
-clear FOO
+% clear FOO
 
 
 %% Plot elastoviscousNum vs. L_ee_morm
