@@ -17,11 +17,7 @@ Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
  
 
-<<<<<<< HEAD
-for no_Group = 7:9%1: NumGroup 
-=======
 for no_Group = 2:3%1: NumGroup 
->>>>>>> Zhibo
     
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
     Info(no_Group).filelist = filelist;
@@ -226,11 +222,7 @@ FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
 Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
 
-<<<<<<< HEAD
-figure('color', 'w'); set(gcf, 'Position', [100 300 1500 600]);
-=======
 figure('color', 'w'); set(gcf, 'Position', [100 300 1500 300]);
->>>>>>> Zhibo
 for no_Group = 7:9%NumGroup
     
     % This is to calculate the average positions of the pillars.
