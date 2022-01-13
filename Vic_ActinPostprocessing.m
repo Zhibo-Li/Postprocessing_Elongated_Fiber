@@ -1,5 +1,9 @@
+% Postprocess code for the actin filaments in porous media (all in one).
+
+%% Get the information, like contour length and elastoviscous number, from the reconstructed shape of the filaments.
+
 clear; clc; close all;
-xlsfile = readcell('ForActinPostprocessing.xlsx','NumHeaderLines',1); % This is the file contains all the information about the later processing.
+xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLines',1); % This is the file that contains all the information about the later processing (in sheet 1).
 
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
 ExpDate = xlsfile(:, 1);  % The experiment date.
@@ -13,7 +17,7 @@ Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
  
 
-for no_Group = 7:9%1: NumGroup 
+for no_Group = 2:3%1: NumGroup 
     
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
     Info(no_Group).filelist = filelist;
@@ -218,7 +222,7 @@ FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
 Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
 
-figure('color', 'w'); set(gcf, 'Position', [100 300 1500 600]);
+figure('color', 'w'); set(gcf, 'Position', [100 300 1500 300]);
 for no_Group = 7:9%NumGroup
     
     % This is to calculate the average positions of the pillars.
