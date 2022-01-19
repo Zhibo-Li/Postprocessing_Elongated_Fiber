@@ -31,7 +31,7 @@ for no_Group = 2:3%1: NumGroup
 %         contour_length = mean(sorted_lengths(round(numel(sorted_lengths)/10):end)) * Obj_Mag{no_Group};  % Select the 10% lengest filaments and averaged as the contour length. (UNIT: um)
         contour_length = max(sorted_lengths) * Obj_Mag{no_Group};  % Select the lengest filaments as the contour length (UNIT: um).
         Info(no_Group).contour_length(no_Case) = contour_length; 
-        Info(no_Group).elastoviscousNum(no_Case) = Get_elastoviscousNum(contour_length*1e-6, Init_U{no_Group});  % Calculate the 'global' elastoviscous number for one trajectory.  (*1e-6: convert the unit to m)
+        Info(no_Group).elastoviscousNum(no_Case) = VicFc_Get_elastoviscousNum(contour_length*1e-6, Init_U{no_Group});  % Calculate the 'global' elastoviscous number for one trajectory.  (*1e-6: convert the unit to m)
         
         centroidxy = reshape(cell2mat(xy.centroid),2,numel(xy.centroid));
         centroidxy = centroidxy(:, Good_case); 
@@ -171,7 +171,7 @@ for no_Group = 1: NumGroup
     line([0,2048],[0,0],'LineStyle','--','Color',[0.8500 0.3250 0.0980],'LineWidth',0.2);  
     
     % This is to calculate the average positions of the pillars.
-    [ave_PA_Ra, pillar_column, ~] = Get_PAsInfo(PAsPath{no_Group});
+    [ave_PA_Ra, pillar_column, ~] = VicFc_Get_PAsInfo(PAsPath{no_Group});
 
     % The centers of the pillars
     for n_centers = 1:numel(pillar_column)
@@ -226,7 +226,7 @@ figure('color', 'w'); set(gcf, 'Position', [100 300 1500 300]);
 for no_Group = 7:9%NumGroup
     
     % This is to calculate the average positions of the pillars.
-    [~, pillar_column, ~] = Get_PAsInfo(PAsPath{no_Group});
+    [~, pillar_column, ~] = VicFc_Get_PAsInfo(PAsPath{no_Group});
     DD = mean(diff(pillar_column));   % the distance betweeen two columns
     pillar_column_add = [pillar_column(1)-DD, pillar_column];
     
@@ -376,7 +376,7 @@ for no_Group = 1: NumGroup
     
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
     % This is to calculate the average positions of the pillars.
-    [ave_PA_Ra, pillar_column, pillar_row] = Get_PAsInfo(PAsPath{no_Group});
+    [ave_PA_Ra, pillar_column, pillar_row] = VicFc_Get_PAsInfo(PAsPath{no_Group});
     DD = mean(diff(pillar_column));   % the distance betweeen two columns
     pillar_column_add = [pillar_column(1)-DD, pillar_column];
     Y_shift =  2048-pillar_row(end);   % shift the plot up or down to make it in a 'cell'. Need to be flipped and 2048 is the size of the image.
@@ -505,7 +505,7 @@ line([100 1e6], [1 1],'Color','red','LineStyle','--')
 
 
 %% Function to calculate the mu_0
-function mu_0 = Get_elastoviscousNum(L, u_0)
+function mu_0 = VicFc_Get_elastoviscousNum(L, u_0)
 % This is to calculate the elasto-viscous number
 
 B = 6.9e-26;  % Bending rigidity
@@ -520,7 +520,7 @@ end
 
 
 %% Function for pillar array information.
-function [PA_Ra, PA_cl, PA_rw] = Get_PAsInfo(PAs)
+function [PA_Ra, PA_cl, PA_rw] = VicFc_Get_PAsInfo(PAs)
 % To extract the pillar columns and rows.
 % PAs: the path of the PAs results got from the 'Circle Finder' APP.
 % Including variables 'centers', 'circleMask', 'metric', and 'radii'.
