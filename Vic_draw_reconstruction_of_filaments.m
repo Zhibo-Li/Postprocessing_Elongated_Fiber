@@ -7,13 +7,13 @@
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20211029-Actin\AfterAveBGR\';
-tifname='M63_Phi20_S15_0.83nM_1nL_Expo20ms_6_no64-no158_AABGR.tif';
+basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220104-Actin\AfterAveBGR\';
+tifname='M63_Phi20_S15_0.5nM_1nL_Expo20ms_15_no11-no105_AABGR.tif';
 
 
 % The .mat file where stores your results.
-loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20211029-Actin\results\',...
-    'trajectory_M63_Phi20_S15_0.83nM_1nL_Expo20ms_6_no64-no158_AABGR_batch1.mat'];
+loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220104-Actin\results\',...
+    'trajectory_M63_Phi20_S15_0.5nM_1nL_Expo20ms_15_no11-no105_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
@@ -156,13 +156,13 @@ save(loadfile,'thickness','structsensitivity','lnoise','lobject','threshold','ds
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20211029-Actin\AfterAveBGR\';
-tifname='M63_Phi20_S15_0.83nM_1nL_Expo20ms_6_no64-no158_AABGR.tif';
+basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220104-Actin\AfterAveBGR\';
+tifname='M63_Phi20_S15_0.5nM_1nL_Expo20ms_15_no11-no105_AABGR.tif';
 
 
 % The .mat file where stores your results.
-loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20211029-Actin\results\Shapes_1\',...
-    'trajectory_M63_Phi20_S15_0.83nM_1nL_Expo20ms_6_no64-no158_AABGR_batch1.mat'];
+loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220104-Actin\results\Shapes_1\',...
+    'trajectory_M63_Phi20_S15_0.5nM_1nL_Expo20ms_15_no11-no105_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;

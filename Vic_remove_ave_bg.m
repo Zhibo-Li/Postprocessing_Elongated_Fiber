@@ -5,7 +5,7 @@
 % inputs should be multitif file @ 2022-01-14
 
 clear; clc; close all;
-pathname = 'G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20211029-Actin\'; % the path that contains the *.tif files to be processed
+pathname = 'G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20210818-Actin\'; % the path that contains the *.tif files to be processed
 filelist = dir(fullfile(pathname,'*.tif'));
 
 for ii = 1:length(filelist)
