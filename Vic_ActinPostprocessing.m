@@ -17,8 +17,9 @@ Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
  
 
-for no_Group = 2:3%1: NumGroup 
+for no_Group = 1: 3 
     
+    Info(no_Group).ExpDate = ExpDate{no_Group, 1};  % list of the experiment date.
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
     Info(no_Group).filelist = filelist;
     
@@ -429,7 +430,7 @@ Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
 
 The_GAP = 3e-5; % The c2c distance between pillars.
 plot_counter1 = 1;
-for no_Group = 6%1: NumGroup
+for no_Group = 9%1: NumGroup
     
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
     for no_Case = 1:length(filelist)    % choose the cases to draw
@@ -485,7 +486,7 @@ PLOT = [mu_0_plot; Period_plot; Period_plot1];
 PLOT(:,PLOT(2,:)==0)=[];
 figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
 semilogx(PLOT(1,:), PLOT(2,:), 'b*', 'MarkerSize', 10); hold on
-% semilogx(PLOT(1,:), PLOT(3,:), 'ro', 'MarkerSize', 10); hold on
+semilogx(PLOT(1,:), PLOT(3,:), 'ro', 'MarkerSize', 10); hold on
 % legend('$\chi$','FontSize', 18,'Interpreter', 'latex');
 
 
