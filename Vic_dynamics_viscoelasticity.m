@@ -10,15 +10,15 @@ ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 savePath = xlsfile(:, 3);  % Saving path.
 
-for no_Group = 1:3
-    Allinfo = readtable(storePath{no_Group},'Sheet','Sheet2');  % read the 
+for no_Group = 1: NumGroup
+    Allinfo = readtable(storePath{no_Group},'Sheet','Sheet2','VariableNamingRule','preserve');  % read the 
     for ii = 5:9 % the column in the sheet
         Allinfo(:, ii) = array2table(table2array(Allinfo(:, ii))+(ii-4));
     end
     % This loop is to assign numbers to different morphologies, e.g.,
     % U-shape=1, S-shape=2, W-shape=3, Helical=4, Folded=5, Coiled=6 if they are true
     % U-shape=0, S-shape=1, W-shape=2, Helical=3, Folded=4, Coiled=5 if they are false.
-    Alldata = table2array(Allinfo); % transfer to array format.
+    Alldata = table2array(Allinfo(:, 1:11)); % transfer to array format (keep only useful data).
     tmp1 = find(isnan(Alldata(:, 10)));
     Alldata(tmp1', :)  = [];  % to delete the rows (or cases) which don't have the information of the contour length and so on.
 
