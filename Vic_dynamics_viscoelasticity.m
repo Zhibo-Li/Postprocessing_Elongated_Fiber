@@ -73,8 +73,8 @@ names = {'U-Shape'; 'S-Shape'; 'W-Shape'; 'Helical'; 'Folded'; 'Coiled'};
 set(gca,'ytick',[1:6],'yticklabel',names,'FontSize',10);
 xlabel('$\bar{\mu}$','FontSize', 15,'Interpreter', 'latex');
 ylabel('$Dynamic\ Modes$','FontSize', 14,'Interpreter', 'latex');
-legend(h_dyn, '$Square\ Phi20\ Gap10$' , '$Square\ Phi20\ Gap5$',...
-    '$Rhombic\ Phi20\ Gap10$', '$Rhombic\ Phi20\ Gap15$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
+legend(h_dyn, '$Square\ \lambda/a=1.88$' , '$Square\ \lambda/a=1.56$',...
+    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
 % f=gcf;
 % exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\dynamicmodes_elastoviscousnumber.png','Resolution',1000)
 
@@ -94,8 +94,8 @@ names = {'Global buckling'; 'Partial buckling'};
 set(gca,'ytick',[1:2],'yticklabel',names,'FontSize',10); ytickangle(90)
 xlabel('$\bar{\mu}$','FontSize', 15,'Interpreter', 'latex');
 ylabel('$Dynamic\ Modes$','FontSize', 14,'Interpreter', 'latex');
-legend(h_buk, '$Square\ Phi20\ Gap10$' , '$Square\ Phi20\ Gap5$',...
-    '$Rhombic\ Phi20\ Gap10$', '$Rhombic\ Phi20\ Gap15$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
+legend(h_buk, '$Square\ \lambda/a=1.88$' , '$Square\ \lambda/a=1.56$',...
+    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
 % f=gcf;
 % exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\bucklingtypes_elastoviscousnumber.png','Resolution',1000)
 
@@ -119,8 +119,10 @@ names = {'U-Shape'; 'S-Shape'; 'W-Shape'; 'Helical'; 'Folded'; 'Coiled'};
 set(gca,'ytick',[1:6],'yticklabel',names,'FontSize',10);
 xlabel('$\bar{\mu}$','FontSize', 15,'Interpreter', 'latex');
 ylabel('$Dynamic\ Modes$','FontSize', 14,'Interpreter', 'latex');
-legend(h_dyn_avg, '$Square\ Phi20\ Gap10$' , '$Square\ Phi20\ Gap5$',...
-    '$Rhombic\ Phi20\ Gap10$', '$Rhombic\ Phi20\ Gap15$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
+legend(h_dyn_avg, '$Square\ \lambda/a=1.88$' , '$Square\ \lambda/a=1.56$',...
+    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
+% f=gcf;
+% exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\dynamicmodes_AVG-elastoviscousnumber.png','Resolution',1000)
 
 % buckling types vs. elastoviscous numner 
 figure('color', 'w'); set(gcf, 'Position', [100 300 800 400]);
@@ -140,6 +142,7 @@ names = {'Global buckling'; 'Partial buckling'};
 set(gca,'ytick',[1:2],'yticklabel',names,'FontSize',10);
 xlabel('$\bar{\mu}$','FontSize', 15,'Interpreter', 'latex');
 ylabel('$Dynamic\ Modes$','FontSize', 14,'Interpreter', 'latex');
-legend(h_buk_avg, '$Square\ Phi20\ Gap10$' , '$Square\ Phi20\ Gap5$',...
-    '$Rhombic\ Phi20\ Gap10$', '$Rhombic\ Phi20\ Gap15$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
-
+legend(h_buk_avg, '$Square\ \lambda/a=1.88$' , '$Square\ \lambda/a=1.56$',...
+    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
+% f=gcf;
+% exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\bucklingtypes_AVG-elastoviscousnumber.png','Resolution',1000)
