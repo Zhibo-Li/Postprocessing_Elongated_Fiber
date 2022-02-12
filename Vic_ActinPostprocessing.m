@@ -17,7 +17,7 @@ Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
  
 
-for no_Group = 1: 3 
+for no_Group = 1: NumGroup 
     
     Info(no_Group).ExpDate = ExpDate{no_Group, 1};  % list of the experiment date.
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
@@ -224,7 +224,7 @@ Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
 
 figure('color', 'w'); set(gcf, 'Position', [100 300 1500 300]);
-for no_Group = 7:9%NumGroup
+for no_Group = 7:10%NumGroup
     
     % This is to calculate the average positions of the pillars.
     [~, pillar_column, ~] = VicFc_Get_PAsInfo(PAsPath{no_Group});
@@ -301,7 +301,8 @@ for no_Group = 7:9%NumGroup
     end    
 end
 % clear FOO
-
+f=gcf;
+exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\Deformation_of_the_Filaments_in_One_Period_20211029-20220104.png','Resolution',500)
 
 %% Plot elastoviscousNum vs. L_ee_morm
 % This part is used to polt the elasto-viscous number /mu vs. end-to-end
