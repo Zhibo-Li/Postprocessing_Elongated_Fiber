@@ -139,7 +139,7 @@ for PAtypeloop = 1:max(PAtype_labels)  % Loop to draw according to the PA type l
 end
 ylim([0 3]);
 names = {'Global buckling'; 'Partial buckling'};
-set(gca,'ytick',[1:2],'yticklabel',names,'FontSize',10);
+set(gca,'ytick',[1:2],'yticklabel',names,'FontSize',10);ytickangle(90)
 xlabel('$\bar{\mu}$','FontSize', 15,'Interpreter', 'latex');
 ylabel('$Dynamic\ Modes$','FontSize', 14,'Interpreter', 'latex');
 legend(h_buk_avg, '$Square\ \lambda/a=1.88$' , '$Square\ \lambda/a=1.56$',...
