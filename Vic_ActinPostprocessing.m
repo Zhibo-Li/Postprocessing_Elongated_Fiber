@@ -26,7 +26,7 @@ for no_Group = 1: NumGroup
     Info(no_Group).filelist = filelist;
     
     for no_Case = 1:length(filelist)
-        
+
         load([storePath{no_Group}, filesep , filelist(no_Case).name])
         lzero = max(lobject,ceil(5*lnoise));   % This is so important!!!!!!!!!!! Came from when we do the filaments detection.
         
@@ -55,7 +55,6 @@ for no_Group = 1: NumGroup
         Info(no_Group).mini_Dis(no_Case) = abs(Ra) * Obj_Mag{no_Group};  % mini_Dis is the minimum distance between CoM and pillar centres (UNIT: um).
         
 
-        
         centroidxy_plot_ind = 1;  % Plot -- x axis.
         count = 1;  % for plot
         for no_Goodcas = 1:size(Good_case,2)
@@ -124,6 +123,30 @@ for no_Group = 1: NumGroup
         
     end
     
+end
+
+
+
+%% Write the contour length and the elastoviscous numbers into the excel. 
+% The excels are stored in ...Processing\EXP DATE\results normally.
+% This part should run after the above 'Get the information' part.
+
+for no_Group = 5: NumGroup
+
+    disp(['You are processing ', datestr(Info(no_Group).ExpDate), ' data!']);
+    [filename, pathname] = uigetfile('*.xlsx', 'Please choose the excel accordingly and carefully!!');
+    xlsfile = readcell([pathname, filename],'Sheet','Sheet2','NumHeaderLines',1);     % The files. (e.g. Classification manually 20220104-Actin.xlsx)
+    thefiles = xlsfile(:, 14);
+
+    filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
+    for no_Case = 1:length(filelist)
+        name = Info(no_Group).filelist(no_Case).name(12:end-11);
+        Ind = find(contains(thefiles,name));  % Search for text that has 'name' as part of the text.
+
+        Value = [Info(no_Group).contour_length(no_Case), Info(no_Group).elastoviscousNum(no_Case)];  % The contour length and the elastoviscous numbers.
+        Loc = ['J', num2str(Ind+1), ':K', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+        writematrix(Value,[pathname, filename],'Sheet','Sheet2','Range', Loc);  % Write the value inti the excel.
+    end
 end
 
 
@@ -309,6 +332,8 @@ end
 % clear FOO
 f=gcf;
 exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\Deformation_of_the_Filaments_in_One_Period_20211029-20220104.png','Resolution',500)
+
+
 
 %% Plot elastoviscousNum vs. L_ee_morm
 % This part is used to polt the elasto-viscous number /mu vs. end-to-end
