@@ -15,6 +15,8 @@ ChannelW = xlsfile(:, 6);  % Channel width (um)
 FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
 Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
+C2C_dis = xlsfile(:, 12); % Center-to-center distance (um)
+Pillar_a = xlsfile(:, 13); % Pillar diameter (um)
  
 
 for no_Group = 1: NumGroup 
@@ -32,7 +34,7 @@ for no_Group = 1: NumGroup
 %         contour_length = mean(sorted_lengths(round(numel(sorted_lengths)/10):end)) * Obj_Mag{no_Group};  % Select the 10% lengest filaments and averaged as the contour length. (UNIT: um)
         contour_length = max(sorted_lengths) * Obj_Mag{no_Group};  % Select the lengest filaments as the contour length (UNIT: um).
         Info(no_Group).contour_length(no_Case) = contour_length; 
-        Info(no_Group).elastoviscousNum(no_Case) = VicFc_Get_elastoviscousNum(contour_length*1e-6, Init_U{no_Group});  % Calculate the 'global' elastoviscous number for one trajectory.  (*1e-6: convert the unit to m)
+        Info(no_Group).elastoviscousNum(no_Case) = VicFc_Get_elastoviscousNum(contour_length*1e-6, Init_U{no_Group}, Pillar_a{no_Group}*1e-6);  % Calculate the 'global' elastoviscous number for one trajectory.  (*1e-6: convert the unit to m)
         
         centroidxy = reshape(cell2mat(xy.centroid),2,numel(xy.centroid));
         centroidxy = centroidxy(:, Good_case); 
@@ -140,6 +142,8 @@ ChannelW = xlsfile(:, 6);  % Channel width (um)
 FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
 Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
+C2C_dis = xlsfile(:, 12); % Center-to-center distance (um)
+Pillar_a = xlsfile(:, 13); % Pillar diameter (um)
 
 for no_Group = 1: NumGroup 
     
@@ -222,6 +226,8 @@ ChannelW = xlsfile(:, 6);  % Channel width (um)
 FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
 Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
+C2C_dis = xlsfile(:, 12); % Center-to-center distance (um)
+Pillar_a = xlsfile(:, 13); % Pillar diameter (um)
 
 figure('color', 'w'); set(gcf, 'Position', [100 300 1500 300]);
 for no_Group = 7:10%NumGroup
@@ -319,6 +325,8 @@ ChannelW = xlsfile(:, 6);  % Channel width (um)
 FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
 Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
+C2C_dis = xlsfile(:, 12); % Center-to-center distance (um)
+Pillar_a = xlsfile(:, 13); % Pillar diameter (um)
 
 plot_counter1 = 1; counter1 = 1;  % plot_counter1: for the final plot. 
 for no_Group = 1: NumGroup  
@@ -373,6 +381,8 @@ ChannelW = xlsfile(:, 6);  % Channel width (um)
 FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
 Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
+C2C_dis = xlsfile(:, 12); % Center-to-center distance (um)
+Pillar_a = xlsfile(:, 13); % Pillar diameter (um)
 
 for no_Group = 1: NumGroup
     
@@ -428,18 +438,21 @@ ChannelW = xlsfile(:, 6);  % Channel width (um)
 FlowRate = xlsfile(:, 7);  % Flow rate (nL/s)
 Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
+C2C_dis = xlsfile(:, 12); % Center-to-center distance (um)
+Pillar_a = xlsfile(:, 13); % Pillar diameter (um)
 
-The_GAP = 3e-5; % The c2c distance between pillars.
 plot_counter1 = 1;
-for no_Group = 9%1: NumGroup
-    
+for no_Group = 7:10%1: NumGroup
+
+    The_GAP = C2C_dis{no_Group}*1e-6;  % *1e-6: convert the unit to m.
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
     for no_Case = 1:length(filelist)    % choose the cases to draw
         [pxx,f] = plomb(Info(no_Group).Chi_norm{1, no_Case}, Info(no_Group).SelectCaseNo{1, no_Case},'power'); % Chi_norm
         [pxx1,f1] = plomb(Info(no_Group).L_ee_norm{1, no_Case}, Info(no_Group).SelectCaseNo{1, no_Case},'power'); % L_ee_norm
 %         figure; plomb(Info(no_Group).L_ee_norm{1, no_Case}, Info(no_Group).SelectCaseNo{1, no_Case},'power');
         TMP = diff(Info(no_Group).Chi_norm{1, no_Case});
-        if min(cos(TMP)) < 0.9  % Select the smooth cases.
+%         if min(cos(TMP)) < 0.9  % Select the smooth cases.
+        if size(Info(no_Group).SelectCaseNo{1, no_Case},2) / max(Info(no_Group).SelectCaseNo{1, no_Case}) < 0.8  
             %         figure; plot(Info(no_Group).Chi_norm{1, no_Case});
             %         figure; plot(cos(TMP)); ylim([0.5 1]);
             Period_plot(plot_counter1) = 0;
@@ -468,7 +481,6 @@ for no_Group = 9%1: NumGroup
 % % %                 ylabel('$Power\ Spectral\ Density\ (PSD)$','FontSize', 18,'Interpreter', 'latex');
 %                 export_fig([savePath{no_Group},filesep,'PSD_vs_Frequency2_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
 
-
                 Period_plot(plot_counter1) = 1/f0(pk == max(pk)) * 0.02 * Init_U{no_Group, 1} / The_GAP; % Chi_norm.    Normalized  by the initial velocity and the c2c distanse between two pillars.
                 Period_plot1(plot_counter1) = 1/f01(pk1 == max(pk1)) * 0.02 * Init_U{no_Group, 1} / The_GAP; % L_ee_norm
 %                 if 1/f0(pk == max(pk)) > 90
@@ -496,7 +508,7 @@ semilogx(PLOT(1,:), PLOT(3,:), 'ro', 'MarkerSize', 10); hold on
 set(gca,'FontSize',12)
 % title('$CoM\ Distribution$','FontSize', 18,'Interpreter', 'latex')
 xlabel('$\mu_0$','FontSize', 18,'Interpreter', 'latex');
-ylabel('$U_0/(\lambda{a} \times f_p)$','FontSize', 18,'Interpreter', 'latex');
+ylabel('$U_0/(\lambda \times f_p)$','FontSize', 18,'Interpreter', 'latex');
 % axis equal;
 % xlim([0 2]);  
 line([100 1e6], [1 1],'Color','red','LineStyle','--')
@@ -507,11 +519,11 @@ line([100 1e6], [1 1],'Color','red','LineStyle','--')
 
 
 %% Function to calculate the mu_0
-function mu_0 = VicFc_Get_elastoviscousNum(L, u_0)
+function mu_0 = VicFc_Get_elastoviscousNum(L, u_0, a)
 % This is to calculate the elasto-viscous number
+% a: pillar diameter
 
 B = 6.9e-26;  % Bending rigidity
-a = 2e-5;  % Diameter of the pillar
 mu = 6.1e-3;  % Dynalic viscosity
 d = 8e-9; % Diameter of the actin filament
 
