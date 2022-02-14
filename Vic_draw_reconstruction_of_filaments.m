@@ -7,13 +7,13 @@
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220104-Actin\AfterAveBGR\';
-tifname='M63_Phi20_S15_0.5nM_1nL_Expo20ms_15_no11-no105_AABGR.tif';
+basepath='F:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20200925-Actin\AfterAveBGR\';
+tifname='M63_Phi20_D30_0.5nM_1nL_Expo10ms_0deg_12_no1490-no1713_AABGR.tif';
 
 
 % The .mat file where stores your results.
 loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220104-Actin\results\',...
-    'trajectory_M63_Phi20_S15_0.5nM_1nL_Expo20ms_15_no11-no105_AABGR_batch1.mat'];
+    'trajectory_M63_Phi20_D30_0.5nM_1nL_Expo10ms_0deg_12_no1490-no1713_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
@@ -156,13 +156,13 @@ save(loadfile,'thickness','structsensitivity','lnoise','lobject','threshold','ds
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220104-Actin\AfterAveBGR\';
-tifname='M63_Phi20_S15_0.5nM_1nL_Expo20ms_15_no11-no105_AABGR.tif';
+basepath='F:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20200925-Actin\AfterAveBGR\';
+tifname='M63_Phi20_D30_0.5nM_1nL_Expo10ms_0deg_12_no1490-no1713_AABGR.tif';
 
 
 % The .mat file where stores your results.
-loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220104-Actin\results\Shapes_1\',...
-    'trajectory_M63_Phi20_S15_0.5nM_1nL_Expo20ms_15_no11-no105_AABGR_batch1.mat'];
+loadfile = ['F:\PhD, PMMH, ESPCI\Processing\20200925-Actin\results\Group_1\',...
+    'trajectory_M63_Phi20_D30_0.5nM_1nL_Expo10ms_0deg_12_no1490-no1713_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
@@ -225,3 +225,19 @@ for j = 1:size(Good_case,2)
     %     hold on
     
 end
+
+figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
+for j = 1:size(Good_case,2)
+
+    i = Good_case(j); % index of the 'good' cases
+    plot(xy.spl{i}(:,1),xy.spl{i}(:,2))
+    hold on
+
+    axis equal
+    xlim('auto')
+    ylim('auto')
+    xlabel(' x [ px ] ')
+    ylabel(' y [ px ] ')
+
+end
+
