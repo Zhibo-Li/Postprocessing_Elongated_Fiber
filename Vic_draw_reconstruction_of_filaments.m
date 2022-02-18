@@ -8,12 +8,12 @@ clear; close all; clc;
 
 % The .tif file you just calculated.
 basepath='F:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20200925-Actin\AfterAveBGR\';
-tifname='M63_Phi20_D30_0.5nM_1nL_Expo10ms_0deg_12_no1490-no1713_AABGR.tif';
+tifname='M63_Phi20_S15_0.83nM_1nL_Expo20ms_2_no13-no101_AABGR.tif';
 
 
 % The .mat file where stores your results.
 loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220104-Actin\results\',...
-    'trajectory_M63_Phi20_D30_0.5nM_1nL_Expo10ms_0deg_12_no1490-no1713_AABGR_batch1.mat'];
+    'trajectory_M63_Phi20_S15_0.83nM_1nL_Expo20ms_2_no13-no101_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
@@ -156,19 +156,24 @@ save(loadfile,'thickness','structsensitivity','lnoise','lobject','threshold','ds
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='F:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20200925-Actin\AfterAveBGR\';
-tifname='M63_Phi20_D30_0.5nM_1nL_Expo10ms_0deg_12_no1490-no1713_AABGR.tif';
+basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20211029-Actin\AfterAveBGR\';
+tifname='M63_Phi20_S15_0.83nM_1nL_Expo20ms_2_no13-no101_AABGR.tif';
 
 
 % The .mat file where stores your results.
-loadfile = ['F:\PhD, PMMH, ESPCI\Processing\20200925-Actin\results\Group_1\',...
-    'trajectory_M63_Phi20_D30_0.5nM_1nL_Expo10ms_0deg_12_no1490-no1713_AABGR_batch1.mat'];
+loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20211029-Actin\results\Group_2\',...
+    'trajectory_M63_Phi20_S15_0.83nM_1nL_Expo20ms_2_no13-no101_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
 lzero = max(lobject,ceil(5*lnoise));
 jj = 1;
     
+v = VideoWriter(strcat('video.avi'),'MPEG-4');   % To make a video!
+v.FrameRate = 1;  % Frame rate in the video.
+v.Quality = 100;
+
+open(v);   % For the video.
 for j = 1:size(Good_case,2)
     
     i = Good_case(j);% index of the 'good' cases
@@ -223,8 +228,14 @@ for j = 1:size(Good_case,2)
     %     hold on
     %     plot(lzero+xy(1).crd{i}(:,1),size(Foo,1)*1.5-lzero-xy(1).crd{i}(:,2),'.','markeredgecolor','k','markerfacecolor','w','linewidth',2)
     %     hold on
-    
+
+    pause(0.001);
+    frame = getframe(gcf);
+    writeVideo(v,frame);
+    close
+
 end
+close(v);  % For the video.
 
 figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
 for j = 1:size(Good_case,2)
