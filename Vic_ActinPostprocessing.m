@@ -28,7 +28,7 @@ for no_Group = 1: NumGroup
     for no_Case = 1:length(filelist)
 
         load([storePath{no_Group}, filesep , filelist(no_Case).name])
-        lzero = max(lobject,ceil(5*lnoise));   % This is so important!!!!!!!!!!! Came from when we do the filaments detection.
+        lzero = max(lobject,ceil(5*lnoise));   % This is so important!!!!!!!!!!! Came from 'elongated_objects_in_flow.m'.
         
         sorted_lengths = sort(xy.arclen_spl(Good_case));  % Good_case: index of the 'good' cases
 %         contour_length = mean(sorted_lengths(round(numel(sorted_lengths)/10):end)) * Obj_Mag{no_Group};  % Select the 10% lengest filaments and averaged as the contour length. (UNIT: um)
@@ -80,12 +80,12 @@ for no_Group = 1: NumGroup
                     Info(no_Group).Chi{no_Case}(count) = atan(Vs(2,2)/Vs(1,2));
                     Info(no_Group).Chi_norm{no_Case}(count) = atan(Vs(2,2)/Vs(1,2))/pi;
                     
-                    
                     Lambda1 = eigenD(2,2); Lambda2 =  eigenD(1,1);
                     Info(no_Group).aniso{no_Case}(count) = 1 - 4*Lambda1*Lambda2/(Lambda1+Lambda2)^2;
                     
                     Info(no_Group).SelectCaseNo{no_Case}(count) = Good_case(no_Goodcas);  % The indexes of the Goodcases. Mostly for the frequency calculation.
-                    
+                    Info(no_Group).cont_lens_frm{no_Case}(count) = xy.arclen_spl(Good_case(no_Goodcas)) * Obj_Mag{no_Group}; % The contour lengths in each frame (UNIT: um)!
+
                     count = count + 1;
                     TheLastOne = Good_case(no_Goodcas);
                 end
@@ -112,6 +112,7 @@ for no_Group = 1: NumGroup
                 Info(no_Group).aniso{no_Case}(no_Goodcas) = 1 - 4*Lambda1*Lambda2/(Lambda1+Lambda2)^2;
                 
                 Info(no_Group).SelectCaseNo{no_Case}(count) = Good_case(no_Goodcas);  % The indexes of the Goodcases. Mostly for the frequency calculation.
+                Info(no_Group).cont_lens_frm{no_Case}(count) = xy.arclen_spl(Good_case(no_Goodcas)) * Obj_Mag{no_Group}; % The contour lengths in each frame (UNIT: um)!
                 
                 count = count + 1;
                 TheLastOne = Good_case(no_Goodcas);
