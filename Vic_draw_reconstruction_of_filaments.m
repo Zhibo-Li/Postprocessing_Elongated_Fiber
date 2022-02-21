@@ -8,12 +8,12 @@ clear; close all; clc;
 
 % The .tif file you just calculated.
 basepath='F:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20200925-Actin\AfterAveBGR\';
-tifname='M63_Phi20_S15_0.83nM_1nL_Expo20ms_2_no13-no101_AABGR.tif';
+tifname='M63_Phi20_S15_0.5nM_1nL_Expo20ms_1_no15-no120_AABGR.tif';
 
 
 % The .mat file where stores your results.
 loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220104-Actin\results\',...
-    'trajectory_M63_Phi20_S15_0.83nM_1nL_Expo20ms_2_no13-no101_AABGR_batch1.mat'];
+    'trajectory_M63_Phi20_S15_0.5nM_1nL_Expo20ms_1_no15-no120_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
@@ -157,20 +157,20 @@ clear; close all; clc;
 
 % The .tif file you just calculated.
 basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20211029-Actin\AfterAveBGR\';
-tifname='M63_Phi20_S15_0.83nM_1nL_Expo20ms_2_no13-no101_AABGR.tif';
+tifname='M63_Phi20_S15_0.5nM_1nL_Expo20ms_1_no15-no120_AABGR.tif';
 
 
 % The .mat file where stores your results.
 loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20211029-Actin\results\Group_2\',...
-    'trajectory_M63_Phi20_S15_0.83nM_1nL_Expo20ms_2_no13-no101_AABGR_batch1.mat'];
+    'trajectory_M63_Phi20_S15_0.5nM_1nL_Expo20ms_1_no15-no120_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
 lzero = max(lobject,ceil(5*lnoise));
 jj = 1;
     
-v = VideoWriter(strcat('video.avi'),'MPEG-4');   % To make a video!
-v.FrameRate = 1;  % Frame rate in the video.
+v = VideoWriter(strcat('20211029_Group_2_M63_Phi20_S15_0.5nM_1nL_Expo20ms_1_no15-no120_AABGR_batch1_video'),'MPEG-4');   % To make a video!
+v.FrameRate = 24;  % Frame rate in the video.
 v.Quality = 100;
 
 open(v);   % For the video.
@@ -199,27 +199,45 @@ for j = 1:size(Good_case,2)
 %     imshow(Foo*1000); hold on; 
     Zoom_in = Foo(round(max(T_C2-ywin/2,1)):round(min(T_C2+ywin/2,size(Foo,1))),...
         round(max(T_C1-xwin/2,1)):round(min(T_C1+xwin/2,size(Foo,2))))*1000;
-    imshow(Zoom_in, 'InitialMagnification', 200); hold on;
-    
-    
-    % Show the B-spline, the idea is to change the original point according
-    % to the required window.
-%     h = plot(T_spl1,T_spl2,'-','linewidth',6);
-    h = plot(T_spl1-max(T_C1-xwin/2,1), T_spl2-max(T_C2-ywin/2,1),'-','linewidth',6);
-    set(h,'marker','.');
-%     title(['No.',num2str(xy.frame(i))],'Color','red','FontSize',14);
-    title(['No.',num2str(j)],'Color','red','FontSize',14);
-    hold on
-    
+
+    the_frame = uint16(zeros(ywin+1, xwin+1));  % Put the Zoom_in into this frame so that every figure has the same size to make the video.
+    xy_mov = size(the_frame)-size(Zoom_in);  % How much should the plot be shifted.
+    if abs(j - 1)  < abs(j - size(Good_case,2))  % To fix the center-of-mass position in the video.
+        the_frame(padarray(true(size(Zoom_in)), xy_mov, 'pre')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
+
+        imshow(the_frame, 'InitialMagnification', 200); hold on;
+% Show the B-spline, the idea is to change the original point according
+% to the required window.
+% h = plot(T_spl1,T_spl2,'-','linewidth',6);
+        h = plot(T_spl1-max(T_C1-xwin/2,1) + xy_mov(2), T_spl2-max(T_C2-ywin/2,1) + xy_mov(1),'-','linewidth',6);
+        set(h,'marker','.');
+% title(['No.',num2str(xy.frame(i))],'Color','red','FontSize',14);
+
+        title(['No.',num2str(j)],'Color','red','FontSize',14);
+        hold on
 %     quiver(lzero+X(:,1),size(Foo,1)-lzero-X(:,2),K2(:,1),-K2(:,2));  % WHY it is '-K2(:,2)'??
 %     hold on;
 
-    plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin/2,1),T_spl2(RR2==min(RR2))...
-        -max(T_C2-ywin/2,1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
-    hold on;
-    
-    plot(T_C1-max(T_C1-xwin/2,1),T_C2-max(T_C2-ywin/2,1),'*','markeredgecolor','r','MarkerSize',5);
-    hold off;
+        plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin/2,1) + xy_mov(2),T_spl2(RR2==min(RR2))...
+            -max(T_C2-ywin/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
+        hold on;
+
+        plot(T_C1-max(T_C1-xwin/2,1) + xy_mov(2),T_C2-max(T_C2-ywin/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
+        hold off;
+
+    else
+        the_frame(padarray(true(size(Zoom_in)), xy_mov, 'post')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
+        imshow(the_frame, 'InitialMagnification', 200); hold on;
+        h = plot(T_spl1-max(T_C1-xwin/2,1), T_spl2-max(T_C2-ywin/2,1) + xy_mov(1),'-','linewidth',6);
+        set(h,'marker','.');
+        title(['No.',num2str(j)],'Color','red','FontSize',14);
+        hold on
+        plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin/2,1),T_spl2(RR2==min(RR2))...
+            -max(T_C2-ywin/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
+        hold on;
+        plot(T_C1-max(T_C1-xwin/2,1),T_C2-max(T_C2-ywin/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
+        hold off;
+    end
     
 %     saveas(gcf,'F:\Code\tmpData\tmp','tiffn');
 %     imwrite(imread('F:\Code\tmpData\tmp.tif'), [basepath,'results\Batch_1',tifname], 'writemode', 'append');
