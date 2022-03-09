@@ -132,10 +132,10 @@ end
 % The excels are stored in ...Processing\EXP DATE\results normally.
 % This part should run after the above 'Get the information' part.
 
-for no_Group = 5: NumGroup
+for no_Group = 1: NumGroup
 
     disp(['You are processing ', datestr(Info(no_Group).ExpDate), ' data!']);
-    [filename, pathname] = uigetfile('*.xlsx', 'Please choose the excel accordingly and carefully!!');
+    [filename, pathname] = uigetfile('E:\Dropbox\Research\All Plottings\Manually classification documents\.xlsx', 'Please choose the excel accordingly and carefully!!');
     xlsfile = readcell([pathname, filename],'Sheet','Sheet2','NumHeaderLines',1);     % The files. (e.g. Classification manually 20220104-Actin.xlsx)
     thefiles = xlsfile(:, 14);
 
@@ -143,6 +143,10 @@ for no_Group = 5: NumGroup
     for no_Case = 1:length(filelist)
         name = Info(no_Group).filelist(no_Case).name(12:end-11);
         Ind = find(contains(thefiles,name));  % Search for text that has 'name' as part of the text.
+
+        if isempty(Ind)
+            disp('There are some problems with the alignment. Please check!!!');
+        end
 
         Value = [Info(no_Group).contour_length(no_Case), Info(no_Group).elastoviscousNum(no_Case)];  % The contour length and the elastoviscous numbers.
         Loc = ['J', num2str(Ind+1), ':K', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
