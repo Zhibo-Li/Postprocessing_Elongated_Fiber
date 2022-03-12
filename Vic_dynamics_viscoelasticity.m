@@ -58,13 +58,13 @@ end
 figure('color', 'w'); set(gcf, 'Position', [100 300 800 400]);
 PAtype_labels = cell2mat(PAtype_label);
 CM = jet(max(PAtype_labels));  % declare the colours for different pillar array types.
-MyMarkers = {'p','o','*','.','x','s','d','^','v','>','<','+','h'};  % declare the markers for different pillar array types.
+MyMarkers = {'p','o','x','s','d','v','>','<','+','h','*','.','^'};  % declare the markers for different pillar array types.
 for no_Group = 1:NumGroup
     PAtype_labels_ind = DrawXY_dynmodes{no_Group, 7};
     for dyn = 1:6
         if ~isempty(DrawXY_dynmodes{no_Group, dyn}) 
             h_dyn(PAtype_labels_ind) = semilogx(DrawXY_dynmodes{no_Group, dyn}(:, 2), DrawXY_dynmodes{no_Group, dyn}(:, 1),...
-                'Color', CM(PAtype_labels_ind,:), 'LineStyle', 'none', 'marker', MyMarkers{1, PAtype_labels_ind}, 'MarkerSize', 10); hold on
+                'Color', CM(PAtype_labels_ind,:), 'LineStyle', 'none', 'marker', MyMarkers{1, PAtype_labels_ind}, 'MarkerSize', 10,'LineWidth', 2); hold on
         end
     end
 end
@@ -74,7 +74,7 @@ set(gca,'ytick',[1:6],'yticklabel',names,'FontSize',10);
 xlabel('$\bar{\mu}$','FontSize', 15,'Interpreter', 'latex');
 ylabel('$Dynamic\ Modes$','FontSize', 14,'Interpreter', 'latex');
 legend(h_dyn, '$Square\ \lambda/a=1.88$' , '$Square\ \lambda/a=1.56$',...
-    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
+    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','$Square\ \lambda/a=1.50$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
 % f=gcf;
 % exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\dynamicmodes_elastoviscousnumber.png','Resolution',1000)
 
@@ -85,7 +85,7 @@ for no_Group = 1:NumGroup
     for buk = 1:2
         if ~isempty(DrawXY_buckletypes{no_Group, buk}) 
             h_buk(PAtype_labels_ind) = semilogx(DrawXY_buckletypes{no_Group, buk}(:, 2), DrawXY_buckletypes{no_Group, buk}(:, 1)*buk,...            % *buk: global buckling (buk=1); partial buckling (buk=2).
-                'Color', CM(PAtype_labels_ind,:), 'LineStyle', 'none', 'marker', MyMarkers{1, PAtype_labels_ind}, 'MarkerSize', 10); hold on
+                'Color', CM(PAtype_labels_ind,:), 'LineStyle', 'none', 'marker', MyMarkers{1, PAtype_labels_ind}, 'MarkerSize', 10,'LineWidth', 2); hold on
         end
     end
 end
@@ -95,7 +95,7 @@ set(gca,'ytick',[1:2],'yticklabel',names,'FontSize',10); ytickangle(90)
 xlabel('$\bar{\mu}$','FontSize', 15,'Interpreter', 'latex');
 ylabel('$Dynamic\ Modes$','FontSize', 14,'Interpreter', 'latex');
 legend(h_buk, '$Square\ \lambda/a=1.88$' , '$Square\ \lambda/a=1.56$',...
-    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
+    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','$Square\ \lambda/a=1.50$','Interpreter','latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
 % f=gcf;
 % exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\bucklingtypes_elastoviscousnumber.png','Resolution',1000)
 
@@ -112,7 +112,7 @@ for PAtypeloop = 1:max(PAtype_labels)  % Loop to draw according to the PA type l
     tmp4 = find(PAtype_labels==PAtypeloop);
     Todraw_averaged_mu_bar_dyn(PAtypeloop, :) = mean(averaged_mu_bar_dyn(tmp4, :),1);
     h_dyn_avg(PAtypeloop) = semilogx(Todraw_averaged_mu_bar_dyn(PAtypeloop, :), 1:dyn,'Color', CM(PAtypeloop,:), ...
-        'LineStyle', 'none', 'marker', MyMarkers{1, PAtypeloop}, 'MarkerSize', 10); hold on
+        'LineStyle', 'none', 'marker', MyMarkers{1, PAtypeloop}, 'MarkerSize', 10,'LineWidth', 2); hold on
 end
 ylim([0 7]);
 names = {'U-Shape'; 'S-Shape'; 'W-Shape'; 'Helical'; 'Folded'; 'Coiled'};
@@ -120,7 +120,7 @@ set(gca,'ytick',[1:6],'yticklabel',names,'FontSize',10);
 xlabel('$\bar{\mu}$','FontSize', 15,'Interpreter', 'latex');
 ylabel('$Dynamic\ Modes$','FontSize', 14,'Interpreter', 'latex');
 legend(h_dyn_avg, '$Square\ \lambda/a=1.88$' , '$Square\ \lambda/a=1.56$',...
-    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
+    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','$Square\ \lambda/a=1.50$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
 % f=gcf;
 % exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\dynamicmodes_AVG-elastoviscousnumber.png','Resolution',1000)
 
@@ -135,7 +135,7 @@ for PAtypeloop = 1:max(PAtype_labels)  % Loop to draw according to the PA type l
     tmp5 = find(PAtype_labels==PAtypeloop);
     Todraw_averaged_mu_bar_buk(PAtypeloop, :) = mean(averaged_mu_bar_buk(tmp5, :),1);
     h_buk_avg(PAtypeloop) = semilogx(Todraw_averaged_mu_bar_buk(PAtypeloop, :), 1:buk,'Color', CM(PAtypeloop,:), ...
-        'LineStyle', 'none', 'marker', MyMarkers{1, PAtypeloop}, 'MarkerSize', 10); hold on
+        'LineStyle', 'none', 'marker', MyMarkers{1, PAtypeloop}, 'MarkerSize', 10,'LineWidth', 2); hold on
 end
 ylim([0 3]);
 names = {'Global buckling'; 'Partial buckling'};
@@ -143,6 +143,6 @@ set(gca,'ytick',[1:2],'yticklabel',names,'FontSize',10);ytickangle(90)
 xlabel('$\bar{\mu}$','FontSize', 15,'Interpreter', 'latex');
 ylabel('$Dynamic\ Modes$','FontSize', 14,'Interpreter', 'latex');
 legend(h_buk_avg, '$Square\ \lambda/a=1.88$' , '$Square\ \lambda/a=1.56$',...
-    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
+    '$Rhombic\ \lambda/a=1.50$', '$Rhombic\ \lambda/a=1.75$','$Square\ \lambda/a=1.50$','Interpreter', 'latex', 'Location','best');  % change the legends according to the excel 'ForActinPostprocessing.xlsx - sheet2'.
 % f=gcf;
 % exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\bucklingtypes_AVG-elastoviscousnumber.png','Resolution',1000)
