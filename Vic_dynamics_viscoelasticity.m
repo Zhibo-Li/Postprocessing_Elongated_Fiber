@@ -24,7 +24,7 @@ for no_Group = 1: NumGroup
     Alldata(tmp1', :)  = [];  % to delete the rows (or cases) which don't have the information of the contour length and so on.
 
     %%%%%%  different modes %%%%%%%%%%
-    ToDraw_dynamicmodes = Alldata(:, [4:9, 11]);  % 4-9 are the shapes; 11 is the elastoviscous number.
+    ToDraw_dynamicmodes = Alldata(:, [4:9, 10]);  % 4-9 are the shapes; 11 is the elastoviscous number.
     for ii = 2:6
         tmp2 = ToDraw_dynamicmodes(:, ii)<ii;
         ToDraw_dynamicmodes(tmp2', ii) = 0;
@@ -41,7 +41,7 @@ for no_Group = 1: NumGroup
     DrawXY_dynmodes{no_Group, dyn+1} = PAtype_label{no_Group, 1};
 
     %%%%%%  global & partial buckling %%%%%%%%%%
-    ToDraw_bucklingtypes = Alldata(:, [1:2, 11]);
+    ToDraw_bucklingtypes = Alldata(:, [1:2, 10]);
     for buk = 1:2
         tmp3 = find(ToDraw_bucklingtypes(:, buk)==0);
         buckletypes = ToDraw_bucklingtypes(:, [buk, 3]);  % put buckling types and elastoviscous number together
