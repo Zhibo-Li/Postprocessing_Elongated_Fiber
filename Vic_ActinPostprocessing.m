@@ -17,7 +17,6 @@ Init_U = xlsfile(:, 8);  % Initial velocity (m/s)
 Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
 C2C_dis = xlsfile(:, 12); % Center-to-center distance (um)
 Pillar_a = xlsfile(:, 13); % Pillar diameter (um)
- 
 
 for no_Group = 1: NumGroup 
     
@@ -29,15 +28,24 @@ for no_Group = 1: NumGroup
 
         load([storePath{no_Group}, filesep , filelist(no_Case).name])
         lzero = max(lobject,ceil(5*lnoise));   % This is so important!!!!!!!!!!! Came from 'elongated_objects_in_flow.m'.
+
+        if Good_case(end) > xy.nframe
+            Good_case_abs = Good_case;
+            Good_case_frm = find(ismember(xy(1).frame, Good_case));
+        else
+            Good_case_frm = Good_case;
+        end
+        % depending on how to get the *.mat, Good_case could have different
+        % meanings.
         
-        sorted_lengths = sort(xy.arclen_spl(Good_case));  % Good_case: index of the 'good' cases
+        sorted_lengths = sort(xy.arclen_spl(Good_case_frm));  % Good_case: index of the 'good' cases
 %         contour_length = mean(sorted_lengths(round(numel(sorted_lengths)/10):end)) * Obj_Mag{no_Group};  % Select the 10% lengest filaments and averaged as the contour length. (UNIT: um)
         contour_length = max(sorted_lengths) * Obj_Mag{no_Group};  % Select the lengest filaments as the contour length (UNIT: um).
         Info(no_Group).contour_length(no_Case) = contour_length; 
         Info(no_Group).elastoviscousNum(no_Case) = VicFc_Get_elastoviscousNum(contour_length*1e-6, Init_U{no_Group}, Pillar_a{no_Group}*1e-6);  % Calculate the 'global' elastoviscous number for one trajectory.  (*1e-6: convert the unit to m)
         
         centroidxy = reshape(cell2mat(xy.centroid),2,numel(xy.centroid));
-        centroidxy = centroidxy(:, Good_case); 
+        centroidxy = centroidxy(:, Good_case_frm); 
 %         centroidxy = centroidxy + lzero;  % The real CoM in the image!! BUT cannot add lzero here because following 'centroidxy_k' need it (NOT in IMAGE)!!!     
 %         Amp(no_Case) = max(centroidxy(2,:)) -  min(centroidxy(2,:));  % This is to calculate the amplitude of the trajectory.
 
@@ -60,10 +68,10 @@ for no_Group = 1: NumGroup
         for no_Goodcas = 1:size(Good_case,2)
             
             if no_Goodcas > 1
-                if Good_case(no_Goodcas) - TheLastOne >= 0  % Equal interval sampling. If put 4, it will be 5 and so on.      
+                if Good_case_frm(no_Goodcas) - TheLastOne >= 0  % Equal interval sampling. If put 4, it will be 5 and so on.      
                     centroidxy_plot_ind(end+1) = no_Goodcas;
                     
-                    crd = xy.crd{1,Good_case(no_Goodcas)};
+                    crd = xy.crd{1,Good_case_frm(no_Goodcas)};
                     centroidxy_k = centroidxy(:, no_Goodcas);
                     
                     L_ee = sqrt((crd(1,1)-crd(end,1))^2 + (crd(1,2)-crd(end,2))^2) * Obj_Mag{no_Group};  % Calculate the L_ee. (end-to-end distance)
@@ -83,15 +91,15 @@ for no_Group = 1: NumGroup
                     Lambda1 = eigenD(2,2); Lambda2 =  eigenD(1,1);
                     Info(no_Group).aniso{no_Case}(count) = 1 - 4*Lambda1*Lambda2/(Lambda1+Lambda2)^2;
                     
-                    Info(no_Group).SelectCaseNo{no_Case}(count) = Good_case(no_Goodcas);  % The indexes of the Goodcases. Mostly for the frequency calculation.
-                    Info(no_Group).cont_lens_frm{no_Case}(count) = xy.arclen_spl(Good_case(no_Goodcas)) * Obj_Mag{no_Group}; % The contour lengths in each frame (UNIT: um)!
+                    Info(no_Group).SelectCaseNo{no_Case}(count) = Good_case_frm(no_Goodcas);  % The indexes of the Goodcases. Mostly for the frequency calculation.
+                    Info(no_Group).cont_lens_frm{no_Case}(count) = xy.arclen_spl(Good_case_frm(no_Goodcas)) * Obj_Mag{no_Group}; % The contour lengths in each frame (UNIT: um)!
 
                     count = count + 1;
-                    TheLastOne = Good_case(no_Goodcas);
+                    TheLastOne = Good_case_frm(no_Goodcas);
                 end
                 
             else
-                crd = xy.crd{1,Good_case(no_Goodcas)};
+                crd = xy.crd{1,Good_case_frm(no_Goodcas)};
                 centroidxy_k = centroidxy(:, no_Goodcas);
                 
                 L_ee = sqrt((crd(1,1)-crd(end,1))^2 + (crd(1,2)-crd(end,2))^2) * Obj_Mag{no_Group};  % Calculate the L_ee. (end-to-end distance)
@@ -111,11 +119,11 @@ for no_Group = 1: NumGroup
                 Lambda1 = eigenD(2,2); Lambda2 =  eigenD(1,1);
                 Info(no_Group).aniso{no_Case}(no_Goodcas) = 1 - 4*Lambda1*Lambda2/(Lambda1+Lambda2)^2;
                 
-                Info(no_Group).SelectCaseNo{no_Case}(count) = Good_case(no_Goodcas);  % The indexes of the Goodcases. Mostly for the frequency calculation.
-                Info(no_Group).cont_lens_frm{no_Case}(count) = xy.arclen_spl(Good_case(no_Goodcas)) * Obj_Mag{no_Group}; % The contour lengths in each frame (UNIT: um)!
+                Info(no_Group).SelectCaseNo{no_Case}(count) = Good_case_frm(no_Goodcas);  % The indexes of the Goodcases. Mostly for the frequency calculation.
+                Info(no_Group).cont_lens_frm{no_Case}(count) = xy.arclen_spl(Good_case_frm(no_Goodcas)) * Obj_Mag{no_Group}; % The contour lengths in each frame (UNIT: um)!
                 
                 count = count + 1;
-                TheLastOne = Good_case(no_Goodcas);
+                TheLastOne = Good_case_frm(no_Goodcas);
             end
         end
         
