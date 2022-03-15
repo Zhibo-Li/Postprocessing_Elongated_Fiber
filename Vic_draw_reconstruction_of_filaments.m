@@ -7,13 +7,13 @@
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='F:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20200925-Actin\AfterAveBGR\';
-tifname='M63_Phi20_S15_0.5nM_1nL_Expo20ms_1_no15-no120_AABGR.tif';
+basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220216-Actin\AfterAveBGR\';
+tifname='M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR.tif';
 
 
 % The .mat file where stores your results.
-loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220104-Actin\results\',...
-    'trajectory_M63_Phi20_S15_0.5nM_1nL_Expo20ms_1_no15-no120_AABGR_batch1.mat'];
+loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220216-Actin\results\',...
+    'trajectory_M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
@@ -149,27 +149,25 @@ save(loadfile,'thickness','structsensitivity','lnoise','lobject','threshold','ds
 
 
 
-%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%% Draw good cases!!!
+%% Draw good cases!!!
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20211029-Actin\AfterAveBGR\';
-tifname='M63_Phi20_S15_0.5nM_1nL_Expo20ms_1_no15-no120_AABGR.tif';
+basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220216-Actin\AfterAveBGR\';
+tifname='M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR.tif';
 
 
 % The .mat file where stores your results.
-loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20211029-Actin\results\Group_2\',...
-    'trajectory_M63_Phi20_S15_0.5nM_1nL_Expo20ms_1_no15-no120_AABGR_batch1.mat'];
+loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220216-Actin\results\',...
+    'trajectory_M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
 lzero = max(lobject,ceil(5*lnoise));
-jj = 1;
     
-v = VideoWriter(strcat('20211029_Group_2_M63_Phi20_S15_0.5nM_1nL_Expo20ms_1_no15-no120_AABGR_batch1_video'),'MPEG-4');   % To make a video!
+v = VideoWriter(strcat('M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR_video2'),'MPEG-4');   % To make a video!
 v.FrameRate = 24;  % Frame rate in the video.
 v.Quality = 100;
 
@@ -270,3 +268,141 @@ for j = 1:size(Good_case,2)
 
 end
 
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Draw good cases!!! (Postprocess code for https://github.com/Zhibo-Li/Filaments-Detecting.git)
+clear; close all; clc;
+
+% The .tif file you just calculated.
+basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220216-Actin\AfterAveBGR\';
+tifname='M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR.tif';
+
+
+% The .mat file where stores your results.
+loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220216-Actin\results\',...
+    'trajectory_M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR_batch2.mat'];
+load(loadfile);
+
+close all;
+
+v = VideoWriter(strcat('M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR_video'),'MPEG-4');   % To make a video!
+v.FrameRate = 24;  % Frame rate in the video.
+v.Quality = 100;
+open(v);   % For the video.
+
+false_ind = ~ismember(xy(1).frame, Good_case);  
+% Here, the 'Good_case' means the absolute frame number, not the index of 
+% xy.frame (different to the code before which calculation and selection 
+% are two processes. 
+
+xy.crd(false_ind) = [];
+xy.centroid(false_ind) = [];
+xy.arclen(false_ind) = [];
+xy.seglen(false_ind) = [];
+xy.nframe = length(Good_case);
+xy.frame(false_ind) = [];
+xy.spl(false_ind) = [];
+xy.knots(false_ind) = [];
+xy.arclen_spl(false_ind) = [];
+xy.seglen_spl(false_ind) = [];
+
+for j = 1:xy.nframe
+    
+    prmt_i = xy(1).frame(j);
+
+    Foo = imread([basepath, tifname],xy(1).frame(j));
+    lzero = max(prmt(prmt_i).lobject,ceil(5*prmt(prmt_i).lnoise));
+   
+    C1 = xy(1).centroid{j}(:,1); C2 = xy(1).centroid{j}(:,2); % Center-of-mass
+    T_C1 = lzero+C1;  T_C2 = size(Foo,1)-lzero-C2; 
+    % Count in the Isero and tranfrom the coordinate because of the different
+    % original point between the image and plot
+    spl1 = xy(1).spl{j}(:,1); spl2 = xy(1).spl{j}(:,2); % x-y coordinates of the B-spline
+    T_spl1 = lzero+spl1;  T_spl2 = size(Foo,1)-lzero-spl2; 
+    % Same as above
+    
+    % calculate the curvature
+    X = xy(1).spl{j};
+    [L2,R2,K2] = curvature(X);
+    RR2 = movmean(R2,ceil(size(X,1)/100));
+    
+    % Zoom in (based on the center-of-mass [C1, C2]) and show the image.
+    % The size of the ROI depends on the [xwin, ywin]
+    fig = figure('Name','filaments','Position', [0 0 100 100]);
+%     imshow(Foo*1000); hold on; 
+    Zoom_in = Foo(round(max(T_C2-prmt(prmt_i).ywin/2,1)):round(min(T_C2+prmt(prmt_i).ywin/2,size(Foo,1))),...
+        round(max(T_C1-prmt(prmt_i).xwin/2,1)):round(min(T_C1+prmt(prmt_i).xwin/2,size(Foo,2))))*1000;
+
+    the_frame = uint16(zeros(prmt(prmt_i).ywin+1, prmt(prmt_i).xwin+1));  % Put the Zoom_in into this frame so that every figure has the same size to make the video.
+    xy_mov = size(the_frame)-size(Zoom_in);  % How much should the plot be shifted.
+    if abs(j - 1)  < abs(j - size(Good_case,2))  % To fix the center-of-mass position in the video.
+        the_frame(padarray(true(size(Zoom_in)), xy_mov, 'pre')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
+
+        imshow(the_frame, 'InitialMagnification', 200); hold on;
+% Show the B-spline, the idea is to change the original point according
+% to the required window.
+% h = plot(T_spl1,T_spl2,'-','linewidth',6);
+        h = plot(T_spl1-max(T_C1-prmt(prmt_i).xwin/2,1) + xy_mov(2), T_spl2-max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'-','linewidth',6);
+        set(h,'marker','.');
+% title(['No.',num2str(xy.frame(j))],'Color','red','FontSize',14);
+
+        title(['No.',num2str(j)],'Color','red','FontSize',14);
+        hold on
+%     quiver(lzero+X(:,1),size(Foo,1)-lzero-X(:,2),K2(:,1),-K2(:,2));  % WHY it is '-K2(:,2)'??
+%     hold on;
+
+        plot(T_spl1(RR2==min(RR2))-max(T_C1-prmt(prmt_i).xwin/2,1) + xy_mov(2),T_spl2(RR2==min(RR2))...
+            -max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
+        hold on;
+
+        plot(T_C1-max(T_C1-prmt(prmt_i).xwin/2,1) + xy_mov(2),T_C2-max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
+        hold off;
+
+    else
+        the_frame(padarray(true(size(Zoom_in)), xy_mov, 'post')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
+        imshow(the_frame, 'InitialMagnification', 200); hold on;
+        h = plot(T_spl1-max(T_C1-prmt(prmt_i).xwin/2,1), T_spl2-max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'-','linewidth',6);
+        set(h,'marker','.');
+        title(['No.',num2str(j)],'Color','red','FontSize',14);
+        hold on
+        plot(T_spl1(RR2==min(RR2))-max(T_C1-prmt(prmt_i).xwin/2,1),T_spl2(RR2==min(RR2))...
+            -max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
+        hold on;
+        plot(T_C1-max(T_C1-prmt(prmt_i).xwin/2,1),T_C2-max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
+        hold off;
+    end
+    
+%     saveas(gcf,'F:\Code\tmpData\tmp','tiffn');
+%     imwrite(imread('F:\Code\tmpData\tmp.tif'), [basepath,'results\Batch_1',tifname], 'writemode', 'append');
+    
+    %     plot(lzero+xy(1).spl{j}(:,1),size(Foo,1)*1.5-lzero-xy(1).spl{j}(:,2),'-','linewidth',6)
+    %     hold on
+    %     plot(lzero+xy(1).crd{j}(:,1),size(Foo,1)*1.5-lzero-xy(1).crd{j}(:,2),'.','markeredgecolor','k','markerfacecolor','w','linewidth',2)
+    %     hold on
+
+    pause(0.001);
+    frame = getframe(gcf);
+    writeVideo(v,frame);
+    close
+
+end
+close(v);  % For the video.
+
+figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
+for j = 1:xy.nframe
+
+    plot(xy.spl{j}(:,1),xy.spl{j}(:,2))
+    hold on
+
+    axis equal
+    xlim('auto')
+    ylim('auto')
+    xlabel(' x [ px ] ')
+    ylabel(' y [ px ] ')
+
+end
