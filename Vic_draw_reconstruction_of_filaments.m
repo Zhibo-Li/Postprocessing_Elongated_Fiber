@@ -8,12 +8,12 @@ clear; close all; clc;
 
 % The .tif file you just calculated.
 basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220216-Actin\AfterAveBGR\';
-tifname='M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR.tif';
+tifname='M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR.tif';
 
 
 % The .mat file where stores your results.
 loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220216-Actin\results\',...
-    'trajectory_M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR_batch1.mat'];
+    'trajectory_M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
@@ -21,68 +21,68 @@ lzero = max(lobject,ceil(5*lnoise));
 jj = 1;
 
 for i = 1:1:xy.nframe
-    
-    % Calculate the length difference between two adjacent filaments, if it's too big (> 20pix) then discard this case. 
+
+    % Calculate the length difference between two adjacent filaments, if it's too big (> 20pix) then discard this case.
     % If the length of filament is too small, then discard it, too.
-%     if abs(xy.arclen_spl(i)-xy.arclen_spl(i-1)) >= 20 || xy.arclen_spl(i) <= 30
-%         continue
-%     end
-    
+    %     if abs(xy.arclen_spl(i)-xy.arclen_spl(i-1)) >= 20 || xy.arclen_spl(i) <= 30
+    %         continue
+    %     end
+
     Foo = imread([basepath, tifname],xy(1).frame(i));
-   
+
     C1 = xy(1).centroid{i}(:,1); C2 = xy(1).centroid{i}(:,2); % Center-of-mass
-    T_C1 = lzero+C1;  T_C2 = size(Foo,1)-lzero-C2; 
+    T_C1 = lzero+C1;  T_C2 = size(Foo,1)-lzero-C2;
     % Count in the Isero and tranfrom the coordinate because of the different
     % original point between the image and plot
     spl1 = xy(1).spl{i}(:,1); spl2 = xy(1).spl{i}(:,2); % x-y coordinates of the B-spline
-    T_spl1 = lzero+spl1;  T_spl2 = size(Foo,1)-lzero-spl2; 
+    T_spl1 = lzero+spl1;  T_spl2 = size(Foo,1)-lzero-spl2;
     % Same as above
-    
+
     % calculate the curvature
     X = xy(1).spl{i};
     [L2,R2,K2] = curvature(X);
     RR2 = movmean(R2,ceil(size(X,1)/100));
-    
+
     % Zoom in (based on the center-of-mass [C1, C2]) and show the image.
     % The size of the ROI depends on the [xwin, ywin]
     fig = figure('Name','filaments','Position', [0 0 100 100]);
-%     imshow(Foo*1000); hold on; 
+    %     imshow(Foo*1000); hold on;
     Zoom_in = Foo(round(max(T_C2-ywin/2,1)):round(min(T_C2+ywin/2,size(Foo,1))),...
         round(max(T_C1-xwin/2,1)):round(min(T_C1+xwin/2,size(Foo,2))))*1000;
     imshow(Zoom_in, 'InitialMagnification', 200); hold on;
-    
-    xwin = 600; 
-    ywin = 300; 
-    
+
+    xwin = 600;
+    ywin = 300;
+
     % Show the B-spline, the idea is to change the original point according
     % to the required window.
-%     h = plot(T_spl1,T_spl2,'-','linewidth',6);
+    %     h = plot(T_spl1,T_spl2,'-','linewidth',6);
     h = plot(T_spl1-max(T_C1-xwin/2,1), T_spl2-max(T_C2-ywin/2,1),'-','linewidth',6);
     set(h,'marker','.');
     title(['No.',num2str(xy.frame(i))],'Color','red','FontSize',14);
     hold on
-    
-%     quiver(lzero+X(:,1),size(Foo,1)-lzero-X(:,2),K2(:,1),-K2(:,2));  % WHY it is '-K2(:,2)'??
-%     hold on;
+
+    %     quiver(lzero+X(:,1),size(Foo,1)-lzero-X(:,2),K2(:,1),-K2(:,2));  % WHY it is '-K2(:,2)'??
+    %     hold on;
 
     plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin/2,1),T_spl2(RR2==min(RR2))...
         -max(T_C2-ywin/2,1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
     hold on;
-    
+
     plot(T_C1-max(T_C1-xwin/2,1),T_C2-max(T_C2-ywin/2,1),'*','markeredgecolor','r','MarkerSize',5);
     hold off;
-    
+
     % This is to draw the relative positions between two neighbouring  figures
     % and check we always follow the same filament.
     if i > 1
         figure('Position', [1500 0 100 100]); imshow(Foo); hold on;
         plot(T_C1_pre, T_C2_pre, 'r*','MarkerSize',3);hold on
         plot(T_C1, T_C2, 'co','MarkerSize',3);hold off
-%         rectangle('Position', [T_C1_pre, T_C2_pre, T_C1-T_C1_pre, T_C2-T_C2_pre], 'EdgeColor', 'b', 'FaceColor', 'r', 'LineWidth', 4); hold off;
+        %         rectangle('Position', [T_C1_pre, T_C2_pre, T_C1-T_C1_pre, T_C2-T_C2_pre], 'EdgeColor', 'b', 'FaceColor', 'r', 'LineWidth', 4); hold off;
     end
     T_C1_pre = T_C1; T_C2_pre = T_C2;
-    
-    
+
+
     % Select the good cases manually.
     try
         Inputnum = input('The B-spline fits well?: \n 1 = Yes \n 2 = No \n');
@@ -125,16 +125,16 @@ for i = 1:1:xy.nframe
     end
 
 
-%     saveas(gcf,'F:\Code\tmpData\tmp','tiffn');
-%     imwrite(imread('F:\Code\tmpData\tmp.tif'), [basepath,'results\Batch_1',tifname], 'writemode', 'append');
-    
+    %     saveas(gcf,'F:\Code\tmpData\tmp','tiffn');
+    %     imwrite(imread('F:\Code\tmpData\tmp.tif'), [basepath,'results\Batch_1',tifname], 'writemode', 'append');
+
     %     plot(lzero+xy(1).spl{i}(:,1),size(Foo,1)*1.5-lzero-xy(1).spl{i}(:,2),'-','linewidth',6)
     %     hold on
     %     plot(lzero+xy(1).crd{i}(:,1),size(Foo,1)*1.5-lzero-xy(1).crd{i}(:,2),'.','markeredgecolor','k','markerfacecolor','w','linewidth',2)
     %     hold on
-    
+
     close all;
-    
+
 end
 
 
@@ -156,45 +156,45 @@ clear; close all; clc;
 
 % The .tif file you just calculated.
 basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220216-Actin\AfterAveBGR\';
-tifname='M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR.tif';
+tifname='M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR.tif';
 
 
 % The .mat file where stores your results.
 loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220216-Actin\results\',...
-    'trajectory_M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR_batch1.mat'];
+    'trajectory_M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
 lzero = max(lobject,ceil(5*lnoise));
-    
-v = VideoWriter(strcat('M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR_video2'),'MPEG-4');   % To make a video!
+
+v = VideoWriter(strcat('M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR_video2'),'MPEG-4');   % To make a video!
 v.FrameRate = 24;  % Frame rate in the video.
 v.Quality = 100;
 
 open(v);   % For the video.
 for j = 1:size(Good_case,2)
-    
+
     i = Good_case(j);% index of the 'good' cases
-    
+
     Foo = imread([basepath, tifname],xy(1).frame(i));
-   
+
     C1 = xy(1).centroid{i}(:,1); C2 = xy(1).centroid{i}(:,2); % Center-of-mass
-    T_C1 = lzero+C1;  T_C2 = size(Foo,1)-lzero-C2; 
+    T_C1 = lzero+C1;  T_C2 = size(Foo,1)-lzero-C2;
     % Count in the Isero and tranfrom the coordinate because of the different
     % original point between the image and plot
     spl1 = xy(1).spl{i}(:,1); spl2 = xy(1).spl{i}(:,2); % x-y coordinates of the B-spline
-    T_spl1 = lzero+spl1;  T_spl2 = size(Foo,1)-lzero-spl2; 
+    T_spl1 = lzero+spl1;  T_spl2 = size(Foo,1)-lzero-spl2;
     % Same as above
-    
+
     % calculate the curvature
     X = xy(1).spl{i};
     [L2,R2,K2] = curvature(X);
     RR2 = movmean(R2,ceil(size(X,1)/100));
-    
+
     % Zoom in (based on the center-of-mass [C1, C2]) and show the image.
     % The size of the ROI depends on the [xwin, ywin]
     fig = figure('Name','filaments','Position', [0 0 100 100]);
-%     imshow(Foo*1000); hold on; 
+    %     imshow(Foo*1000); hold on;
     Zoom_in = Foo(round(max(T_C2-ywin/2,1)):round(min(T_C2+ywin/2,size(Foo,1))),...
         round(max(T_C1-xwin/2,1)):round(min(T_C1+xwin/2,size(Foo,2))))*1000;
 
@@ -204,17 +204,17 @@ for j = 1:size(Good_case,2)
         the_frame(padarray(true(size(Zoom_in)), xy_mov, 'pre')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
 
         imshow(the_frame, 'InitialMagnification', 200); hold on;
-% Show the B-spline, the idea is to change the original point according
-% to the required window.
-% h = plot(T_spl1,T_spl2,'-','linewidth',6);
+        % Show the B-spline, the idea is to change the original point according
+        % to the required window.
+        % h = plot(T_spl1,T_spl2,'-','linewidth',6);
         h = plot(T_spl1-max(T_C1-xwin/2,1) + xy_mov(2), T_spl2-max(T_C2-ywin/2,1) + xy_mov(1),'-','linewidth',6);
         set(h,'marker','.');
-% title(['No.',num2str(xy.frame(i))],'Color','red','FontSize',14);
+        % title(['No.',num2str(xy.frame(i))],'Color','red','FontSize',14);
 
         title(['No.',num2str(j)],'Color','red','FontSize',14);
         hold on
-%     quiver(lzero+X(:,1),size(Foo,1)-lzero-X(:,2),K2(:,1),-K2(:,2));  % WHY it is '-K2(:,2)'??
-%     hold on;
+        %     quiver(lzero+X(:,1),size(Foo,1)-lzero-X(:,2),K2(:,1),-K2(:,2));  % WHY it is '-K2(:,2)'??
+        %     hold on;
 
         plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin/2,1) + xy_mov(2),T_spl2(RR2==min(RR2))...
             -max(T_C2-ywin/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
@@ -236,10 +236,10 @@ for j = 1:size(Good_case,2)
         plot(T_C1-max(T_C1-xwin/2,1),T_C2-max(T_C2-ywin/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
         hold off;
     end
-    
-%     saveas(gcf,'F:\Code\tmpData\tmp','tiffn');
-%     imwrite(imread('F:\Code\tmpData\tmp.tif'), [basepath,'results\Batch_1',tifname], 'writemode', 'append');
-    
+
+    %     saveas(gcf,'F:\Code\tmpData\tmp','tiffn');
+    %     imwrite(imread('F:\Code\tmpData\tmp.tif'), [basepath,'results\Batch_1',tifname], 'writemode', 'append');
+
     %     plot(lzero+xy(1).spl{i}(:,1),size(Foo,1)*1.5-lzero-xy(1).spl{i}(:,2),'-','linewidth',6)
     %     hold on
     %     plot(lzero+xy(1).crd{i}(:,1),size(Foo,1)*1.5-lzero-xy(1).crd{i}(:,2),'.','markeredgecolor','k','markerfacecolor','w','linewidth',2)
@@ -279,26 +279,35 @@ end
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220216-Actin\AfterAveBGR\';
-tifname='M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR.tif';
+basepath='D:\Dropbox\tmp\';
+tifname='M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR.tif';
 
 
 % The .mat file where stores your results.
-loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220216-Actin\results\',...
-    'trajectory_M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR_batch2.mat'];
+loadfile = ['D:\Dropbox\tmp\',...
+    'trajectory_M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR_batch2.mat'];
 load(loadfile);
 
 close all;
 
-v = VideoWriter(strcat('M63_Phi20_T10_0.5nM_0.5nL_Expo20ms_13_no8-no201_AABGR_video'),'MPEG-4');   % To make a video!
+v = VideoWriter(strcat('M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR_video'),'MPEG-4');   % To make a video!
 v.FrameRate = 24;  % Frame rate in the video.
 v.Quality = 100;
 open(v);   % For the video.
 
-false_ind = ~ismember(xy(1).frame, Good_case);  
-% Here, the 'Good_case' means the absolute frame number, not the index of 
-% xy.frame (different to the code before which calculation and selection 
-% are two processes. 
+xwin_max = 0; ywin_max = 0;
+for ii = 1: length(prmt)-1
+    xwin_max = max([prmt(ii+1).xwin, prmt(ii).xwin, xwin_max]);
+    ywin_max = max([prmt(ii+1).ywin, prmt(ii).ywin, ywin_max]);
+end
+ywin_max = round(ywin_max/2)*2; xwin_max = round(xwin_max/2)*2; 
+% The frame size in the video and make sure they are even numbers because 
+% will need half of the size. 
+
+false_ind = ~ismember(xy(1).frame, Good_case);
+% Here, the 'Good_case' means the absolute frame number, not the index of
+% xy.frame (different to the code before which calculation and selection
+% are two processes.
 
 xy.crd(false_ind) = [];
 xy.centroid(false_ind) = [];
@@ -312,78 +321,77 @@ xy.arclen_spl(false_ind) = [];
 xy.seglen_spl(false_ind) = [];
 
 for j = 1:xy.nframe
-    
-    prmt_i = xy(1).frame(j);
 
+    % The real parameters used to do the calculation because the first
+    % processing frame might not be 1. Here is mainly for xwin and ywin
+    % below.
+    prmt_i = xy(1).frame(j) - xy(1).frame(1) + 1;
     Foo = imread([basepath, tifname],xy(1).frame(j));
-    lzero = max(prmt(prmt_i).lobject,ceil(5*prmt(prmt_i).lnoise));
-   
+
+    % tranfrom the coordinate because of the different original point
+    % between the image and plot.
     C1 = xy(1).centroid{j}(:,1); C2 = xy(1).centroid{j}(:,2); % Center-of-mass
-    T_C1 = lzero+C1;  T_C2 = size(Foo,1)-lzero-C2; 
-    % Count in the Isero and tranfrom the coordinate because of the different
-    % original point between the image and plot
+    T_C1 = C1;  T_C2 = size(Foo,1)-C2;
     spl1 = xy(1).spl{j}(:,1); spl2 = xy(1).spl{j}(:,2); % x-y coordinates of the B-spline
-    T_spl1 = lzero+spl1;  T_spl2 = size(Foo,1)-lzero-spl2; 
-    % Same as above
-    
+    T_spl1 = spl1;  T_spl2 = size(Foo,1)-spl2;
+
     % calculate the curvature
     X = xy(1).spl{j};
     [L2,R2,K2] = curvature(X);
     RR2 = movmean(R2,ceil(size(X,1)/100));
-    
+
     % Zoom in (based on the center-of-mass [C1, C2]) and show the image.
     % The size of the ROI depends on the [xwin, ywin]
     fig = figure('Name','filaments','Position', [0 0 100 100]);
-%     imshow(Foo*1000); hold on; 
-    Zoom_in = Foo(round(max(T_C2-prmt(prmt_i).ywin/2,1)):round(min(T_C2+prmt(prmt_i).ywin/2,size(Foo,1))),...
-        round(max(T_C1-prmt(prmt_i).xwin/2,1)):round(min(T_C1+prmt(prmt_i).xwin/2,size(Foo,2))))*1000;
+    Zoom_in = Foo(max(T_C2-ywin_max/2,1):min(T_C2+ywin_max/2,size(Foo,1)),...
+        max(T_C1-xwin_max/2,1):min(T_C1+xwin_max/2,size(Foo,2)))*1000;
 
-    the_frame = uint16(zeros(prmt(prmt_i).ywin+1, prmt(prmt_i).xwin+1));  % Put the Zoom_in into this frame so that every figure has the same size to make the video.
-    xy_mov = size(the_frame)-size(Zoom_in);  % How much should the plot be shifted.
+    % How much should the plot be shifted (ensure the center-of-mass is
+    % fixed). It's equal to "xy_mov = size(the_frame)-size(Zoom_in)"
+    xy_mov = [ywin_max+1, xwin_max+1]-size(Zoom_in);
+    
     if abs(j - 1)  < abs(j - size(Good_case,2))  % To fix the center-of-mass position in the video.
+        the_frame = uint16(zeros(ywin_max+1, xwin_max+1));
+        % Will put the Zoom_in into this frame so that every figure has the same
+        % size to make the video.
         the_frame(padarray(true(size(Zoom_in)), xy_mov, 'pre')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
 
         imshow(the_frame, 'InitialMagnification', 200); hold on;
-% Show the B-spline, the idea is to change the original point according
-% to the required window.
-% h = plot(T_spl1,T_spl2,'-','linewidth',6);
-        h = plot(T_spl1-max(T_C1-prmt(prmt_i).xwin/2,1) + xy_mov(2), T_spl2-max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'-','linewidth',6);
+        % Show the B-spline, the idea is to change the original point according
+        % to the required window.
+        % h = plot(T_spl1,T_spl2,'-','linewidth',6);
+        h = plot(T_spl1-max(T_C1-xwin_max/2,1) + xy_mov(2), T_spl2-max(T_C2-ywin_max/2,1) + xy_mov(1),'-','linewidth',0.1);
         set(h,'marker','.');
-% title(['No.',num2str(xy.frame(j))],'Color','red','FontSize',14);
+        % title(['No.',num2str(xy.frame(j))],'Color','red','FontSize',14);
 
         title(['No.',num2str(j)],'Color','red','FontSize',14);
         hold on
-%     quiver(lzero+X(:,1),size(Foo,1)-lzero-X(:,2),K2(:,1),-K2(:,2));  % WHY it is '-K2(:,2)'??
-%     hold on;
+        %     quiver(lzero+X(:,1),size(Foo,1)-lzero-X(:,2),K2(:,1),-K2(:,2));  % WHY it is '-K2(:,2)'??
+        %     hold on;
 
-        plot(T_spl1(RR2==min(RR2))-max(T_C1-prmt(prmt_i).xwin/2,1) + xy_mov(2),T_spl2(RR2==min(RR2))...
-            -max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
+        plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin_max/2,1) + xy_mov(2),T_spl2(RR2==min(RR2))...
+            -max(T_C2-ywin_max/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
         hold on;
 
-        plot(T_C1-max(T_C1-prmt(prmt_i).xwin/2,1) + xy_mov(2),T_C2-max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
+        plot(T_C1-max(T_C1-xwin_max/2,1) + xy_mov(2),T_C2-max(T_C2-ywin_max/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
         hold off;
 
     else
+        the_frame = uint16(zeros(ywin_max+1, xwin_max+1));
+        % Will put the Zoom_in into this frame so that every figure has the same
+        % size to make the video.
         the_frame(padarray(true(size(Zoom_in)), xy_mov, 'post')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
         imshow(the_frame, 'InitialMagnification', 200); hold on;
-        h = plot(T_spl1-max(T_C1-prmt(prmt_i).xwin/2,1), T_spl2-max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'-','linewidth',6);
+        h = plot(T_spl1-max(T_C1-xwin_max/2,1), T_spl2-max(T_C2-ywin_max/2,1) + xy_mov(1),'-','linewidth',0.1);
         set(h,'marker','.');
         title(['No.',num2str(j)],'Color','red','FontSize',14);
         hold on
-        plot(T_spl1(RR2==min(RR2))-max(T_C1-prmt(prmt_i).xwin/2,1),T_spl2(RR2==min(RR2))...
-            -max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
+        plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin_max/2,1),T_spl2(RR2==min(RR2))...
+            -max(T_C2-ywin_max/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
         hold on;
-        plot(T_C1-max(T_C1-prmt(prmt_i).xwin/2,1),T_C2-max(T_C2-prmt(prmt_i).ywin/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
+        plot(T_C1-max(T_C1-xwin_max/2,1),T_C2-max(T_C2-ywin_max/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
         hold off;
     end
-    
-%     saveas(gcf,'F:\Code\tmpData\tmp','tiffn');
-%     imwrite(imread('F:\Code\tmpData\tmp.tif'), [basepath,'results\Batch_1',tifname], 'writemode', 'append');
-    
-    %     plot(lzero+xy(1).spl{j}(:,1),size(Foo,1)*1.5-lzero-xy(1).spl{j}(:,2),'-','linewidth',6)
-    %     hold on
-    %     plot(lzero+xy(1).crd{j}(:,1),size(Foo,1)*1.5-lzero-xy(1).crd{j}(:,2),'.','markeredgecolor','k','markerfacecolor','w','linewidth',2)
-    %     hold on
 
     pause(0.001);
     frame = getframe(gcf);
