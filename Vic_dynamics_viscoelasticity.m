@@ -10,7 +10,32 @@ storePath = xlsfile(:, 2);  % Path of the data to be processed.
 savePath = xlsfile(:, 3);  % Saving path.
 PAtype = xlsfile(:, 4); % Pillar array types.
 PAtype_label = xlsfile(:, 5); % PAtype labels (in number). Easier for drawing.
+PAtype_label = cell2mat(PAtype_label); % convert format.
 
+
+%% Plot histogram of contour lengths in different PA types.
+ContourL_all = cell(1, max(PAtype_label));
+PAtype_name = cell(1, max(PAtype_label));
+for no_Group = 1: NumGroup
+    Allinfo = readtable(storePath{no_Group},'Sheet','Sheet2','VariableNamingRule','preserve');  % read the 
+    ContourL = table2array(Allinfo(:, 10)); % transfer to array format (contour length).  
+    ContourL(isnan(ContourL))  = []; % remove the NAN results.
+    type_ind = PAtype_label(no_Group); % PA type indicators.
+    ContourL_all(type_ind) = {[ContourL_all{type_ind};ContourL]}; % classify countour according to different PA types.
+    PAtype_name(type_ind) = PAtype(no_Group);
+end
+
+for no_Group = 1: max(PAtype_label)
+    figure('color', 'w'); set(gcf, 'Position', [100 300 800 400]);
+    histogram(ContourL_all{no_Group}, 5); 
+    title(PAtype_name{no_Group}, Interpreter='latex',FontSize=12);
+    set(gca,'FontSize',12);
+    xlabel('$Contour\ length\ ({\mu}m)$','FontSize', 12,'Interpreter', 'latex');
+    ylabel('$Number\ of\ events$','FontSize', 12,'Interpreter', 'latex');
+end
+
+
+%% Extract data for the following plotting.
 for no_Group = 1: NumGroup
     Allinfo = readtable(storePath{no_Group},'Sheet','Sheet2','VariableNamingRule','preserve');  % read the 
     for ii = 5:9 % the column in the sheet
@@ -38,7 +63,7 @@ for no_Group = 1: NumGroup
         % remove the false cases.
         DrawXY_dynmodes{no_Group, dyn} = dynmodes; % save the data into a cell (row: groups; column: dynamic modes).
     end
-    DrawXY_dynmodes{no_Group, dyn+1} = PAtype_label{no_Group, 1};
+    DrawXY_dynmodes{no_Group, dyn+1} = PAtype_label(no_Group);
 
     %%%%%%  global & partial buckling %%%%%%%%%%
     ToDraw_bucklingtypes = Alldata(:, [1:2, 10]);
@@ -49,15 +74,14 @@ for no_Group = 1: NumGroup
         % remove the false cases.
         DrawXY_buckletypes{no_Group, buk} = buckletypes;  % save the data into a cell (row: groups; column: buckling types).
     end
-    DrawXY_buckletypes{no_Group, buk+1} = PAtype_label{no_Group, 1};
+    DrawXY_buckletypes{no_Group, buk+1} = PAtype_label(no_Group);
 end
 
-%% Plot all points
 
+%% Plot all points
 % dynamic modes vs. elastoviscous numner
 figure('color', 'w'); set(gcf, 'Position', [100 300 800 400]);
-PAtype_labels = cell2mat(PAtype_label);
-CM = jet(max(PAtype_labels));  % declare the colours for different pillar array types.
+CM = jet(max(PAtype_label));  % declare the colours for different pillar array types.
 MyMarkers = {'p','o','x','s','d','v','>','<','+','h','*','.','^'};  % declare the markers for different pillar array types.
 for no_Group = 1:NumGroup
     PAtype_labels_ind = DrawXY_dynmodes{no_Group, 7};
@@ -108,8 +132,8 @@ for no_Group = 1:NumGroup
         averaged_mu_bar_dyn(no_Group, dyn) = mean(DrawXY_dynmodes{no_Group, dyn}(:, 2), 'omitnan');
     end
 end
-for PAtypeloop = 1:max(PAtype_labels)  % Loop to draw according to the PA type labels.
-    tmp4 = find(PAtype_labels==PAtypeloop);
+for PAtypeloop = 1:max(PAtype_label)  % Loop to draw according to the PA type labels.
+    tmp4 = find(PAtype_label==PAtypeloop);
     Todraw_averaged_mu_bar_dyn(PAtypeloop, :) = mean(averaged_mu_bar_dyn(tmp4, :),1);
     h_dyn_avg(PAtypeloop) = semilogx(Todraw_averaged_mu_bar_dyn(PAtypeloop, :), 1:dyn,'Color', CM(PAtypeloop,:), ...
         'LineStyle', 'none', 'marker', MyMarkers{1, PAtypeloop}, 'MarkerSize', 10,'LineWidth', 2); hold on
@@ -131,8 +155,8 @@ for no_Group = 1:NumGroup
         averaged_mu_bar_buk(no_Group, buk) = mean(DrawXY_buckletypes{no_Group, buk}(:, 2), 'omitnan');
     end
 end
-for PAtypeloop = 1:max(PAtype_labels)  % Loop to draw according to the PA type labels.
-    tmp5 = find(PAtype_labels==PAtypeloop);
+for PAtypeloop = 1:max(PAtype_label)  % Loop to draw according to the PA type labels.
+    tmp5 = find(PAtype_label==PAtypeloop);
     Todraw_averaged_mu_bar_buk(PAtypeloop, :) = mean(averaged_mu_bar_buk(tmp5, :),1);
     h_buk_avg(PAtypeloop) = semilogx(Todraw_averaged_mu_bar_buk(PAtypeloop, :), 1:buk,'Color', CM(PAtypeloop,:), ...
         'LineStyle', 'none', 'marker', MyMarkers{1, PAtypeloop}, 'MarkerSize', 10,'LineWidth', 2); hold on
