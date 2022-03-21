@@ -18,7 +18,7 @@ Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
 C2C_dis = xlsfile(:, 12); % Center-to-center distance (um)
 Pillar_a = xlsfile(:, 13); % Pillar diameter (um)
 
-for no_Group = 1: NumGroup 
+for no_Group = 13: NumGroup 
     
     Info(no_Group).ExpDate = ExpDate{no_Group, 1};  % list of the experiment date.
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
@@ -27,9 +27,10 @@ for no_Group = 1: NumGroup
     for no_Case = 1:length(filelist)
 
         load([storePath{no_Group}, filesep , filelist(no_Case).name])
-        lzero = max(lobject,ceil(5*lnoise));   % This is so important!!!!!!!!!!! Came from 'elongated_objects_in_flow.m'.
+%         lzero = max(lobject,ceil(5*lnoise));   % This is so important!!!!!!!!!!! Came from 'elongated_objects_in_flow.m'.
+        lzero = 0;
 
-        if Good_case(end) > xy.nframe
+        if Good_case(end) > xy.nframe  % This condition is not enough !!!
             Good_case_abs = Good_case;
             Good_case_frm = find(ismember(xy(1).frame, Good_case));
         else
@@ -140,7 +141,7 @@ end
 % The excels are stored in ...Processing\EXP DATE\results normally.
 % This part should run after the above 'Get the information' part.
 
-for no_Group = 1: NumGroup
+for no_Group = 13: NumGroup
 
     disp(['You are processing ', datestr(Info(no_Group).ExpDate), ' data!']);
     [filename, pathname] = uigetfile('E:\Dropbox\Research\All Plottings\Manually classification documents\.xlsx', 'Please choose the excel accordingly and carefully!!');
