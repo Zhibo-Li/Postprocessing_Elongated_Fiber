@@ -25,13 +25,15 @@ for no_Group = 1: NumGroup
     PAtype_name(type_ind) = PAtype(no_Group);
 end
 
-for no_Group = 1: max(PAtype_label)
+for PAtype_ind = 1: max(PAtype_label)
     figure('color', 'w'); set(gcf, 'Position', [100 300 800 400]);
-    histogram(ContourL_all{no_Group}, 5); 
-    title(PAtype_name{no_Group}, Interpreter='latex',FontSize=12);
+    histogram(ContourL_all{PAtype_ind}, 5); 
+    title(PAtype_name{PAtype_ind}, Interpreter='latex',FontSize=12);
     set(gca,'FontSize',12);
     xlabel('$Contour\ length\ ({\mu}m)$','FontSize', 12,'Interpreter', 'latex');
     ylabel('$Number\ of\ events$','FontSize', 12,'Interpreter', 'latex');
+%     f=gcf;
+%     exportgraphics(f,['E:\Dropbox\Research\All Plottings\General plots\',PAtype_name{PAtype_ind},'_contourL_histogram.png'],'Resolution',500)
 end
 
 
