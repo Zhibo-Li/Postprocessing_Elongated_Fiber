@@ -7,13 +7,13 @@
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220216-Actin\AfterAveBGR\';
-tifname='M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR.tif';
+basepath='D:\Dropbox\tmp\AfterAveBGR\';
+tifname='M63_H40.44_Phi30_1nM_2nL2nL0.2nL_Expo20ms_11_no1018-no1085_AABGR.tif';
 
 
 % The .mat file where stores your results.
-loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220216-Actin\results\',...
-    'trajectory_M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR_batch1.mat'];
+loadfile = ['D:\Dropbox\tmp\AfterAveBGR\results\',...
+    'trajectory_M63_H40.44_Phi30_1nM_2nL2nL0.2nL_Expo20ms_11_no1018-no1085_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
@@ -51,8 +51,8 @@ for i = 1:1:xy.nframe
         round(max(T_C1-xwin/2,1)):round(min(T_C1+xwin/2,size(Foo,2))))*1000;
     imshow(Zoom_in, 'InitialMagnification', 200); hold on;
 
-    xwin = 600;
-    ywin = 300;
+%     xwin = 600;
+%     ywin = 300;
 
     % Show the B-spline, the idea is to change the original point according
     % to the required window.
@@ -155,15 +155,13 @@ save(loadfile,'thickness','structsensitivity','lnoise','lobject','threshold','ds
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220216-Actin\AfterAveBGR\';
-tifname='M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR.tif';
+% basepath='D:\Dropbox\tmp\AfterAveBGR\';
+% tifname='M63_H40.44_Phi30_1nM_2nL2nL0.2nL_Expo20ms_11_no721-no797_AABGR.tif';
 
 
 % The .mat file where stores your results.
-loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220216-Actin\results\',...
-    'trajectory_M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR_batch1.mat'];
-load(loadfile);
-
+[filename, pathname]=uigetfile({'D:\Dropbox\tmp\AfterAveBGR\results\*.mat'}, 'Choose a file to be processed');  % input file
+load([pathname, filename]);
 close all;
 lzero = max(lobject,ceil(5*lnoise));
 
@@ -253,11 +251,16 @@ for j = 1:size(Good_case,2)
 end
 close(v);  % For the video.
 
-figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
+% figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
+bgim=imread('D:\Dropbox\tmp\Tri_1 - Copy.tif');  % background image.
+imshow(bgim, []); hold on;
+
 for j = 1:size(Good_case,2)
 
     i = Good_case(j); % index of the 'good' cases
-    plot(xy.spl{i}(:,1),xy.spl{i}(:,2))
+    spl1 = xy(1).spl{i}(:,1); spl2 = xy(1).spl{i}(:,2); % x-y coordinates of the B-spline
+    T_spl1 = lzero+spl1;  T_spl2 = 2048-lzero-spl2;
+    plot(T_spl1,T_spl2)
     hold on
 
     axis equal
@@ -268,6 +271,8 @@ for j = 1:size(Good_case,2)
 
 end
 
+f=gcf;
+exportgraphics(f,[pathname, filename, 'trajectory.png'],'Resolution',200)
 
 
 
@@ -279,18 +284,18 @@ end
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='D:\Dropbox\tmp\';
-tifname='M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR.tif';
+basepath='E:\Dropbox\tmp\';
+tifname='M63_Phi20_T20_0.5nM_1nL_Expo20ms_17_no333-no447_AABGR.tif';
 
 
 % The .mat file where stores your results.
-loadfile = ['D:\Dropbox\tmp\',...
-    'trajectory_M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR_batch2.mat'];
+loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220217-Actin\results\',...
+    'trajectory_M63_Phi20_T20_0.5nM_1nL_Expo20ms_17_no333-no447_AABGR_batch1.mat'];
 load(loadfile);
 
 close all;
 
-v = VideoWriter(strcat('M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR_video'),'MPEG-4');   % To make a video!
+v = VideoWriter(strcat('M63_Phi20_T20_0.5nM_1nL_Expo20ms_17_no333-no447_AABGR_video'),'MPEG-4');   % To make a video!
 v.FrameRate = 24;  % Frame rate in the video.
 v.Quality = 100;
 open(v);   % For the video.
