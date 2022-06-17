@@ -7,14 +7,20 @@
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='D:\Dropbox\tmp\AfterAveBGR\';
-tifname='M63_H40.44_Phi30_1nM_2nL2nL0.2nL_Expo20ms_11_no1018-no1085_AABGR.tif';
+[filename, pathname]=uigetfile({'G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220217-Actin\AfterAveBGR\*.tif'}, 'Choose a file to be processed');  % input file
+
+basepath=pathname;
+tifname=filename;
+
+% basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220217-Actin\AfterAveBGR\';
+% tifname='M63_H40.44_Phi30_1nM_2nL2nL0.2nL_Expo20ms_11_no1018-no1085_AABGR.tif';
 
 
 % The .mat file where stores your results.
-loadfile = ['D:\Dropbox\tmp\AfterAveBGR\results\',...
-    'trajectory_M63_H40.44_Phi30_1nM_2nL2nL0.2nL_Expo20ms_11_no1018-no1085_AABGR_batch1.mat'];
-load(loadfile);
+[filename, pathname]=uigetfile({'G:\PhD, PMMH, ESPCI\Processing\20220217-Actin\results\Group_1\*.mat'}, 'Choose a file to be processed');  % input file
+% loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220217-Actin\results\',...
+%     'trajectory_M63_H40.44_Phi30_1nM_2nL2nL0.2nL_Expo20ms_11_no1018-no1085_AABGR_batch1.mat'];
+load([pathname, filename]);
 
 close all;
 lzero = max(lobject,ceil(5*lnoise));
@@ -138,7 +144,7 @@ for i = 1:1:xy.nframe
 end
 
 
-save(loadfile,'thickness','structsensitivity','lnoise','lobject','threshold','ds',...
+save([pathname, filename],'thickness','structsensitivity','lnoise','lobject','threshold','ds',...
     'npnts','FilNum','initial_frame',...
     'frame_step','final_frame','framelist','improc','InfoImage',...,
     'sensitivity','MinBranchLength','ROI','missed_frames',...
@@ -271,8 +277,8 @@ for j = 1:size(Good_case,2)
 
 end
 
-f=gcf;
-exportgraphics(f,[pathname, filename, 'trajectory.png'],'Resolution',200)
+% f=gcf;
+% exportgraphics(f,[pathname, filename, 'trajectory.png'],'Resolution',200)
 
 
 
