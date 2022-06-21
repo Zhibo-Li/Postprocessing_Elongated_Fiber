@@ -1,5 +1,5 @@
 clear; close all; clc;
-[filename, pathname]=uigetfile({'C:\Users\LaVision\Desktop\20220614-SU8_Fibers_Size\*.tif'}, 'Choose a file to be processed');  % input file
+[filename, pathname]=uigetfile({'G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220614-SU8_Fibers_Size\*.tif'}, 'Choose a file to be processed');  % input file
 % path for the result files
 % pathout = uigetdir('C:\Users\LaVision\Desktop\20220614-SU8_Fibers_Size\', 'Choose the saving folder');
 % [status,msg,msgID] = mkdir(pathout);
@@ -21,15 +21,28 @@ lobject = false;
 threshold = 0;
 bina_sensitivity = 0.1;
 MinBranchLength = 300;
-FilNum = 3;
+FilNum = 10;
 
-for img_i = 5%1:imtot
+for img_i = 1:25
     Img = imread(tifpath, img_i);
     IMG = im2double(Img) - 0.9;
-    imshow(Img); figure; imshow(uint16(rescale(IMG, 0, 2^bitimg-1)));
+%     imshow(Img); figure; imshow(uint16(rescale(IMG, 0, 2^bitimg-1)));
 
     [fiber_img,blur_img,BI,skel_full,L_full,cntrds] = Vic_get_skeleton(Img, ...
         thickness,structsens,lnoise,lobject,threshold,bina_sensitivity,MinBranchLength,FilNum);
+
+    r_p = regionprops(L_full,'PixelList');
+    figure;imshow(L_full, []); hold on;
+    for im_no = 1:size(r_p, 1)
+        c = minBoundingBox([r_p(im_no).PixelList(:, 1), r_p(im_no).PixelList(:, 2)]');
+        the_area = polyarea(c(1,:), c(2,:)); % the area of the minimum-covered rectangle.
+        one_edge = min(sqrt(sum((circshift(c,1,2) - c).^2))); % the length of one edge of the rectangle.
+        theother_edge = the_area / one_edge; % the length of the other edge.
+        the_ratio = max(one_edge, theother_edge) / min(one_edge, theother_edge); % the ratio between two edges.
+        if the_area>500 && the_ratio>20
+            plot(c(1,[1:end 1]),c(2,[1:end 1]),'r'); hold on;
+        end
+    end
 
 end
 
@@ -94,7 +107,7 @@ for filament_i = 1 : FilNum
 end
 BI_full = logical(sum(cat(3,s_full{:}),3));
 skel_full = bwskel(BI_full,'MinBranchLength', MinBranchLength); 
-figure;imshow(labeloverlay(ImageIN, skel_full, 'Transparency', 0))
+% figure;imshow(labeloverlay(ImageIN, skel_full, 'Transparency', 0))
 % find the connected part of the skeletonization image
 CC_full = bwconncomp(skel_full);
 % label each filament with a different number
