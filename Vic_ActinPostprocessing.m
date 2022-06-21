@@ -1,7 +1,8 @@
 % Postprocess code for the actin filaments in porous media (all in one).
 
 %% Get the information, like contour length and elastoviscous number, from the reconstructed shape of the filaments.
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear; clc; close all;
 xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLines',1); % This is the file that contains all the information about the later processing (in sheet 1).
 
@@ -138,8 +139,10 @@ end
 
 
 %% Write the contour length and the elastoviscous numbers into the excel. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The excels are stored in ...Processing\EXP DATE\results normally.
 % This part should run after the above 'Get the information' part.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 for no_Group = 13: NumGroup
 
@@ -166,7 +169,9 @@ end
 
 
 %% Plot 'L_ee_norm', 'omega' & 'Chi_norm'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This part is to plot the characterizations along one trajectory.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clearvars -except Info xlsfile
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
@@ -250,8 +255,9 @@ end
 
 
 %% Plot 'L_ee_norm', 'omega' & 'Chi_norm' in cell;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This part is to plot the characterizations in one cell.
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clearvars -except Info xlsfile
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
 ExpDate = xlsfile(:, 1);  % The experiment date.
@@ -349,9 +355,270 @@ exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\Deformation_of
 
 
 
+%% Plot deviation angle vs. contour length or elastoviscous Number at different flow angle.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+contourL = []; mu_bar = []; Slope = []; filelist = []; XY_plot_traj = []; counter = 1;
+
+% Angle = 10° and Angle = 20°
+for no_Group = 13: 18
+    mu_bar = [mu_bar, Info(no_Group).elastoviscousNum];
+    contourL = [contourL, Info(no_Group).contour_length];
+    filelist = [filelist, Info(no_Group).filelist'];
+    for no_Case = 1:length(Info(no_Group).contour_length)
+        XXX = Info(no_Group).centroidxy_plotX{1, no_Case};
+        YYY = Info(no_Group).centroidxy_plotY{1, no_Case};
+        XY = [XXX; YYY];
+        XY_plot_traj{counter} = XY;
+        for movind = 1:size(XY, 2)-5
+
+            tmp_p = polyfit(XY(1, movind:movind+5), XY(2, movind:movind+5),1);
+            sec_p(movind) = tmp_p(1);
+
+        end
+
+        posi_sec_p_ind = find(sec_p>-0.1);
+        foo = diff(posi_sec_p_ind);
+        posi_sec_p_cut_ind = find(foo>1);
+%         figure('Position',[-1800 0 800 600]); plot(XXX(1:end-5), sec_p);
+%         figure('Position',[-900 0 800 600]); plot(XXX, YYY); axis equal; hold on
+        if ~isempty(posi_sec_p_cut_ind)
+            for piece = 1:size(posi_sec_p_cut_ind,2)+1
+                if piece == 1
+                    XXYY = XY(:, posi_sec_p_ind(1):posi_sec_p_ind(posi_sec_p_cut_ind(piece)));
+                    if XXYY(1, end) - XXYY(1, 1) > 500
+                        [p,S] = polyfit(XXYY(1, :), XXYY(2, :),1);
+                        [y_fit,delta] = polyval(p,XXYY(1, :),S);
+                        if mean(delta) < 10
+                            Slope_tmp(piece) = p(1);
+                        else
+                            Slope_tmp(piece) = nan;
+                        end
+                    end
+                    XXYYY{piece} = XY(:, posi_sec_p_ind(1):posi_sec_p_ind(posi_sec_p_cut_ind(piece)));
+                    XXXYYY = XXYYY{piece};
+%                     plot(XXXYYY(1, :), XXXYYY(2, :),'r'); hold on
+                elseif piece == size(posi_sec_p_cut_ind,2)+1
+                    XXYY = XY(:, posi_sec_p_ind(posi_sec_p_cut_ind(piece-1)+1):posi_sec_p_ind(end));
+                    if XXYY(1, end) - XXYY(1, 1) > 500
+                        [p,S] = polyfit(XXYY(1, :), XXYY(2, :),1);
+                        [y_fit,delta] = polyval(p,XXYY(1, :),S);
+                        if mean(delta) < 10
+                            Slope_tmp(piece) = p(1);
+                        else
+                            Slope_tmp(piece) = nan;
+                        end
+                    end
+                    XXYYY{piece} = XY(:, posi_sec_p_ind(posi_sec_p_cut_ind(piece-1)+1):posi_sec_p_ind(end));
+                    XXXYYY = XXYYY{piece};
+%                     plot(XXXYYY(1, :), XXXYYY(2, :),'g'); hold on
+                else
+                    XXYY = XY(:, posi_sec_p_ind(posi_sec_p_cut_ind(piece-1)+1):posi_sec_p_ind(posi_sec_p_cut_ind(piece)));
+                    if XXYY(1, end) - XXYY(1, 1) > 500
+                        [p,S] = polyfit(XXYY(1, :), XXYY(2, :),1);
+                        [y_fit,delta] = polyval(p,XXYY(1, :),S);
+                        if mean(delta) < 10
+                            Slope_tmp(piece) = p(1);
+                        else
+                            Slope_tmp(piece) = nan;
+                        end
+                    end
+                    XXYYY{piece} = XY(:, posi_sec_p_ind(posi_sec_p_cut_ind(piece-1)+1):posi_sec_p_ind(posi_sec_p_cut_ind(piece)));
+                    XXXYYY = XXYYY{piece};
+%                     plot(XXXYYY(1, :), XXXYYY(2, :),'y'); hold on
+                end
+                XY_plot_traj_calculatedpiece{counter} = XXXYYY;
+            end
+            try
+                Slope_tmp(Slope_tmp==0)=[];
+                Slope(counter) = mean(Slope_tmp,'omitnan');
+            catch
+                warning('No slope for this one.');
+                Slope(counter) = nan;
+            end
+        else
+            XY(:, XY(1, :)<500)=[]; XY(:, XY(1, :)>1400)=[];
+            [p,S] =   polyfit(XY(1, :), XY(2, :),1);
+            [y_fit,delta] = polyval(p,XY(1, :),S);
+            if mean(delta) < 10
+                Slope(counter) = p(1);
+            else
+                Slope(counter) = nan;
+            end
+        end
+
+%         figure;
+%         subplot(3,1,1);
+%         plot(XXX, YYY); axis equal
+%         subplot(3,1,2);
+%         plot(XXX(1:size(XY, 2)-5), sec_p);
+%         subplot(3,1,3);
+%         h = histogram(sec_p,'Normalization','probability','BinWidth', 0.02);
+%         pause(1)
+        clear sec_p XXYY Slope_tmp
+        close all
+        %         close;
+        %         p = polyfit(XY(1, :), XY(2, :),1);
+        %         Slope(counter) = p(1);
+
+        counter = counter + 1;
+    end
+end
+
+% Angle = 0°
+for no_Group = 7: 8
+    mu_bar = [mu_bar, Info(no_Group).elastoviscousNum];
+    contourL = [contourL, Info(no_Group).contour_length];
+    filelist = [filelist, Info(no_Group).filelist'];
+    for no_Case = 1:length(Info(no_Group).contour_length)
+        XXX = Info(no_Group).centroidxy_plotX{1, no_Case};
+        YYY = Info(no_Group).centroidxy_plotY{1, no_Case};
+        XY = [XXX; YYY];
+        XY_plot_traj{counter} = XY;
+        [p,S] =   polyfit(XY(1, :), XY(2, :),1);
+        [y_fit,delta] = polyval(p,XY(1, :),S);
+        if mean(delta) < 10
+            Slope(counter) = p(1);
+        else
+            Slope(counter) = nan;
+        end
+        XY_plot_traj_calculatedpiece{counter} = nan;
+        counter = counter + 1;
+    end
+end
+
+
+Ang10_caseNum = length(Info(13).contour_length) + length(Info(14).contour_length) + length(Info(15).contour_length);
+Ang20_caseNum = length(Info(16).contour_length) + length(Info(17).contour_length) + length(Info(18).contour_length);
+Ang0_caseNum = length(Info(8).contour_length) + length(Info(9).contour_length);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Drawing: contour Length vs deviation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure('color', 'w'); set(gcf, 'Position', [100 100 800 500]);
+
+plot(contourL(Ang10_caseNum+Ang20_caseNum+1:end), abs(atand(Slope(Ang10_caseNum+Ang20_caseNum+1:end))-atand(0.0092)), ...
+    'Color','m', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on;
+Ang0 = [contourL(Ang10_caseNum+Ang20_caseNum+1:end);atand(Slope(Ang10_caseNum+Ang20_caseNum+1:end))-atand(0.0092)];
+Ang0(:, isnan(Ang0(2, :)))=[];
+pp3 = polyfit(Ang0(1, :),Ang0(2, :),1);
+f3 = polyval(pp3,Ang0(1, :));
+Ang0_fit = [Ang0(1, :);f3];
+Ang0_fit = sortrows(Ang0_fit',1);
+plot(Ang0_fit(:, 1),abs(Ang0_fit(:, 2)),':m', 'LineWidth',2); hold on;
+
+plot(contourL(1:Ang10_caseNum), abs(atand(Slope(1:Ang10_caseNum))-10), ...
+    'Color','r', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on;
+Ang10 = [contourL(1:70);atand(Slope(1:70))-10]; % minus the slope of the pillar array!
+Ang10(:, isnan(Ang10(2, :)))=[];
+pp1 = polyfit(Ang10(1, :),Ang10(2, :),1);
+f1 = polyval(pp1,Ang10(1, :));
+Ang10_fit = [Ang10(1, :);f1];
+Ang10_fit = sortrows(Ang10_fit',1);
+plot(Ang10_fit(:, 1),abs(Ang10_fit(:, 2)),':r','LineWidth',2); hold on;
+
+plot(contourL(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum), abs(atand(Slope(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum))-20), ...
+    'Color','c', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on;
+Ang20 = [contourL(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum);atand(Slope(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum))-20];
+Ang20(:, isnan(Ang20(2, :)))=[];
+pp2 = polyfit(Ang20(1, :),Ang20(2, :),1);
+f2 = polyval(pp2,Ang20(1, :));
+Ang20_fit = [Ang20(1, :);f2];
+Ang20_fit = sortrows(Ang20_fit',1);
+plot(Ang20_fit(:, 1),abs(Ang20_fit(:, 2)),':c', 'LineWidth',2); hold on;
+
+% title('CrMask Square Phi20 Gap10 FlowAng10', FontSize=12);
+set(gca,'FontSize',16);
+xlabel('$\bf{Contour\ length\ ({\mu}m)}$','FontSize', 20,'Interpreter', 'latex');
+ylabel('$\bf{CoM\ trajectory\ deviation\ \phi\ (^{\circ})}$','FontSize', 20,'Interpreter', 'latex');
+% hold on;plot([0 60], [0.1763 0.1763], 'b--', 'LineWidth',1.5)
+legend({'Flow angle = 0°', '', 'Flow angle = 10°','', 'Flow angle = 20°',''},'FontSize', 20, 'Location','best')
+ylim([0 10])
+% f=gcf;
+% exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\20210914_20220216-20220217_trajectoryslope_contourlength_abs_degree.png','Resolution',100)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Drawing: elastoviscous Number vs deviation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure('color', 'w'); set(gcf, 'Position', [100 100 800 500]);
+
+semilogx(mu_bar(Ang10_caseNum+Ang20_caseNum+1:end), abs(atand(Slope(Ang10_caseNum+Ang20_caseNum+1:end))-atand(0.0092)), ...
+    'Color','m', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on;
+Ang0 = [log10(mu_bar(Ang10_caseNum+Ang20_caseNum+1:end));atand(Slope(Ang10_caseNum+Ang20_caseNum+1:end))-atand(0.0092)];
+Ang0(:, isnan(Ang0(2, :)))=[];
+pp3 = polyfit(Ang0(1, :),Ang0(2, :),1);
+f3 = polyval(pp3,Ang0(1, :));
+Ang0_fit = [Ang0(1, :);f3];
+Ang0_fit = sortrows(Ang0_fit',1);
+plot(10.^(Ang0_fit(:, 1)),abs(Ang0_fit(:, 2)),':m', 'LineWidth',2); hold on;
+
+semilogx(mu_bar(1:Ang10_caseNum), abs(atand(Slope(1:Ang10_caseNum))-10), ...
+    'Color','r', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on;
+Ang10 = [log10(mu_bar(1:70));atand(Slope(1:70))-10]; % minus the slope of the pillar array!
+Ang10(:, isnan(Ang10(2, :)))=[];
+pp1 = polyfit(Ang10(1, :),Ang10(2, :),1);
+f1 = polyval(pp1,Ang10(1, :));
+Ang10_fit = [Ang10(1, :);f1];
+Ang10_fit = sortrows(Ang10_fit',1);
+plot(10.^(Ang10_fit(:, 1)),abs(Ang10_fit(:, 2)),':r','LineWidth',2); hold on;
+
+semilogx(mu_bar(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum), abs(atand(Slope(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum))-20), ...
+    'Color','c', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on;
+Ang20 = [log10(mu_bar(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum));atand(Slope(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum))-20];
+Ang20(:, isnan(Ang20(2, :)))=[];
+pp2 = polyfit(Ang20(1, :),Ang20(2, :),1);
+f2 = polyval(pp2,Ang20(1, :));
+Ang20_fit = [Ang20(1, :);f2];
+Ang20_fit = sortrows(Ang20_fit',1);
+plot(10.^(Ang20_fit(:, 1)),abs(Ang20_fit(:, 2)),':c', 'LineWidth',2); hold on;
+
+% title('CrMask Square Phi20 Gap10 FlowAng10', FontSize=12);
+set(gca,'FontSize',16);
+xlabel('$\bf{Elastoviscous\ Number\ \bar{\mu}}$','FontSize', 20,'Interpreter', 'latex');
+ylabel('$\bf{CoM\ trajectory\ deviation\ \phi\ (^{\circ})}$','FontSize', 20,'Interpreter', 'latex');
+% hold on;plot([0 60], [0.1763 0.1763], 'b--', 'LineWidth',1.5)
+legend({'Flow angle = 0°', '', 'Flow angle = 10°','', 'Flow angle = 20°',''},'FontSize', 20, 'Location','best')
+ylim([0 10])
+% f=gcf;
+% exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\20210914_20220216-20220217_trajectoryslope_elastoviscousnumber_abs_degree.png','Resolution',100)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Pick a point on 'elastoviscous Number vs deviation' and draw the trajectory as well as find the video of the case.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[the_elsvisN, the_devi] = ginput(1); % pick up the point you want to show the trajectory.
+% [the_conL, the_devi] = ginput(1);
+
+the_layout = 10; % declare the layout (flow angle) for the converting later.
+
+% the_loc = intersect(find(contourL>the_conL*0.99 & contourL<the_conL*1.01),...
+%     find(abs(atand(Slope)-the_layout)>the_devi*0.99 & abs(atand(Slope)-the_layout)...
+%     < the_devi*1.01));
+
+the_loc = intersect(find(mu_bar>the_elsvisN*0.95 & mu_bar<the_elsvisN*1.05),...
+    find(abs(atand(Slope)-the_layout)>the_devi*0.95 & abs(atand(Slope)-the_layout)...
+    < the_devi*1.05));  % Change the control range if there is an error.
+
+filelist(the_loc).name     % show the file
+filelist(the_loc).folder    % show the folder
+
+index_tmp = find(strcmp(xlsfile(:, 2), filelist(the_loc).folder)); % identify the PA information (Path of the pillar array).
+PAsPath = xlsfile(index_tmp(1), 3);
+
+figure('color', 'w', 'Position',[100 100 800 600]); 
+load(PAsPath{1}); % load the PAs information
+centers = cat(2, centers(:,1), 2048 - centers(:,2)); % 2048 is image size.
+viscircles(centers,radii,'LineStyle','--', 'LineWidth', 1, 'Color', 'k'); hold on
+
+plot(XY_plot_traj{the_loc}(1, :), XY_plot_traj{the_loc}(2, :), 'LineWidth',2); axis equal; hold on
+plot(XY_plot_traj_calculatedpiece{the_loc}(1, :), XY_plot_traj_calculatedpiece{the_loc}(2, :),'r','LineWidth',2); hold off
+axis off
+
+
 %% Plot elastoviscousNum vs. L_ee_morm
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This part is used to polt the elasto-viscous number /mu vs. end-to-end
 % length L_ee_norm.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clearvars -except Info xlsfile
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
@@ -401,13 +668,17 @@ ylabel('$L_{ee}/L_0$','FontSize', 18,'Interpreter', 'latex');
 
 
 %%  Plot elastoviscousNum vs. L_ee_morm
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Draw Lee/L0 vs mu0, meanwhile divide into different parts according to
 % the initial position.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
 %% Plot pdf of CoM
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This part is used to polt the pdf of CoM in a cell.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clearvars -except Info xlsfile
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
@@ -459,12 +730,16 @@ xlim([0 2]);  ylim([0 1]);
 
 
 %% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Draw Lee/L0 vs mu0, meanwhile divide into different parts according to
 % the initial position.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
 %% About the periodicity (Orientation & Deformation)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clearvars -except Info xlsfile
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
