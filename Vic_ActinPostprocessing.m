@@ -19,7 +19,7 @@ Obj_Mag = xlsfile(:, 9); % Calibration (um/pixel)
 C2C_dis = xlsfile(:, 12); % Center-to-center distance (um)
 Pillar_a = xlsfile(:, 13); % Pillar diameter (um)
 
-for no_Group = 13: NumGroup 
+for no_Group = 1: NumGroup 
     
     Info(no_Group).ExpDate = ExpDate{no_Group, 1};  % list of the experiment date.
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));  % list of the .mat files which contain the reconstruction information (came from 'Filaments detection' code) in one group.
@@ -358,6 +358,7 @@ exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\Deformation_of
 %% Plot deviation angle vs. contour length or elastoviscous Number at different flow angle.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% load('E:\Dropbox\tmp\INfO.mat'); % This part needs the variable 'info'.
 contourL = []; mu_bar = []; Slope = []; filelist = []; XY_plot_traj = []; counter = 1;
 
 % Angle = 10° and Angle = 20°
