@@ -21,14 +21,14 @@ lobject = false;
 threshold = 0;
 bina_sensitivity = 0.1;
 MinBranchLength = 300;
-FilNum = 10;
+FilNum = 1;
 
-for img_i = 1:25
+for img_i = 1:5
     Img = imread(tifpath, img_i);
     IMG = im2double(Img) - 0.9;
 %     imshow(Img); figure; imshow(uint16(rescale(IMG, 0, 2^bitimg-1)));
 
-    [fiber_img,blur_img,BI,skel_full,L_full,cntrds] = Vic_get_skeleton(Img, ...
+    [fiber_img,blur_img,BI,skel_full,L_full,cntrds] = Vic_get_skeleton(Img, bitimg, ...
         thickness,structsens,lnoise,lobject,threshold,bina_sensitivity,MinBranchLength,FilNum);
 
     r_p = regionprops(L_full,'PixelList');
@@ -47,7 +47,7 @@ for img_i = 1:25
 end
 
 
-function [fiber_img,blur_img,BI,skel_full,L_full,cntrds] = Vic_get_skeleton(ImageIN,...
+function [fiber_img,blur_img,BI,skel_full,L_full,cntrds] = Vic_get_skeleton(ImageIN, BitDepth,...
     thickness,structsens,lnoise,lobject,threshold,bina_sensitivity,MinBranchLength,FilNum)
 %
 % NAME:
@@ -63,6 +63,8 @@ function [fiber_img,blur_img,BI,skel_full,L_full,cntrds] = Vic_get_skeleton(Imag
 %
 % INPUTS:
 %               ImageIN:    The two-dimensional array to be processed.
+%               bitimg:     the bit-depth of the image for double2im
+%               converting.
 %               thickness and structsens:   SEE func:fibermetric.
 %                       ! The value of structsens indicates the percentage
 %                       of the diff(getrangefromclass(I))
@@ -85,7 +87,11 @@ function [fiber_img,blur_img,BI,skel_full,L_full,cntrds] = Vic_get_skeleton(Imag
 %               Written by Zhibo LI, ESPCI Paris, 2022-06.
 
 % Enhance elongated or tubular structures in images
-fiber_img = fibermetric(ImageIN, thickness, 'StructureSensitivity', ...
+% figure; imshow(ImageIN);
+% figure; imshow(uint16(2^BitDepth * (im2double(ImageIN)-graythresh(ImageIN))));
+im_threshold = uint16(2^BitDepth * (im2double(ImageIN)-graythresh(ImageIN)));
+% the global threshold based on Otsu's method.
+fiber_img = fibermetric(im_threshold, thickness, 'StructureSensitivity', ...
     structsens*diff(getrangefromclass(ImageIN)));
 %figure;imshow(fiber_img)
 
