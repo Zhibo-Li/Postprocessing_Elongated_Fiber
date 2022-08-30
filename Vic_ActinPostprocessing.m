@@ -4,7 +4,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear; clc; close all;
-xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLines',1); % This is the file that contains all the information about the later processing (in sheet 1).
+xlsfile = readcell('ForActinPostprocessing_laptop.xlsx','Sheet','Sheet1','NumHeaderLines',1); % This is the file that contains all the information about the later processing (in sheet 1).
 
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
 ExpDate = xlsfile(:, 1);  % The experiment date.
@@ -371,97 +371,7 @@ for no_Group = 13: 18
         YYY = Info(no_Group).centroidxy_plotY{1, no_Case};
         XY = [XXX; YYY];
         XY_plot_traj{counter} = XY;
-        for movind = 1:size(XY, 2)-5
-
-            tmp_p = polyfit(XY(1, movind:movind+5), XY(2, movind:movind+5),1);
-            sec_p(movind) = tmp_p(1);
-
-        end
-
-        posi_sec_p_ind = find(sec_p>-0.1);
-        foo = diff(posi_sec_p_ind);
-        posi_sec_p_cut_ind = find(foo>1);
-%         figure('Position',[-1800 0 800 600]); plot(XXX(1:end-5), sec_p);
-%         figure('Position',[-900 0 800 600]); plot(XXX, YYY); axis equal; hold on
-        if ~isempty(posi_sec_p_cut_ind)
-            for piece = 1:size(posi_sec_p_cut_ind,2)+1
-                if piece == 1
-                    XXYY = XY(:, posi_sec_p_ind(1):posi_sec_p_ind(posi_sec_p_cut_ind(piece)));
-                    if XXYY(1, end) - XXYY(1, 1) > 500
-                        [p,S] = polyfit(XXYY(1, :), XXYY(2, :),1);
-                        [y_fit,delta] = polyval(p,XXYY(1, :),S);
-                        if mean(delta) < 10
-                            Slope_tmp(piece) = p(1);
-                        else
-                            Slope_tmp(piece) = nan;
-                        end
-                    end
-                    XXYYY{piece} = XY(:, posi_sec_p_ind(1):posi_sec_p_ind(posi_sec_p_cut_ind(piece)));
-                    XXXYYY = XXYYY{piece};
-%                     plot(XXXYYY(1, :), XXXYYY(2, :),'r'); hold on
-                elseif piece == size(posi_sec_p_cut_ind,2)+1
-                    XXYY = XY(:, posi_sec_p_ind(posi_sec_p_cut_ind(piece-1)+1):posi_sec_p_ind(end));
-                    if XXYY(1, end) - XXYY(1, 1) > 500
-                        [p,S] = polyfit(XXYY(1, :), XXYY(2, :),1);
-                        [y_fit,delta] = polyval(p,XXYY(1, :),S);
-                        if mean(delta) < 10
-                            Slope_tmp(piece) = p(1);
-                        else
-                            Slope_tmp(piece) = nan;
-                        end
-                    end
-                    XXYYY{piece} = XY(:, posi_sec_p_ind(posi_sec_p_cut_ind(piece-1)+1):posi_sec_p_ind(end));
-                    XXXYYY = XXYYY{piece};
-%                     plot(XXXYYY(1, :), XXXYYY(2, :),'g'); hold on
-                else
-                    XXYY = XY(:, posi_sec_p_ind(posi_sec_p_cut_ind(piece-1)+1):posi_sec_p_ind(posi_sec_p_cut_ind(piece)));
-                    if XXYY(1, end) - XXYY(1, 1) > 500
-                        [p,S] = polyfit(XXYY(1, :), XXYY(2, :),1);
-                        [y_fit,delta] = polyval(p,XXYY(1, :),S);
-                        if mean(delta) < 10
-                            Slope_tmp(piece) = p(1);
-                        else
-                            Slope_tmp(piece) = nan;
-                        end
-                    end
-                    XXYYY{piece} = XY(:, posi_sec_p_ind(posi_sec_p_cut_ind(piece-1)+1):posi_sec_p_ind(posi_sec_p_cut_ind(piece)));
-                    XXXYYY = XXYYY{piece};
-%                     plot(XXXYYY(1, :), XXXYYY(2, :),'y'); hold on
-                end
-                XY_plot_traj_calculatedpiece{counter} = XXXYYY;
-            end
-            try
-                Slope_tmp(Slope_tmp==0)=[];
-                Slope(counter) = mean(Slope_tmp,'omitnan');
-            catch
-                warning('No slope for this one.');
-                Slope(counter) = nan;
-            end
-        else
-            XY(:, XY(1, :)<500)=[]; XY(:, XY(1, :)>1400)=[];
-            [p,S] =   polyfit(XY(1, :), XY(2, :),1);
-            [y_fit,delta] = polyval(p,XY(1, :),S);
-            if mean(delta) < 10
-                Slope(counter) = p(1);
-            else
-                Slope(counter) = nan;
-            end
-        end
-
-%         figure;
-%         subplot(3,1,1);
-%         plot(XXX, YYY); axis equal
-%         subplot(3,1,2);
-%         plot(XXX(1:size(XY, 2)-5), sec_p);
-%         subplot(3,1,3);
-%         h = histogram(sec_p,'Normalization','probability','BinWidth', 0.02);
-%         pause(1)
-        clear sec_p XXYY Slope_tmp
-        close all
-        %         close;
-        %         p = polyfit(XY(1, :), XY(2, :),1);
-        %         Slope(counter) = p(1);
-
+        Slope(counter) = VicFc_Get_Slope(XY, 5, -0.1, 500, 500, 1400);
         counter = counter + 1;
     end
 end
@@ -508,9 +418,9 @@ Ang0_fit = [Ang0(1, :);f3];
 Ang0_fit = sortrows(Ang0_fit',1);
 plot(Ang0_fit(:, 1),abs(Ang0_fit(:, 2)),':m', 'LineWidth',2); hold on;
 
-plot(contourL(1:Ang10_caseNum), abs(atand(Slope(1:Ang10_caseNum))-10), ...
+plot(contourL(1:Ang10_caseNum), abs(atand(Slope(1:Ang10_caseNum))-10.65), ...
     'Color','r', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on;
-Ang10 = [contourL(1:70);atand(Slope(1:70))-10]; % minus the slope of the pillar array!
+Ang10 = [contourL(1:70);atand(Slope(1:70))-10.65]; % minus the slope of the pillar array (10.65)!
 Ang10(:, isnan(Ang10(2, :)))=[];
 pp1 = polyfit(Ang10(1, :),Ang10(2, :),1);
 f1 = polyval(pp1,Ang10(1, :));
@@ -518,9 +428,9 @@ Ang10_fit = [Ang10(1, :);f1];
 Ang10_fit = sortrows(Ang10_fit',1);
 plot(Ang10_fit(:, 1),abs(Ang10_fit(:, 2)),':r','LineWidth',2); hold on;
 
-plot(contourL(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum), abs(atand(Slope(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum))-20), ...
+plot(contourL(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum), abs(atand(Slope(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum))-19.4), ...
     'Color','c', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on;
-Ang20 = [contourL(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum);atand(Slope(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum))-20];
+Ang20 = [contourL(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum);atand(Slope(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum))-19.4]; % minus the slope of the pillar array (19.4)!
 Ang20(:, isnan(Ang20(2, :)))=[];
 pp2 = polyfit(Ang20(1, :),Ang20(2, :),1);
 f2 = polyval(pp2,Ang20(1, :));
@@ -538,6 +448,22 @@ ylim([0 10])
 % f=gcf;
 % exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\20210914_20220216-20220217_trajectoryslope_contourlength_abs_degree.png','Resolution',100)
 
+% 10 degree trajectory from simulation
+data = readmatrix('D:\Dropbox\PROCESS remotely\202208_differentFlowangles_relatedto_0811exp_45deg\10deg\Data\Streamline.csv');
+XXYY_Simu = data(1:10:end, 14:15); 
+XXYY_Simu(XXYY_Simu(:, 2) > -0.00105, :) = []; XXYY_Simu(XXYY_Simu(:, 2) < -0.00140, :) = []; 
+Slope10deg = VicFc_Get_Slope(sortrows(XXYY_Simu)', 5, 0, 0.0011, 0.0015, 0.0015);
+hold on; plot([0 100], [10-atand(Slope10deg) 10-atand(Slope10deg)]);
+
+data = readmatrix('D:\Dropbox\PROCESS remotely\202208_differentFlowangles_relatedto_0811exp_45deg\20deg\Data\Streamline.csv');
+XXYY_Simu = data(1:10:end, 14:15); 
+XXYY_Simu(XXYY_Simu(:, 2) > 0, :) = []; XXYY_Simu(XXYY_Simu(:, 2) < -0.0006, :) = []; 
+Slope20deg = VicFc_Get_Slope(sortrows(XXYY_Simu)', 5, 0.01, 0.0005, 0.002, 0.002);
+hold on; plot([0 100], [20-atand(Slope20deg) 20-atand(Slope20deg)])
+
+
+
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Drawing: elastoviscous Number vs deviation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -830,48 +756,5 @@ line([100 1e6], [1 1],'Color','red','LineStyle','--')
 % legend('$\chi$','','FontSize', 18,'Interpreter', 'latex');
 % ylim([0.4 1.4]);
 % export_fig([savePath{no_Group},filesep,'Orientation_periodicity_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
-% savefig([savePath{no_Group},filesep,'mostprob_Lee_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group),'.fig'])
-
-
-%% Function to calculate the mu_0
-function mu_0 = VicFc_Get_elastoviscousNum(L, u_0, a)
-% This is to calculate the elasto-viscous number
-% a: pillar diameter
-
-B = 6.9e-26;  % Bending rigidity
-mu = 6.1e-3;  % Dynalic viscosity
-d = 8e-9; % Diameter of the actin filament
-
-mu_0 = 8 * pi * mu * L^4 * u_0 / (B * a * -log((d/L)^2 * exp(1)));
-
-end
-
-
-
-%% Function for pillar array information.
-function [PA_Ra, PA_cl, PA_rw] = VicFc_Get_PAsInfo(PAs)
-% To extract the pillar columns and rows.
-% PAs: the path of the PAs results got from the 'Circle Finder' APP.
-% Including variables 'centers', 'circleMask', 'metric', and 'radii'.
-
-load(PAs);  % Load the PAs information.
-PA_Ra = mean(radii);  % The averaged the radius.
-sorted_centers = sort(centers(:,1));  % Calculate the interval along x-direction.
-Jumps = find(diff(sorted_centers) > 100); Jumps = [0;Jumps;size(sorted_centers,1)];  % Please change the value '100' accordingly.
-for ii = 1:size(Jumps, 1)-1
-    PA_cl(ii) = mean(sorted_centers(Jumps(ii)+1: Jumps(ii + 1)));
-end
-
-sorted_centersY = sort(centers(:,2));  % Calculate the interval along y-direction.
-JumpsY = find(diff(sorted_centersY) > 80); JumpsY = [0;JumpsY;size(sorted_centersY,1)];   % Please change the value '80' accordingly.
-for ii = 1:size(JumpsY, 1)-1
-    PA_rw(ii) = mean(sorted_centersY(JumpsY(ii)+1: JumpsY(ii + 1)));
-end
-
-end
-
-
-    
-    
-    
+% savefig([savePath{no_Group},filesep,'mostprob_Lee_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group),'.fig']) 
     
