@@ -4,7 +4,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear; clc; close all;
-xlsfile = readcell('ForActinPostprocessing_laptop.xlsx','Sheet','Sheet1','NumHeaderLines',1); % This is the file that contains all the information about the later processing (in sheet 1).
+xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLines',1); % This is the file that contains all the information about the later processing (in sheet 1).
 
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
 ExpDate = xlsfile(:, 1);  % The experiment date.
@@ -147,7 +147,7 @@ end
 for no_Group = 13: NumGroup
 
     disp(['You are processing ', datestr(Info(no_Group).ExpDate), ' data!']);
-    [filename, pathname] = uigetfile('E:\Dropbox\Research\All Plottings\Manually classification documents\.xlsx', 'Please choose the excel accordingly and carefully!!');
+    [filename, pathname] = uigetfile('D:\Dropbox\Research\All Plottings\Manually classification documents\.xlsx', 'Please choose the excel accordingly and carefully!!');
     xlsfile = readcell([pathname, filename],'Sheet','Sheet2','NumHeaderLines',1);     % The files. (e.g. Classification manually 20220104-Actin.xlsx)
     thefiles = xlsfile(:, 14);
 
@@ -350,8 +350,8 @@ for no_Group = 7:10%NumGroup
     end    
 end
 % clear FOO
-f=gcf;
-exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\Deformation_of_the_Filaments_in_One_Period_20211029-20220104.png','Resolution',500)
+% f=gcf;
+% exportgraphics(f,'D:\Dropbox\Research\All Plottings\General plots\Deformation_of_the_Filaments_in_One_Period_20211029-20220104.png','Resolution',500)
 
 
 
@@ -416,7 +416,7 @@ pp3 = polyfit(Ang0(1, :),Ang0(2, :),1);
 f3 = polyval(pp3,Ang0(1, :));
 Ang0_fit = [Ang0(1, :);f3];
 Ang0_fit = sortrows(Ang0_fit',1);
-plot(Ang0_fit(:, 1),abs(Ang0_fit(:, 2)),':m', 'LineWidth',2); hold on;
+plot(Ang0_fit(:, 1),abs(Ang0_fit(:, 2)),'--m', 'LineWidth',2); hold on;
 
 plot(contourL(1:Ang10_caseNum), abs(atand(Slope(1:Ang10_caseNum))-10.65), ...
     'Color','r', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on;
@@ -426,7 +426,7 @@ pp1 = polyfit(Ang10(1, :),Ang10(2, :),1);
 f1 = polyval(pp1,Ang10(1, :));
 Ang10_fit = [Ang10(1, :);f1];
 Ang10_fit = sortrows(Ang10_fit',1);
-plot(Ang10_fit(:, 1),abs(Ang10_fit(:, 2)),':r','LineWidth',2); hold on;
+plot(Ang10_fit(:, 1),abs(Ang10_fit(:, 2)),'--r','LineWidth',2); hold on;
 
 plot(contourL(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum), abs(atand(Slope(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum))-19.4), ...
     'Color','c', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on;
@@ -436,31 +436,31 @@ pp2 = polyfit(Ang20(1, :),Ang20(2, :),1);
 f2 = polyval(pp2,Ang20(1, :));
 Ang20_fit = [Ang20(1, :);f2];
 Ang20_fit = sortrows(Ang20_fit',1);
-plot(Ang20_fit(:, 1),abs(Ang20_fit(:, 2)),':c', 'LineWidth',2); hold on;
+plot(Ang20_fit(:, 1),abs(Ang20_fit(:, 2)),'--c', 'LineWidth',2); hold on;
 
 % title('CrMask Square Phi20 Gap10 FlowAng10', FontSize=12);
 set(gca,'FontSize',16);
 xlabel('$\bf{Contour\ length\ ({\mu}m)}$','FontSize', 20,'Interpreter', 'latex');
 ylabel('$\bf{CoM\ trajectory\ deviation\ \phi\ (^{\circ})}$','FontSize', 20,'Interpreter', 'latex');
 % hold on;plot([0 60], [0.1763 0.1763], 'b--', 'LineWidth',1.5)
-legend({'Flow angle = 0°', '', 'Flow angle = 10°','', 'Flow angle = 20°',''},'FontSize', 20, 'Location','best')
-ylim([0 10])
-% f=gcf;
-% exportgraphics(f,'E:\Dropbox\Research\All Plottings\General plots\20210914_20220216-20220217_trajectoryslope_contourlength_abs_degree.png','Resolution',100)
 
 % 10 degree trajectory from simulation
 data = readmatrix('D:\Dropbox\PROCESS remotely\202208_differentFlowangles_relatedto_0811exp_45deg\10deg\Data\Streamline.csv');
 XXYY_Simu = data(1:10:end, 14:15); 
 XXYY_Simu(XXYY_Simu(:, 2) > -0.00105, :) = []; XXYY_Simu(XXYY_Simu(:, 2) < -0.00140, :) = []; 
 Slope10deg = VicFc_Get_Slope(sortrows(XXYY_Simu)', 5, 0, 0.0011, 0.0015, 0.0015);
-hold on; plot([0 100], [10-atand(Slope10deg) 10-atand(Slope10deg)]);
+hold on; plot([0 100], [10-atand(Slope10deg) 10-atand(Slope10deg)],'-r','LineWidth',2);
 
 data = readmatrix('D:\Dropbox\PROCESS remotely\202208_differentFlowangles_relatedto_0811exp_45deg\20deg\Data\Streamline.csv');
 XXYY_Simu = data(1:10:end, 14:15); 
 XXYY_Simu(XXYY_Simu(:, 2) > 0, :) = []; XXYY_Simu(XXYY_Simu(:, 2) < -0.0006, :) = []; 
 Slope20deg = VicFc_Get_Slope(sortrows(XXYY_Simu)', 5, 0.01, 0.0005, 0.002, 0.002);
-hold on; plot([0 100], [20-atand(Slope20deg) 20-atand(Slope20deg)])
+hold on; plot([0 100], [20-atand(Slope20deg) 20-atand(Slope20deg)],'-c','LineWidth',2)
 
+legend({'Flow angle = 0°', '', 'Flow angle = 10°','', 'Flow angle = 20°', '', 'Simu: Flow angle = 10°', 'Simu: Flow angle = 20°'},'FontSize', 10, 'Location','best')
+ylim([0 10])
+% f=gcf;
+% exportgraphics(f,'D:\Dropbox\Research\All Plottings\General plots\20210914_20220216-20220217_trajectoryslope_contourlength_abs_degree_with_simulation_results.png','Resolution',100)
 
 
 %%
@@ -541,6 +541,78 @@ plot(XY_plot_traj_calculatedpiece{the_loc}(1, :), XY_plot_traj_calculatedpiece{t
 axis off
 
 
+
+%% Plot averge speed (in x-direction) vs. contour length or elastoviscous Number at different flow angle.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% load('E:\Dropbox\tmp\INfO.mat'); % This part needs the variable 'info'.
+contourL = []; mu_bar = []; Slope = []; filelist = []; XY_plot_traj = []; counter = 1;
+
+% Angle = 10° and Angle = 20°
+for no_Group = 13: 18
+    mu_bar = [mu_bar, Info(no_Group).elastoviscousNum];
+    contourL = [contourL, Info(no_Group).contour_length];
+    filelist = [filelist, Info(no_Group).filelist'];
+    for no_Case = 1:length(Info(no_Group).contour_length)
+
+        theName = Info(no_Group).filelist(no_Case).name; 
+        expoTime = str2double(extractBetween(theName,'Expo','ms'));
+        initialFlowRate = str2double(extractBetween(theName,'nM_','nL_'));
+        delta_frames = Info(no_Group).SelectCaseNo{1, no_Case}; 
+        delta_T = expoTime * (delta_frames(end) - delta_frames(1));  % delta t (unit: ms). 
+        XXX = Info(no_Group).centroidxy_plotX{1, no_Case}; 
+        delta_X = XXX(end) - XXX(1); % displacement in x direction (unit: pixel).
+
+        Ave_Speed_X(counter) = delta_X / delta_T * 0.1 * 1000 / initialFlowRate; % averge speed in x-direction (unit: um/s). 0.1 is the calibration.
+        counter = counter + 1;
+    end
+end
+
+% Angle = 0°
+for no_Group = 7: 8
+    mu_bar = [mu_bar, Info(no_Group).elastoviscousNum];
+    contourL = [contourL, Info(no_Group).contour_length];
+    filelist = [filelist, Info(no_Group).filelist'];
+    for no_Case = 1:length(Info(no_Group).contour_length)
+
+        theName = Info(no_Group).filelist(no_Case).name; 
+        expoTime = str2double(extractBetween(theName,'Expo','ms'));
+        initialFlowRate = str2double(extractBetween(theName,'nM_','nL_'));
+        delta_frames = Info(no_Group).SelectCaseNo{1, no_Case}; 
+        delta_T = expoTime * (delta_frames(end) - delta_frames(1));  % delta t (unit: ms). 
+        XXX = Info(no_Group).centroidxy_plotX{1, no_Case}; 
+        delta_X = XXX(end) - XXX(1); % displacement in x direction (unit: pixel).
+
+        Ave_Speed_X(counter) = delta_X / delta_T * 0.1 * 1000  / initialFlowRate; % averge speed in x-direction (unit: us/ms). 0.1 is the calibration.
+        counter = counter + 1;
+    end
+end
+
+
+Ang10_caseNum = length(Info(13).contour_length) + length(Info(14).contour_length) + length(Info(15).contour_length);
+Ang20_caseNum = length(Info(16).contour_length) + length(Info(17).contour_length) + length(Info(18).contour_length);
+Ang0_caseNum = length(Info(8).contour_length) + length(Info(9).contour_length);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Drawing: contour Length vs averge speed
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure('color', 'w'); set(gcf, 'Position', [100 100 960 600]);
+plot(contourL(Ang10_caseNum+Ang20_caseNum+1:end), Ave_Speed_X(Ang10_caseNum+Ang20_caseNum+1:end), ...
+    'Color','m', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on; % Ang0
+plot(contourL(1:Ang10_caseNum), Ave_Speed_X(1:Ang10_caseNum), ...
+    'Color','r', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on; % Ang10
+plot(contourL(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum), Ave_Speed_X(Ang10_caseNum+1:Ang10_caseNum+Ang20_caseNum), ...
+    'Color','c', 'LineStyle', 'none', 'marker', 'o', 'MarkerSize', 10,'LineWidth', 2); hold on; % Ang20
+set(gca,'FontSize',16);
+xlabel('$\bf{Contour\ length\ ({\mu}m)}$','FontSize', 20,'Interpreter', 'latex');
+ylabel({'$$\textbf{Mean\ speed\ in\ x-direction}$$', '$$normalized\ by\ initial\ flow\ rate\ ({\mu}m/nL)$$'},'FontSize', 20,'Interpreter', 'latex');
+legend({'Flow angle = 0°', 'Flow angle = 10°', 'Flow angle = 20°'},'FontSize', 20, 'Location','best')
+xlim([0 80])
+% f=gcf;
+% exportgraphics(f,'D:\Dropbox\Research\All Plottings\General plots\20210914_20220216-20220217_meanXspeed_contourlength.png','Resolution',100)
+
+
+
 %% Plot elastoviscousNum vs. L_ee_morm
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This part is used to polt the elasto-viscous number /mu vs. end-to-end
@@ -591,15 +663,6 @@ ylabel('$L_{ee}/L_0$','FontSize', 18,'Interpreter', 'latex');
 % xlim([0 2]);  ylim([0 1]);
 % export_fig([savePath{no_Group},filesep,'mostprob_Lee_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
 % savefig([savePath{no_Group},filesep,'mostprob_Lee_vs_mu0_',datestr(ExpDate{no_Group}),'-',num2str(no_Group),'.fig'])
-
-
-
-%%  Plot elastoviscousNum vs. L_ee_morm
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Draw Lee/L0 vs mu0, meanwhile divide into different parts according to
-% the initial position.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 
 %% Plot pdf of CoM
@@ -653,15 +716,6 @@ xlim([0 2]);  ylim([0 1]);
 % export_fig(['F:\PhD, PMMH, ESPCI\Processing\20210430-Actin\results\Figures\CoM_1nL'],'-tif')
 % export_fig([savePath{no_Group},filesep,'CoM_',datestr(ExpDate{no_Group}),'-',num2str(no_Group)],'-tif')
 % savefig([savePath{no_Group},filesep,'CoM_',datestr(ExpDate{no_Group}),'-',num2str(no_Group),'.fig'])
-
-
-
-%% 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Draw Lee/L0 vs mu0, meanwhile divide into different parts according to
-% the initial position.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 
 %% About the periodicity (Orientation & Deformation)
