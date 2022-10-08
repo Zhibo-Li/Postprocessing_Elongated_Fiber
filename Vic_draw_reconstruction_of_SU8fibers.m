@@ -1,4 +1,4 @@
-%% Draw and select the good cases!!!
+% %% Draw and select the good cases!!!
 % This first part of the code is to select the nice cases after calculating
 % the shape based on Francesco's code, and then save these cases into 'Good_case'
 % Notice the different 'original points' for the image and coordinate
@@ -7,18 +7,19 @@
 clear; close all; clc;
 
 % The .tif file you just calculated.
-[filename, pathname]=uigetfile({['F:\Experimental Data (EXTRACTED)\FSI - Rigid Fiber ' ...
-    '&  Individual Obstacle\20220624-SU8_Fibers-Individual_triangularPillar_uppoint\' ...
-    'AfterAveBGR\*.tif']}, 'Choose a file to be processed');  % input file
+[filename, pathname]=uigetfile({['Z:\Experimental Data (EXTRACTED)\FSI - ' ...
+    'Rigid Fiber &  Individual Obstacle\20221005-SU8_Fibers-Individual_triang' ...
+    'ularPillar_uppoint\Inverted\*.tif']}, 'Choose a file to be processed');  % input file
 basepath=pathname;
 tifname=filename;
 
 % The .mat file where stores your results.
-[filename, pathname]=uigetfile({['F:\Processing & Results\FSI - Rigid Fiber' ...
-    ' &  Individual Obstacle\20220624-SU8_Fibers-Individual_triangularPillar_' ...
+[filename, pathname]=uigetfile({['Z:\Processing & Results\FSI - Rigid Fiber ' ...
+    '&  Individual Obstacle\20221005-SU8_Fibers-Individual_triangularPillar_' ...
     'uppoint\results\*.mat']}, ...
     'Choose a file to be processed');  % input file
 load([pathname, filename]);
+% clearvars Good_case_frm
 
 % lnoise = prmt(1).lnoise; lobject = prmt(1).lobject;
 xwin = prmt(1).xwin; ywin = prmt(1).ywin;
@@ -54,7 +55,7 @@ for i = 1:1:xy.nframe
     fig = figure('Name','filaments','Position', [0 0 100 100]);
     %     imshow(Foo*1000); hold on;
     Zoom_in = Foo(round(max(T_C2-ywin/2,1)):round(min(T_C2+ywin/2,size(Foo,1))),...
-        round(max(T_C1-xwin/2,1)):round(min(T_C1+xwin/2,size(Foo,2))))*10;
+        round(max(T_C1-xwin/2,1)):round(min(T_C1+xwin/2,size(Foo,2))))*2;
     imshow(Zoom_in, 'InitialMagnification', 200); hold on;
 
     % Show the B-spline, the idea is to change the original point according
@@ -78,7 +79,7 @@ for i = 1:1:xy.nframe
     % This is to draw the relative positions between two neighbouring  figures
     % and check we always follow the same filament.
     if i > 1
-        figure('Position', [1500 0 100 100]); imshow(Foo); hold on;
+        figure('Position', [1200 0 100 100]); imshow(Foo); hold on;
         plot(T_C1_pre, T_C2_pre, 'r*','MarkerSize',3);hold on
         plot(T_C1, T_C2, 'co','MarkerSize',3);hold off
         %         rectangle('Position', [T_C1_pre, T_C2_pre, T_C1-T_C1_pre, T_C2-T_C2_pre], 'EdgeColor', 'b', 'FaceColor', 'r', 'LineWidth', 4); hold off;
@@ -147,25 +148,27 @@ save([pathname, filename],'framelist','Good_case','Good_case_frm','xy', ...
 
 
 
-% % % %% Draw good cases!!!
+%% Draw good cases!!!
 % % % clear; close all; clc;
 % % % 
 % % % % The .tif file you just calculated.
-% % % [filename, pathname]=uigetfile({['D:\Dropbox\PROCESS remotely\Experimental Data ' ...
-% % %     '(EXTRACTED)\20220913-SU8_Fibers-Individual_triangularPillar_uppoint\Inverted\' ...
-% % %     'AfterAveBGR\*.tif']}, 'Choose a file to be processed');  % input file
+% % % [filename, pathname]=uigetfile({['Z:\Experimental Data (EXTRACTED)\FSI - ' ...
+% % %     'Rigid Fiber &  Individual Obstacle\20221004-SU8_Fibers-Individual_triang' ...
+% % %     'ularPillar_uppoint\Inverted\*.tif']}, 'Choose a file to be processed');  % input file
 % % % basepath=pathname;
 % % % tifname=filename;
 % % % 
 % % % % The .mat file where stores your results.
-% % % [filename, pathname]=uigetfile({'D:\Dropbox\PROCESS remotely\Processing & Results\20220913-SU8_Fibers-Individual_triangularPillar_uppoint\results\*.mat'}, 'Choose a file to be processed');  % input file
+% % % [filename, pathname]=uigetfile({['Z:\Processing & Results\FSI - Rigid Fiber ' ...
+% % %     '&  Individual Obstacle\20221004-SU8_Fibers-Individual_triangularPillar_' ...
+% % %     'uppoint\results\*.mat']}, 'Choose a file to be processed');  % input file
 % % % load([pathname, filename]);
 % % % close all;
 % % % lzero = 0;
 % % % xwin = prmt(1).xwin; ywin = prmt(1).ywin;
 % % % 
-% % % v = VideoWriter(strcat('theVideos'),'MPEG-4');   % To make a video!
-% % % v.FrameRate = 24;  % Frame rate in the video.
+% % % v = VideoWriter(strcat(filename),'MPEG-4');   % To make a video!
+% % % v.FrameRate = 10;  % Frame rate in the video.
 % % % v.Quality = 100;
 % % % 
 % % % open(v);   % For the video.
@@ -193,9 +196,9 @@ save([pathname, filename],'framelist','Good_case','Good_case_frm','xy', ...
 % % %     fig = figure('Name','filaments','Position', [0 0 100 100]);
 % % %     %     imshow(Foo*1000); hold on;
 % % %     Zoom_in = Foo(round(max(T_C2-ywin/2,1)):round(min(T_C2+ywin/2,size(Foo,1))),...
-% % %         round(max(T_C1-xwin/2,1)):round(min(T_C1+xwin/2,size(Foo,2))))*1000;
+% % %         round(max(T_C1-xwin/2,1)):round(min(T_C1+xwin/2,size(Foo,2))))*2;
 % % % 
-% % %     the_frame = uint16(zeros(ywin+1, xwin+1));  % Put the Zoom_in into this frame so that every figure has the same size to make the video.
+% % %     the_frame = uint8(zeros(ywin+1, xwin+1));  % Put the Zoom_in into this frame so that every figure has the same size to make the video.
 % % %     xy_mov = size(the_frame)-size(Zoom_in);  % How much should the plot be shifted.
 % % %     if abs(j - 1)  < abs(j - size(Good_case_frm,2))  % To fix the center-of-mass position in the video.
 % % %         the_frame(padarray(true(size(Zoom_in)), xy_mov, 'pre')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
@@ -204,7 +207,7 @@ save([pathname, filename],'framelist','Good_case','Good_case_frm','xy', ...
 % % %         % Show the B-spline, the idea is to change the original point according
 % % %         % to the required window.
 % % %         % h = plot(T_spl1,T_spl2,'-','linewidth',6);
-% % %         h = plot(T_spl1-max(T_C1-xwin/2,1) + xy_mov(2), T_spl2-max(T_C2-ywin/2,1) + xy_mov(1),'-','linewidth',6);
+% % %         h = plot(T_spl1-max(T_C1-xwin/2,1) + xy_mov(2), T_spl2-max(T_C2-ywin/2,1) + xy_mov(1),'-m','linewidth', 2);
 % % %         set(h,'marker','.');
 % % %         % title(['No.',num2str(xy.frame(i))],'Color','red','FontSize',14);
 % % % 
@@ -223,7 +226,7 @@ save([pathname, filename],'framelist','Good_case','Good_case_frm','xy', ...
 % % %     else
 % % %         the_frame(padarray(true(size(Zoom_in)), xy_mov, 'post')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
 % % %         imshow(the_frame, 'InitialMagnification', 200); hold on;
-% % %         h = plot(T_spl1-max(T_C1-xwin/2,1), T_spl2-max(T_C2-ywin/2,1) + xy_mov(1),'-','linewidth',6);
+% % %         h = plot(T_spl1-max(T_C1-xwin/2,1), T_spl2-max(T_C2-ywin/2,1) + xy_mov(1),'-m','linewidth', 2);
 % % %         set(h,'marker','.');
 % % %         title(['No.',num2str(j)],'Color','red','FontSize',14);
 % % %         hold on
@@ -242,7 +245,7 @@ save([pathname, filename],'framelist','Good_case','Good_case_frm','xy', ...
 % % %     %     plot(lzero+xy(1).crd{i}(:,1),size(Foo,1)*1.5-lzero-xy(1).crd{i}(:,2),'.','markeredgecolor','k','markerfacecolor','w','linewidth',2)
 % % %     %     hold on
 % % % 
-% % %     pause(0.001);
+% % % %     pause(0.001);
 % % %     frame = getframe(gcf);
 % % %     writeVideo(v,frame);
 % % %     close
@@ -254,18 +257,18 @@ save([pathname, filename],'framelist','Good_case','Good_case_frm','xy', ...
 % % % % bgim=imread('D:\Dropbox\tmp\Tri_1 - Copy.tif');  % background image.
 % % % % imshow(bgim, []); hold on;
 % % % 
-% % % for j = 1:size(Good_case_frm,2)
-% % % 
-% % %     i = Good_case_frm(j); % index of the 'good' cases
-% % %     spl1 = xy(1).spl{i}(:,1); spl2 = xy(1).spl{i}(:,2); % x-y coordinates of the B-spline
-% % %     T_spl1 = lzero+spl1;  T_spl2 = 2048-lzero-spl2;
-% % %     plot(T_spl1,T_spl2)
-% % %     hold on
-% % % 
-% % %     axis equal
-% % %     xlim('auto')
-% % %     ylim('auto')
-% % %     xlabel(' x [ px ] ')
-% % %     ylabel(' y [ px ] ')
-% % % 
-% % % end
+% % % % for j = 1:size(Good_case_frm,2)
+% % % % 
+% % % %     i = Good_case_frm(j); % index of the 'good' cases
+% % % %     spl1 = xy(1).spl{i}(:,1); spl2 = xy(1).spl{i}(:,2); % x-y coordinates of the B-spline
+% % % %     T_spl1 = lzero+spl1;  T_spl2 = 2048-lzero-spl2;
+% % % %     plot(T_spl1,T_spl2)
+% % % %     hold on
+% % % % 
+% % % %     axis equal
+% % % %     xlim('auto')
+% % % %     ylim('auto')
+% % % %     xlabel(' x [ px ] ')
+% % % %     ylabel(' y [ px ] ')
+% % % % 
+% % % % end
