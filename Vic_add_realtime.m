@@ -21,7 +21,7 @@ matFiles = dir(fullfile(matpath, '*.mat'));
 savepathname = uigetdir(['F:\Processing & Results\FSI - Rigid Fiber &  Individua' ...
     'l Obstacle\'], 'Choose a folder to save the results');
 
-% loop the excel columns to add the timestamps.
+% loop the excel columns to add the git a.
 for ii = 1:timecase_No 
 
     tmp_currenttime = thetime(:, ii);
