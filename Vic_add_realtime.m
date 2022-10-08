@@ -42,8 +42,15 @@ for ii = 1:timecase_No
         currentmatfile = matFiles(matcase_No(jj)).name;  % find and load the counterpart *.mat file.
 
         if contains(currentmatfile, '_no') && contains(currentmatfile, '-no')
-            imagestart = str2double(extractBetween(currentmatfile,'_no','-no')); % the location of the start frame in the original cxd file.
-            currenttime(1:imagestart-1) = []; % remove the non-calculated counterpart timestamps.
+            if isnan(str2double(extractBetween(currentmatfile,'_no','-no')))
+                imageinterval = str2double(extractBetween(currentmatfile,'-interval','-no'));
+                imagestart = str2double(extractBetween(currentmatfile,'_no','-interval'));
+                currenttime(1:imagestart-1) = []; % remove the non-calculated counterpart timestamps.
+                currenttime(2:imageinterval:end) = [];
+            else
+                imagestart = str2double(extractBetween(currentmatfile,'_no','-no')); % the location of the start frame in the original cxd file.
+                currenttime(1:imagestart-1) = []; % remove the non-calculated counterpart timestamps.
+            end
         end
 
         calculated_frame_time = currenttime(xy.frame);
