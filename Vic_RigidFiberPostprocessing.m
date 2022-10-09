@@ -146,6 +146,12 @@ norm_final_y = final_y / h_obs; % normalized y_f
 bypass_tip = [All_data(:).bypass_tip];
 speed = [All_data(:).ave_speed];
 
+%%% calculate the delta chi
+Chi = [All_data(:).Chi];
+for i = 1:length(Chi)
+    delta_Chi(i) = Chi{1, i}(end) - Chi{1, i}(1);
+end
+
 %%% statistics
 % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 % edges = 20:20:180;
@@ -179,7 +185,7 @@ speed = [All_data(:).ave_speed];
 % % f=gcf;
 % % exportgraphics(f,'Statistics_y0.png','Resolution',100)
 
-together = [norm_delta_y; norm_contourL; Chi_0; norm_initial_x; norm_initial_y; norm_final_x; norm_final_y; bypass_tip; speed];
+together = [norm_delta_y; norm_contourL; Chi_0; norm_initial_x; norm_initial_y; norm_final_x; norm_final_y; bypass_tip; speed; delta_Chi];
 names(together(4, :) > -7) = [];
 together(:, together(4, :) > -7) = []; % remove the cases too close to the obstacle on the upstream side.
 names(together(6, :) < 7) = [];
@@ -240,7 +246,7 @@ set(gca,'FontSize',16);
 xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
 % f=gcf;
-% exportgraphics(f,'The_map_zeroAngle_Simu_AVG-L_separated.png','Resolution',100)
+% exportgraphics(f,'Deviation-ContourL-InitialY_Angle10-10_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
 
 % pick the data point on the last plot to get the case name.
 [the_L, the_y0] = ginput(1); % pick up the point you want to show the trajectory.
@@ -260,4 +266,19 @@ grid on
 set(gca,'FontSize',16);
 xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
+% f=gcf;
+% exportgraphics(f,'Avespeed-ContourL-InitialY_Angle10-10_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
 
+% the delta Chi: contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1
+figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
+cmap = cmocean('thermal');
+scatter(together(2, :), together(5, :), 200, together(10, :), 'Filled','diamond')
+cmap(size(contourL,2)); 
+hcb=colorbar;
+title(hcb,'$\chi_f - \chi_0\ (^{\circ})$','FontSize', 16,'Interpreter', 'latex');
+grid on
+set(gca,'FontSize',16);
+xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
+ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
+% f=gcf;
+% exportgraphics(f,'DeltaChi-ContourL-InitialY_Angle10-10_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
