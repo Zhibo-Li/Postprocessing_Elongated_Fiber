@@ -46,11 +46,17 @@ for ii = 1:length(Files)
 %     exportgraphics(f,[pathname,'\results with timestamps\',Files(ii).name,'_looping_color.png'],'Resolution',100)
 %     close
 
+    % add the names
     All_data.filename{ii} = Files(ii).name;    
 
+    % add the timestamps
+    All_data.timestamps{ii} = Good_case_frm_time - min(Good_case_frm_time);
+
+    % add the contour lengths 
     sorted_lengths = sort(xy.arclen_spl(Good_case_frm));
     All_data.contour_length(ii) = mean(sorted_lengths) * Obj_Mag;  % Average to get the contour length (UNIT: um).
 
+    % add the position information
     centroidxy = reshape(cell2mat(xy.centroid),2,numel(xy.centroid));
     centroidxy = centroidxy(:, Good_case_frm);
     All_data.delta_y(ii) = abs(centroidxy(2, 1) - centroidxy(2,end)) * Obj_Mag;
@@ -61,6 +67,9 @@ for ii = 1:length(Files)
     All_data.CoM{ii} = centroidxy;
     %     hold on; plot(centroidxy(1,:), 2048-centroidxy(2,:)-800, "Color",'k', 'LineStyle','--');
 
+    % calculate the average speed along x-direction (UNIT: um/s)
+    All_data.ave_speed(ii) = ((centroidxy(1, end) - Pillar_CoM(1)) - (centroidxy(1, 1) - Pillar_CoM(1))) * Obj_Mag / (max(Good_case_frm_time) - min(Good_case_frm_time));
+
     % check if the fiber bypass the obtacle tip
     if 2048 - mean(centroidxy(2, and(Pillar_CoM(1)-100 < centroidxy(1, :), centroidxy(1, :) < Pillar_CoM(1)+100))) > Pillar_CoM(2) % if it goes below (in image system).
         bypass_tip = true;
@@ -69,8 +78,9 @@ for ii = 1:length(Files)
     end
     All_data.bypass_tip(ii) = bypass_tip;
 
-    crd = xy.crd{1,1};
-    centroidxy_k = xy.centroid{1,1};
+    % calculate the initial angle Chi_0
+    crd = xy.crd{1,Good_case_frm(1)};
+    centroidxy_k = xy.centroid{1,Good_case_frm(1)};
     Gyr = 1/size(crd,1) * [sum((crd(:, 1)-centroidxy_k(1)).^2),  sum((crd(:, 1)-centroidxy_k(1)) .* (crd(:, 2)-centroidxy_k(2)));
         sum((crd(:, 2)-centroidxy_k(2)) .* (crd(:, 1)-centroidxy_k(1))), sum((crd(:, 2)-centroidxy_k(2)).^2)];
 
@@ -78,11 +88,27 @@ for ii = 1:length(Files)
     [d,ind] = sort(diag(eigenD));
     Ds = eigenD(ind,ind);
     Vs = eigenV(:,ind);
-    All_data.Chi(ii)  = atan(Vs(2,2)/Vs(1,2))/pi*180;
+    All_data.Chi_0(ii)  = atan(Vs(2,2)/Vs(1,2))/pi*180;
+
+    % calculate all the angles
+    for jj = 1:length(Good_case_frm)
+        crd = xy.crd{1,Good_case_frm(jj)};
+        centroidxy_k = xy.centroid{1,Good_case_frm(jj)};
+        Gyr = 1/size(crd,1) * [sum((crd(:, 1)-centroidxy_k(1)).^2),  sum((crd(:, 1)-centroidxy_k(1)) .* (crd(:, 2)-centroidxy_k(2)));
+            sum((crd(:, 2)-centroidxy_k(2)) .* (crd(:, 1)-centroidxy_k(1))), sum((crd(:, 2)-centroidxy_k(2)).^2)];
+
+        [eigenV,eigenD] = eig(Gyr);
+        [d,ind] = sort(diag(eigenD));
+        Ds = eigenD(ind,ind);
+        Vs = eigenV(:,ind);
+        Chi(jj) = atan(Vs(2,2)/Vs(1,2))/pi*180;
+    end
+    All_data.Chi{ii}  = Chi;
+    clearvars Chi
 
 end
 
-% save([pathname, '_infos_contourL-fromAVG.mat'], 'All_data');
+% save([pathname, '_infos_contourL-fromAVG_with_all-Chi_timestamps.mat'], 'All_data');
 
 
 
@@ -91,29 +117,34 @@ clear; close all; clc;
 
 h_obs = 75; l_obs = 86.6;
 
-load('20220624-SU8_Fibers-Individual_triangularPillar_uppoint_infos_contourL-fromAVG.mat');
+load('20220624-SU8_Fibers-Individual_triangularPillar_uppoint_infos_contourL-fromAVG_with_all-Chi_timestamps.mat');
 All_data1 = All_data;
-load('20220913-SU8_Fibers-Individual_triangularPillar_uppoint_infos_contourL-fromAVG.mat');
+load('20220913-SU8_Fibers-Individual_triangularPillar_uppoint_infos_contourL-fromAVG_with_all-Chi_timestamps.mat');
 All_data2 = All_data;
-All_data = [All_data1, All_data2];
+load('20221004-SU8_Fibers-Individual_triangularPillar_uppoint_infos_contourL-fromAVG_with_all-Chi_timestamps.mat');
+All_data3 = All_data;
+load('20221005-SU8_Fibers-Individual_triangularPillar_uppoint_infos_contourL-fromAVG_with_all-Chi_timestamps.mat');
+All_data4 = All_data;
+All_data = [All_data1, All_data2, All_data3, All_data4];
 
-names = [All_data(1).filename, All_data(2).filename];
+names = [All_data(:).filename];
 
-delta_y = [All_data(1).delta_y, All_data(2).delta_y];
+delta_y = [All_data(:).delta_y];
 norm_delta_y = delta_y / h_obs; % normalized delta
-contourL = [All_data(1).contour_length, All_data(2).contour_length];
+contourL = [All_data(:).contour_length];
 norm_contourL = contourL / l_obs; % normalized L
-Chi = [All_data(1).Chi, All_data(2).Chi]; 
+Chi_0 = [All_data(:).Chi_0]; 
 
-initial_x = [All_data(1).initial_x, All_data(2).initial_x];
+initial_x = [All_data(:).initial_x];
 norm_initial_x = initial_x / h_obs; % normalized x_0
-initial_y = [All_data(1).initial_y, All_data(2).initial_y];
+initial_y = [All_data(:).initial_y];
 norm_initial_y = initial_y / h_obs; % normalized y_0
-final_x = [All_data(1).final_x, All_data(2).final_x];
+final_x = [All_data(:).final_x];
 norm_final_x = final_x / h_obs; % normalized x_f
-final_y = [All_data(1).final_y, All_data(2).final_y];
+final_y = [All_data(:).final_y];
 norm_final_y = final_y / h_obs; % normalized y_f
-bypass_tip = [All_data(1).bypass_tip, All_data(2).bypass_tip];
+bypass_tip = [All_data(:).bypass_tip];
+speed = [All_data(:).ave_speed];
 
 %%% statistics
 % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
@@ -129,7 +160,7 @@ bypass_tip = [All_data(1).bypass_tip, All_data(2).bypass_tip];
 %%% statistics
 % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 % edges = -90:20:90;
-% histogram(Chi,edges);
+% histogram(Chi_0,edges);
 % set(gca,'FontSize',16);
 % xlabel('$Initial\ angle\ \chi_0\ (^{\circ})$','FontSize', 22,'Interpreter', 'latex');
 % ylabel('$Number\ of\ cases$','FontSize', 22,'Interpreter', 'latex');
@@ -148,7 +179,7 @@ bypass_tip = [All_data(1).bypass_tip, All_data(2).bypass_tip];
 % % f=gcf;
 % % exportgraphics(f,'Statistics_y0.png','Resolution',100)
 
-together = [norm_delta_y; norm_contourL; Chi; norm_initial_x; norm_initial_y; norm_final_x; norm_final_y; bypass_tip];
+together = [norm_delta_y; norm_contourL; Chi_0; norm_initial_x; norm_initial_y; norm_final_x; norm_final_y; bypass_tip; speed];
 names(together(4, :) > -7) = [];
 together(:, together(4, :) > -7) = []; % remove the cases too close to the obstacle on the upstream side.
 names(together(6, :) < 7) = [];
@@ -169,10 +200,10 @@ together(:, together(6, :) < 7) = []; % remove the cases too close to the obstac
 % % exportgraphics(f,'The_map_full_AVG-L.png','Resolution',100)
 
 names(together(3, :) < -10) = [];
-together(:, together(3, :) < -10) = [];  % the initial angle: -10 < Chi < 10.
+together(:, together(3, :) < -10) = [];  % the initial angle: -10 < Chi_0 < 10.
 names(together(3, :) > 10) = [];
 together(:, together(3, :) > 10) = [];
-% the map -10 < Chi < 10.
+% the map -10 < Chi_0 < 10.
 % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 % cmap = cmocean('thermal');
 % scatter(together(2, :), together(5, :), 50, together(1, :), 'Filled')
@@ -217,4 +248,16 @@ the_loc = intersect(find(together(2, :)>the_L*0.98 & together(2, :)<the_L*1.02),
     find(together(5, :)>the_y0*0.98 & together(5, :)<the_y0*1.02));  % Change the control range if there is an error.
 
 names(the_loc)     % show the file
+
+% the speed: contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1
+figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
+cmap = cmocean('thermal');
+scatter(together(2, :), together(5, :), 200, together(9, :), 'Filled','square')
+cmap(size(contourL,2)); 
+hcb=colorbar;
+title(hcb,'$Average\ speed\ (\mu{m}/s)$','FontSize', 16,'Interpreter', 'latex');
+grid on
+set(gca,'FontSize',16);
+xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
+ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
 
