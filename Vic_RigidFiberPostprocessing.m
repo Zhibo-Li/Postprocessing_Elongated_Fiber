@@ -115,7 +115,7 @@ end
 %% Ploting
 clear; close all; clc;
 
-h_obs = 75; l_obs = 86.6;
+h_obs = 75; l_obs = 86.6; Obj_Mag = 0.63;
 
 load('20220624-SU8_Fibers-Individual_triangularPillar_uppoint_infos_contourL-fromAVG_with_all-Chi_timestamps.mat');
 All_data1 = All_data;
@@ -145,12 +145,59 @@ final_y = [All_data(:).final_y];
 norm_final_y = final_y / h_obs; % normalized y_f
 bypass_tip = [All_data(:).bypass_tip];
 speed = [All_data(:).ave_speed];
+timestamps = [All_data(:).timestamps];
 
 %%% calculate the delta chi
 Chi = [All_data(:).Chi];
+% plot the chi evolution.
 for i = 1:length(Chi)
-    delta_Chi(i) = Chi{1, i}(end) - Chi{1, i}(1);
+    dt = diff(timestamps{1, i}); % [time(i+1) - time(i)]
+    dchi = diff(Chi{1, i})'; % chi(i+1) - chi(i)
+    dchi_dt = dchi ./ (dt * 100); % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. Here * 100 for convenience.
+
+%     figure('color', 'w'); set(gcf, 'Position', [-2000 500 2000 300]);
+%     subplot(1,4,1); plot(timestamps{1, i}, Chi{1, i}); ylim([-90 90]); title('chi') % plot chi vs. time.
+%     subplot(1,4,2); plot(dt); ylim([0 0.1]); title('d_t')
+%     subplot(1,4,3); plot(dchi); ylim([-180 180]); title('d_c_h_i')
+%     hold on; line([0 300],[60 60],'color','b');
+%     hold on; line([0 300],[-60 -60],'color','b'); hold off 
+%     subplot(1,4,4); plot(dchi_dt); ylim([-15 15]); title('d_c_h_i/d_t')
+
+    n_plus = length(find(dchi<-60));  n_minus = length(find(dchi>60)); % check if there is a rotation and determine the direction via the value of d_chi
+
+%     if n_plus == 0 && n_minus == 0 && max(abs(dchi)) > 60
+%         n_plus = n_plus + sum(dt(dchi<-60) > 0.1);  
+%         n_minus = n_minus + sum(dt(dchi>60) > 0.1); 
+%     end
+
+    % delta_chi: counterclockwise is positive.
+    delta_Chi(i) = Chi{1, i}(end) - Chi{1, i}(1) + n_plus*180 - n_minus*180;
 end
+delta_Chi(18) = delta_Chi(18) + 180; % correct these values.
+delta_Chi(27) = delta_Chi(27) + 180;
+delta_Chi(38) = delta_Chi(38) - 180;
+delta_Chi(39) = delta_Chi(39) + 180;
+delta_Chi(87) = delta_Chi(87)  + 180;
+delta_Chi(102) = delta_Chi(102) + 180;
+delta_Chi(104) = delta_Chi(104) + 180;
+delta_Chi(110) = delta_Chi(110) + 180;
+
+%%% calculate the dx/dt
+CoM = [All_data(:).CoM];
+for j = 1:length(CoM)
+    dt = diff(timestamps{1, j}); % [time(i+1) - time(i)]
+    dx = diff(CoM{1, j}(1, :))'; % [x(i+1) - x(i)]
+    dx_dt = dx ./ dt * Obj_Mag; % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. Here * 100 for convenience.
+
+%     figure('color', 'w'); set(gcf, 'Position', [-1000 500 400 300]);
+%     plot(dx_dt); 
+
+    num_upper_obs = sum(CoM{1, j}(1, :) < 600);
+    speed_upstream(j) = mean(dx_dt(1:num_upper_obs));
+%     delta_Chi(i) = Chi{1, i}(end) - Chi{1, i}(1) + n_plus*180 - n_minus*180;
+end
+
+
 
 %%% statistics
 % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
@@ -232,6 +279,7 @@ names(together(5, :) < 0) = [];
 together(:, together(5, :) < 0) = [];  % the initial position: 0 < y_0 < 1
 names(together(5, :) > 1) = [];
 together(:, together(5, :) > 1) = [];
+
 figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 cmap = cmocean('thermal');
 bypass_edge_only = together(:,together(8, :) == 0);
@@ -249,11 +297,11 @@ ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex
 % exportgraphics(f,'Deviation-ContourL-InitialY_Angle10-10_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
 
 % pick the data point on the last plot to get the case name.
-[the_L, the_y0] = ginput(1); % pick up the point you want to show the trajectory.
-the_loc = intersect(find(together(2, :)>the_L*0.98 & together(2, :)<the_L*1.02),...
-    find(together(5, :)>the_y0*0.98 & together(5, :)<the_y0*1.02));  % Change the control range if there is an error.
-
-names(the_loc)     % show the file
+% [the_L, the_y0] = ginput(1); % pick up the point you want to show the trajectory.
+% the_loc = intersect(find(together(2, :)>the_L*0.98 & together(2, :)<the_L*1.02),...
+%     find(together(5, :)>the_y0*0.98 & together(5, :)<the_y0*1.02));  % Change the control range if there is an error.
+% 
+% names(the_loc)     % show the file
 
 % the speed: contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1
 figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
@@ -282,3 +330,10 @@ xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
 % f=gcf;
 % exportgraphics(f,'DeltaChi-ContourL-InitialY_Angle10-10_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
+
+% the delta Chi vs deviation (contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1)
+figure('color', 'w'); set(gcf, 'Position', [100 100 600 400]);
+plot(abs(together(10, :)), together(1, :), 'Color','r', 'LineStyle','none', 'Marker','.', 'MarkerSize', 15)
+set(gca,'FontSize',16);
+xlabel('$\left|\chi_f - \chi_0\ \right| (^{\circ})$','FontSize',22,'Interpreter', 'latex');
+ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
