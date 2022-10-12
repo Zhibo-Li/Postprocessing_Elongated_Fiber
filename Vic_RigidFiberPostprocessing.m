@@ -189,28 +189,34 @@ for j = 1:length(CoM)
     dx = diff(CoM{1, j}(1, :))'; % [x(i+1) - x(i)]
     dx_dt = dx ./ dt * Obj_Mag; % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. Here * 100 for convenience.
 
-%     figure('color', 'w'); set(gcf, 'Position', [-1000 500 400 300]);
-%     plot(dx_dt); 
+%     figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
+%     plot(timestamps{1, j}(1:end-1), dx_dt, 'Color','m', 'LineStyle','none', 'Marker','.', 'MarkerSize', 20); 
+%     xlim([0 3]); ylim([0 1200])
+%     xlabel('$Time\ (s)$','FontSize', 22,'Interpreter', 'latex');
+%     ylabel('$U_x\ (\mu{m}/s)$','FontSize', 22,'Interpreter', 'latex');
+%     f=gcf;
+%     exportgraphics(f,[num2str(j),'_',names{1, j}(1:end-4)  ,'_U_x.png'],'Resolution',100)
+%     close all
 
-    num_upper_obs = sum(CoM{1, j}(1, :) < 600);
+    num_upper_obs = sum(CoM{1, j}(1, :) < 300);
     speed_upstream(j) = mean(dx_dt(1:num_upper_obs));
-%     delta_Chi(i) = Chi{1, i}(end) - Chi{1, i}(1) + n_plus*180 - n_minus*180;
+    speed_ave_all(j) = mean(dx_dt);
 end
 
 
 
-%%% statistics
+% %% statistics
 % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 % edges = 20:20:180;
 % histogram(contourL,edges);
 % set(gca,'FontSize',16);
 % xlabel('$Contour\ length\ L\ ({\mu}m)$','FontSize', 22,'Interpreter', 'latex');
 % ylabel('$Number\ of\ cases$','FontSize', 22,'Interpreter', 'latex');
-% xlim([20 180]);
+% xlim([20 160]);
 % % f=gcf;
 % % exportgraphics(f,'Statistics_contourL.png','Resolution',100)
-
-%%% statistics
+% 
+% %% statistics
 % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 % edges = -90:20:90;
 % histogram(Chi_0,edges);
@@ -220,8 +226,8 @@ end
 % xlim([-90 90]);
 % % f=gcf;
 % % exportgraphics(f,'Statistics_Chi0.png','Resolution',100)
-
-%%% statistics
+% 
+% %% statistics
 % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 % edges = -0.2:0.2:1.2;
 % histogram(norm_initial_y,edges);
@@ -232,13 +238,16 @@ end
 % % f=gcf;
 % % exportgraphics(f,'Statistics_y0.png','Resolution',100)
 
-together = [norm_delta_y; norm_contourL; Chi_0; norm_initial_x; norm_initial_y; norm_final_x; norm_final_y; bypass_tip; speed; delta_Chi];
+together = [norm_delta_y; norm_contourL; Chi_0; norm_initial_x; norm_initial_y; norm_final_x; norm_final_y; bypass_tip; ones(1, length(CoM))-speed_ave_all./speed_upstream; delta_Chi];
+% No.9 row: ones(1, length(CoM))-speed./speed_upstream: 1 - U_bar/U0.
+trapped_names = names(together(6, :) < 0);  % extract the trapping case names
+trapped_together = together(:, together(6, :) < 0); % extract the trapping case information
 names(together(4, :) > -7) = [];
 together(:, together(4, :) > -7) = []; % remove the cases too close to the obstacle on the upstream side.
 names(together(6, :) < 7) = [];
 together(:, together(6, :) < 7) = []; % remove the cases too close to the obstacle on the downstream side.
 
-% the map: without any 'filter'.
+%%% the map: without any 'filter'.
 % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 % cmap = cmocean('thermal');
 % scatter(together(2, :), together(5, :), 50, together(1, :), 'Filled')
@@ -252,11 +261,12 @@ together(:, together(6, :) < 7) = []; % remove the cases too close to the obstac
 % % f=gcf;
 % % exportgraphics(f,'The_map_full_AVG-L.png','Resolution',100)
 
-names(together(3, :) < -10) = [];
-together(:, together(3, :) < -10) = [];  % the initial angle: -10 < Chi_0 < 10.
-names(together(3, :) > 10) = [];
-together(:, together(3, :) > 10) = [];
-% the map -10 < Chi_0 < 10.
+range_chi_low = 3; range_chi_up = 10;
+names(together(3, :) < range_chi_low) = [];
+together(:, together(3, :) < range_chi_low) = [];  % the initial angle: -10 < Chi_0 < 10.
+names(together(3, :) > range_chi_up) = [];
+together(:, together(3, :) > range_chi_up) = [];
+%%% the map -10 < Chi_0 < 10.
 % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 % cmap = cmocean('thermal');
 % scatter(together(2, :), together(5, :), 50, together(1, :), 'Filled')
@@ -270,7 +280,25 @@ together(:, together(3, :) > 10) = [];
 % % f=gcf;
 % % exportgraphics(f,'The_map_zeroAngle_AVG-L.png','Resolution',100)
 
-% the map: contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1
+% %%% plotting include trapping cases 
+% figure('color', 'w'); set(gcf, 'Position', [100 100 1200 600]);
+% cmap = cmocean('thermal');
+% bypass_edge_only = together(:,together(8, :) == 0);
+% bypass_tip_only = together(:,together(8, :) == 1);
+% scatter(bypass_edge_only(2, :), bypass_edge_only(5, :), 100, bypass_edge_only(3, :), 'Filled','^'); hold on
+% scatter(bypass_tip_only(2, :), bypass_tip_only(5, :), 100, bypass_tip_only(3, :), 'Filled'); hold on
+% scatter(trapped_together(2, :), trapped_together(5, :), 250, trapped_together(3, :), 'Filled', 'diamond')
+% cmap(size(contourL,2)); 
+% hcb=colorbar;
+% title(hcb,'$\chi_0 (^{\circ})$','FontSize', 16,'Interpreter', 'latex'); % for trapping case plotting.
+% grid on
+% set(gca,'FontSize',16);
+% xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
+% ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
+% % f=gcf;
+% % exportgraphics(f,'Chi0-ContourL-InitialY_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
+
+%%% the map: contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1
 names(together(2, :) < 0.5) = [];
 together(:, together(2, :) < 0.5) = []; % the contour length: 0.5 < L < 1
 names(together(2, :) > 1) = [];
@@ -285,7 +313,7 @@ cmap = cmocean('thermal');
 bypass_edge_only = together(:,together(8, :) == 0);
 bypass_tip_only = together(:,together(8, :) == 1);
 scatter(bypass_edge_only(2, :), bypass_edge_only(5, :), 200, bypass_edge_only(1, :), 'Filled','^'); hold on
-scatter(bypass_tip_only(2, :), bypass_tip_only(5, :), 200, bypass_tip_only(1, :), 'Filled')
+scatter(bypass_tip_only(2, :), bypass_tip_only(5, :), 200, bypass_tip_only(1, :), 'Filled'); hold on
 cmap(size(contourL,2)); 
 hcb=colorbar;
 title(hcb,'$Deviation\ (\delta/h_{obs})$','FontSize', 16,'Interpreter', 'latex');
@@ -293,34 +321,51 @@ grid on
 set(gca,'FontSize',16);
 xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
-% f=gcf;
-% exportgraphics(f,'Deviation-ContourL-InitialY_Angle10-10_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
+f=gcf;
+exportgraphics(f,['Deviation-ContourL-InitialY_Angle',num2str(range_chi_up), ...
+    num2str(range_chi_low),'_AVG-L_without-incomplete-trajectory_alldata(till20221005).png'],'Resolution',100)
 
-% pick the data point on the last plot to get the case name.
+%%% pick the data point on the last plot to get the case name.
 % [the_L, the_y0] = ginput(1); % pick up the point you want to show the trajectory.
 % the_loc = intersect(find(together(2, :)>the_L*0.98 & together(2, :)<the_L*1.02),...
 %     find(together(5, :)>the_y0*0.98 & together(5, :)<the_y0*1.02));  % Change the control range if there is an error.
 % 
 % names(the_loc)     % show the file
 
-% the speed: contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1
+% %%% the speed: contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1
+% figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
+% cmap = cmocean('thermal');
+% scatter(together(2, :), together(5, :), 200, together(9, :), 'Filled','square') % remember to change the 9th row of 'together'
+% cmap(size(contourL,2)); 
+% hcb=colorbar;
+% title(hcb,'$Average\ speed\ (\mu{m}/s)$','FontSize', 16,'Interpreter', 'latex');
+% grid on
+% set(gca,'FontSize',16);
+% xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
+% ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
+% % f=gcf;
+% % exportgraphics(f,'Avespeed-ContourL-InitialY_Angle10-10_contourL0.5-1_Y0-1_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
+
+%%% 1 - U_bar/U0: contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1
 figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 cmap = cmocean('thermal');
-scatter(together(2, :), together(5, :), 200, together(9, :), 'Filled','square')
+scatter(together(2, :), together(5, :), 200, together(9, :), 'Filled','square') % remember to change the 9th row of 'together'
 cmap(size(contourL,2)); 
 hcb=colorbar;
-title(hcb,'$Average\ speed\ (\mu{m}/s)$','FontSize', 16,'Interpreter', 'latex');
+title(hcb,'$1-\bar{U}/U_0$','FontSize', 16,'Interpreter', 'latex');
 grid on
 set(gca,'FontSize',16);
 xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
-% f=gcf;
-% exportgraphics(f,'Avespeed-ContourL-InitialY_Angle10-10_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
+f=gcf;
+exportgraphics(f,['U_barU0-ContourL-InitialY_Angle',num2str(range_chi_up),num2str(range_chi_low),'' ...
+    '_contourL0.5-1_Y0-1_AVG-L_without-incomplete-trajectory_alldata(till20221005).png'],'Resolution',100)
 
-% the delta Chi: contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1
+
+%%% the delta Chi: contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1
 figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 cmap = cmocean('thermal');
-scatter(together(2, :), together(5, :), 200, together(10, :), 'Filled','diamond')
+scatter(together(2, :), together(5, :), 200, together(10, :)', 'Filled','diamond')    % add ' to avoid obfuscating to a triplet.
 cmap(size(contourL,2)); 
 hcb=colorbar;
 title(hcb,'$\chi_f - \chi_0\ (^{\circ})$','FontSize', 16,'Interpreter', 'latex');
@@ -328,12 +373,27 @@ grid on
 set(gca,'FontSize',16);
 xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
-% f=gcf;
-% exportgraphics(f,'DeltaChi-ContourL-InitialY_Angle10-10_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
+f=gcf;
+exportgraphics(f,['DeltaChi-ContourL-InitialY_Angle',num2str(range_chi_up),num2str(range_chi_low), ...
+    '_contourL0.5-1_Y0-1_AVG-L_without-incomplete-trajectory_alldata(till20221005).png'],'Resolution',100)
 
-% the delta Chi vs deviation (contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1)
+%%% the |delta Chi| vs deviation (contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1)
 figure('color', 'w'); set(gcf, 'Position', [100 100 600 400]);
-plot(abs(together(10, :)), together(1, :), 'Color','r', 'LineStyle','none', 'Marker','.', 'MarkerSize', 15)
+plot(abs(together(10, :)), together(1, :), 'Color','r', 'LineStyle','none', 'Marker','.', 'MarkerSize', 30)
 set(gca,'FontSize',16);
-xlabel('$\left|\chi_f - \chi_0\ \right| (^{\circ})$','FontSize',22,'Interpreter', 'latex');
+xlabel('$\left|\chi_f - \chi_0 \right| (^{\circ})$','FontSize',22,'Interpreter', 'latex');
 ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
+% f=gcf;
+% exportgraphics(f,['DeltaChi-Deviation_Angle',num2str(range_chi_up),num2str(range_chi_low), ...
+%     '_contourL0.5-1_Y0-1_AVG-L_without-incomplete-trajectory_alldata(till20221005).png'],'Resolution',100)
+
+%%% the 1 - U_bar/U0 vs deviation (contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1)
+figure('color', 'w'); set(gcf, 'Position', [100 100 600 400]);
+plot(together(9, :), together(1, :), 'Color','r', 'LineStyle','none', 'Marker','.', 'MarkerSize', 30)
+set(gca,'FontSize',16);
+xlabel('$1-\bar{U}/U_0$','FontSize',22,'Interpreter', 'latex');
+ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
+xlim([0 0.6])
+% f=gcf;
+% exportgraphics(f,['U_barU0-Deviation_Angle',num2str(range_chi_up),num2str(range_chi_low), ...
+%     '_contourL0.5-1_Y0-1_AVG-L_without-incomplete-trajectory_alldata(till20221005).png'],'Resolution',100)
