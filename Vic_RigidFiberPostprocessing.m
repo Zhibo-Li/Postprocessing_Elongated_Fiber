@@ -59,7 +59,7 @@ for ii = 1:length(Files)
     % add the position information
     centroidxy = reshape(cell2mat(xy.centroid),2,numel(xy.centroid));
     centroidxy = centroidxy(:, Good_case_frm);
-    All_data.delta_y(ii) = abs(centroidxy(2, 1) - centroidxy(2,end)) * Obj_Mag;
+    All_data.delta_y(ii) = (centroidxy(2, 1) - centroidxy(2,end)) * Obj_Mag;
     All_data.initial_y(ii) = ((2048-centroidxy(2, 1)) - Pillar_CoM(2)) * Obj_Mag + 25; % Definition of y0 is the distance between CoM and the edge, so +25.
     All_data.initial_x(ii) = (centroidxy(1, 1) - Pillar_CoM(1)) * Obj_Mag;
     All_data.final_y(ii) = ((2048-centroidxy(2, end)) - Pillar_CoM(2)) * Obj_Mag + 25; % Definition of y0 is the distance between CoM and the edge, so +25.
@@ -187,7 +187,7 @@ CoM = [All_data(:).CoM];
 for j = 1:length(CoM)
     dt = diff(timestamps{1, j}); % [time(i+1) - time(i)]
     dx = diff(CoM{1, j}(1, :))'; % [x(i+1) - x(i)]
-    dx_dt = dx ./ dt * Obj_Mag; % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. Here * 100 for convenience.
+    dx_dt = movmean(dx, 7) ./ movmean(dt, 7) * Obj_Mag; % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. Here * 100 for convenience.
 
 %     figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 %     plot(timestamps{1, j}(1:end-1), dx_dt, 'Color','m', 'LineStyle','none', 'Marker','.', 'MarkerSize', 20); 
@@ -261,7 +261,7 @@ together(:, together(6, :) < 7) = []; % remove the cases too close to the obstac
 % % f=gcf;
 % % exportgraphics(f,'The_map_full_AVG-L.png','Resolution',100)
 
-range_chi_low = 3; range_chi_up = 10;
+range_chi_low = -10; range_chi_up = 10;
 names(together(3, :) < range_chi_low) = [];
 together(:, together(3, :) < range_chi_low) = [];  % the initial angle: -10 < Chi_0 < 10.
 names(together(3, :) > range_chi_up) = [];
@@ -321,16 +321,16 @@ grid on
 set(gca,'FontSize',16);
 xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
-f=gcf;
-exportgraphics(f,['Deviation-ContourL-InitialY_Angle',num2str(range_chi_up), ...
-    num2str(range_chi_low),'_AVG-L_without-incomplete-trajectory_alldata(till20221005).png'],'Resolution',100)
+% f=gcf;
+% exportgraphics(f,['Deviation-ContourL-InitialY_Angle',num2str(range_chi_up), ...
+%     num2str(range_chi_low),'_AVG-L_without-incomplete-trajectory_alldata(till20221005).png'],'Resolution',100)
 
 %%% pick the data point on the last plot to get the case name.
-% [the_L, the_y0] = ginput(1); % pick up the point you want to show the trajectory.
-% the_loc = intersect(find(together(2, :)>the_L*0.98 & together(2, :)<the_L*1.02),...
-%     find(together(5, :)>the_y0*0.98 & together(5, :)<the_y0*1.02));  % Change the control range if there is an error.
-% 
-% names(the_loc)     % show the file
+[the_L, the_y0] = ginput(1); % pick up the point you want to show the trajectory.
+the_loc = intersect(find(together(2, :)>the_L*0.98 & together(2, :)<the_L*1.02),...
+    find(together(5, :)>the_y0*0.98 & together(5, :)<the_y0*1.02));  % Change the control range if there is an error.
+
+names(the_loc)     % show the file
 
 % %%% the speed: contour length: 0.5 < L < 1 & initial position: 0 < y_0 < 1
 % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
