@@ -2,6 +2,8 @@ clear; close all; clc;
 pathname = uigetdir('F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle', 'Choose a folder');  % input file
 Files = dir(fullfile(pathname, 'results with timestamps', '*.mat'));
 bg = imread(fullfile(pathname, 'results', "The Pillar.tif"));
+the_excel = readcell(fullfile(pathname, 'PoleVaultingCheck.xls'), 'NumHeaderLines', 1);
+avi_names = the_excel(:, 1);
 im_BW = imbinarize(bg);
 LL = regionprops(im_BW, 'Centroid');
 Pillar_CoM  = LL.Centroid;
@@ -13,6 +15,12 @@ im_no = 1:length(Files);
 for ii = 1:length(Files)
 
     load([Files(ii).folder, filesep, Files(ii).name]);
+    avi_No = find(cellfun(@(x) any(strcmp(x, append(extractBetween(Files(ii).name, ...
+        'trajectory_', '_AABGR'), '.avi'))), avi_names));
+    All_data.PoleVaulting(ii) = the_excel{avi_No, 2};
+    All_data.Trapping(ii) = the_excel{avi_No, 3};
+    All_data.Sliding(ii) = the_excel{avi_No, 4};
+    All_data.ApexVaulting(ii) = the_excel{avi_No, 5};
 
 %     %%% Plot trajectories
 %     the_time = Good_case_frm_time * 100;
