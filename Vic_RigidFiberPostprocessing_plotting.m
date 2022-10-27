@@ -50,6 +50,7 @@ for i = 1:length(Chi)
     dchi_dt = dchi ./ (dt * 100); % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. Here * 100 for convenience.
     n_plus = length(find(dchi<-60));  n_minus = length(find(dchi>60)); % check if there is a rotation and determine the direction via the value of d_chi
     delta_Chi(i) = Chi{1, i}(end) - Chi{1, i}(1) + n_plus*180 - n_minus*180;
+    Chi_f(i) = - Chi{1, i}(end); % the orientation of the fiber in the last frame (most downstream)
 %     % plot the chi evolution.
 %     figure('color', 'w'); set(gcf, 'Position', [-2000 500 2000 300]);
 %     subplot(1,4,1); plot(timestamps{1, i}, Chi{1, i}); ylim([-90 90]); title('chi') % plot chi vs. time.
@@ -71,9 +72,18 @@ for j = 1:length(CoM)
     dt = diff(timestamps{1, j}); % [time(i+1) - time(i)]
     dx = diff(CoM{1, j}(1, :))'; % [x(i+1) - x(i)]
     dx_dt = movmean(dx, 7) ./ movmean(dt, 7) * Obj_Mag; % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. 
-    num_upper_obs = sum(CoM{1, j}(1, :) < 300); % set range (without the perturbation of the obstacle) for average speed calculation (in pixel).
-    speed_upstream(j) = mean(dx_dt(1:num_upper_obs)); % average speed (without the perturbation of the obstacle)
+    num_up_obs = sum(CoM{1, j}(1, :) < 300); % set range (without the perturbation of the obstacle) for average speed calculation (in pixel).
+    speed_upstream(j) = mean(dx_dt(1:num_up_obs)); % average speed (without the perturbation of the obstacle)
+    num_down_obs = sum(CoM{1, j}(1, :) > 1749); % set range (without the perturbation of the obstacle) for average speed calculation (in pixel).
+    if Trapping(j) == 1
+        speed_downstream(j) = speed_upstream(j);
+    else
+        speed_downstream(j) = mean(dx_dt(end-num_down_obs+1:end)); % average speed (without the perturbation of the obstacle)
+    end
+    U0(j) = 0.5 * (speed_upstream(j) + speed_downstream(j)); % U0: average of speed_upstream and speed_downstream
     speed_ave_all(j) = mean(dx_dt); % average speed 
+    interaction1(j) = 1-speed_ave_all(j)/U0(j);
+    interaction2(j) = max(abs(dx_dt-U0(j)))/U0(j); % interaction2 defines as max(abs(U0-U(t)))/U0;
 %     % plot the dx/dt evolution.
 %     figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 %     plot(timestamps{1, j}(1:end-1), dx_dt, 'Color','m', 'LineStyle','none', 'Marker','.', 'MarkerSize', 20); 
@@ -89,7 +99,7 @@ end
 together = [norm_delta_y; norm_contourL; Chi_0; norm_initial_x; norm_initial_y;...
     norm_final_x; norm_final_y; bypass_tip_together; speed_ave_all;...
     delta_Chi; PoleVaulting; ApexVaulting; Sliding; Trapping; ... 
-    ones(1, length(CoM))-speed_ave_all./speed_upstream];
+    interaction1; speed_upstream; speed_downstream; Chi_f; interaction2];
 % No.9 row: ones(1, length(CoM))-speed./speed_upstream: 1 - U_bar/U0.
 trapped_names = names(logical(Trapping));  % extract the trapping case names
 trapped_together = together(:, logical(Trapping)); % extract the trapping case information
@@ -185,7 +195,7 @@ ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex
 if range_L_low ~= 0; xlim([range_L_low range_L_up]); end
 if range_y0_low ~= -10; ylim([range_y0_low range_y0_up]); end
 % f=gcf;
-% exportgraphics(f,'The_map_full.png','Resolution',100)
+% exportgraphics(f,'delta_vs_L-y0.png','Resolution',100)
 % % %%%%%% pick the data point on the last plot to get the case name %%%%%%%
 % % [the_L, the_y0] = ginput(1); % pick up the point you want to show the trajectory.
 % % the_loc = intersect(find(together_plot(2, :)>the_L*0.98 & together_plot(2, :)<the_L*1.02),...
@@ -215,9 +225,9 @@ ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex
 if range_L_low ~= 0; xlim([range_L_low range_L_up]); end
 if range_y0_low ~= -10; ylim([range_y0_low range_y0_up]); end
 % f=gcf;
-% exportgraphics(f,'Chi0-ContourL-InitialY_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
+% exportgraphics(f,'delta_vs_L-y0_classification.png','Resolution',100)
 
-% plot the y_0 vs deviation & (1-U_bar/U0) (with classification):
+% plot the y_0 vs deviation & (1-U_bar/U0) <interaction1> (with classification):
 figure('color', 'w'); set(gcf, 'Position', [100 100 1200 600]);
 cmap = cmocean('thermal');
 bypass_edge_together = together_plot(:, ~logical(together_plot(8, :)));
@@ -225,6 +235,12 @@ bypass_tip_together = together_plot(:, logical(together_plot(8, :)));
 pole_vaulting_together = together_plot(:, logical(together_plot(11, :))); 
 apex_vaulting_together = together_plot(:, logical(together_plot(12, :)));
 sliding_together = together_plot(:, logical(together_plot(13, :)));
+scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', 'v'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', 'pentagram'); hold on % for legend only
 scatter(trapped_together(15, :), trapped_together(1, :), 200, trapped_together(5, :), 'Filled', 'diamond'); hold on 
 scatter(bypass_edge_together(15, :), bypass_edge_together(1, :), 200, bypass_edge_together(5, :), 'Filled'); hold on
 scatter(bypass_tip_together(15, :), bypass_tip_together(1, :), 200, bypass_tip_together(5, :), 'Filled', 'square'); hold on
@@ -237,10 +253,90 @@ title(hcb,'$Initial\ position\ (y_0/h_{obs})$','FontSize', 16,'Interpreter', 'la
 set(gca,'FontSize',16);
 xlabel('$1-\bar{U}/U_0$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
+legend({'Trapping','Passing Below','Passing Above (apex side)','Pole Vaulting','Apex Vaulting', ...
+    'Sliding'}, 'Location', 'southwest','FontSize', 14,'Interpreter', 'latex')
 % if range_L_low ~= 0; xlim([range_L_low range_L_up]); end
 % if range_y0_low ~= -10; ylim([range_y0_low range_y0_up]); end
 % f=gcf;
-% exportgraphics(f,'Chi0-ContourL-InitialY_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
+% exportgraphics(f,'y0_vs_interaction-delta_classification.png','Resolution',100)
+
+% plot the y_0 vs deviation & (1-U_bar/U0) <interaction1> (with classification and further data cleaning !!!):
+figure('color', 'w'); set(gcf, 'Position', [100 100 1200 600]);
+cmap = cmocean('thermal');
+together_plot_filtered = together_plot;
+together_plot_filtered(:, together_plot_filtered(9, :) > 800) = []; % remove the cases that are too fast
+together_plot_filtered(:, together_plot_filtered(9, :) < 400) = []; % remove the cases that are too slow
+abs_delta_U = abs(together_plot_filtered(17, :) - together_plot_filtered(16, :)); % |U_f - u_0|
+abs_delta_chi = abs(together_plot_filtered(18, :) - together_plot_filtered(3, :)); % |chi_f - chi_0|
+together_plot_filtered(:, and(abs_delta_U > 100, abs_delta_chi < 10)) = []; % remove the cases that have large U-differences but very small chi-differences.
+bypass_edge_together = together_plot_filtered(:, ~logical(together_plot_filtered(8, :)));
+bypass_tip_together = together_plot_filtered(:, logical(together_plot_filtered(8, :)));
+pole_vaulting_together = together_plot_filtered(:, logical(together_plot_filtered(11, :))); 
+apex_vaulting_together = together_plot_filtered(:, logical(together_plot_filtered(12, :)));
+sliding_together = together_plot_filtered(:, logical(together_plot_filtered(13, :)));
+scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', 'v'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', 'pentagram'); hold on % for legend only
+scatter(trapped_together(15, :), trapped_together(1, :), 200, trapped_together(5, :), 'Filled', 'diamond'); hold on 
+scatter(bypass_edge_together(15, :), bypass_edge_together(1, :), 200, bypass_edge_together(5, :), 'Filled'); hold on
+scatter(bypass_tip_together(15, :), bypass_tip_together(1, :), 200, bypass_tip_together(5, :), 'Filled', 'square'); hold on
+scatter(pole_vaulting_together(15, :), pole_vaulting_together(1, :), 200, pole_vaulting_together(5, :), 'Filled', '^'); hold on
+scatter(apex_vaulting_together(15, :), apex_vaulting_together(1, :), 200, apex_vaulting_together(5, :), 'Filled', 'v'); hold on
+scatter(sliding_together(15, :), sliding_together(1, :), 200, sliding_together(5, :), 'Filled', 'pentagram');
+cmap(size(together_plot_filtered,2)); 
+hcb=colorbar;
+title(hcb,'$Initial\ position\ (y_0/h_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
+set(gca,'FontSize',16);
+xlabel('$1-\bar{U}/U_0$','FontSize', 22,'Interpreter', 'latex');
+ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
+legend({'Trapping','Passing Below','Passing Above (apex side)','Pole Vaulting','Apex Vaulting', ...
+    'Sliding'}, 'Location', 'southwest','FontSize', 14,'Interpreter', 'latex')
+% if range_L_low ~= 0; xlim([range_L_low range_L_up]); end
+% if range_y0_low ~= -10; ylim([range_y0_low range_y0_up]); end
+% f=gcf;
+% exportgraphics(f,'y0_vs_interaction-delta_classification_datacleaning.png','Resolution',100)
+
+% plot the y_0 vs deviation & max(abs(U0-U(t)))/U0 <interaction2> (with classification and further data cleaning !!!):
+figure('color', 'w'); set(gcf, 'Position', [100 100 1200 600]);
+cmap = cmocean('thermal');
+together_plot_filtered = together_plot;
+together_plot_filtered(:, together_plot_filtered(9, :) > 800) = []; % remove the cases that are too fast
+together_plot_filtered(:, together_plot_filtered(9, :) < 400) = []; % remove the cases that are too slow
+abs_delta_U = abs(together_plot_filtered(17, :) - together_plot_filtered(16, :)); % |U_f - u_0|
+abs_delta_chi = abs(together_plot_filtered(18, :) - together_plot_filtered(3, :)); % |chi_f - chi_0|
+together_plot_filtered(:, and(abs_delta_U > 100, abs_delta_chi < 10)) = []; % remove the cases that have large U-differences but very small chi-differences.
+bypass_edge_together = together_plot_filtered(:, ~logical(together_plot_filtered(8, :))); 
+bypass_tip_together = together_plot_filtered(:, logical(together_plot_filtered(8, :)));
+pole_vaulting_together = together_plot_filtered(:, logical(together_plot_filtered(11, :))); 
+apex_vaulting_together = together_plot_filtered(:, logical(together_plot_filtered(12, :)));
+sliding_together = together_plot_filtered(:, logical(together_plot_filtered(13, :)));
+scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', 'v'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', 'pentagram'); hold on % for legend only
+scatter(trapped_together(19, :), trapped_together(1, :), 200, trapped_together(5, :), 'Filled', 'diamond'); hold on 
+scatter(bypass_edge_together(19, :), bypass_edge_together(1, :), 200, bypass_edge_together(5, :), 'Filled'); hold on
+scatter(bypass_tip_together(19, :), bypass_tip_together(1, :), 200, bypass_tip_together(5, :), 'Filled', 'square'); hold on
+scatter(pole_vaulting_together(19, :), pole_vaulting_together(1, :), 200, pole_vaulting_together(5, :), 'Filled', '^'); hold on
+scatter(apex_vaulting_together(19, :), apex_vaulting_together(1, :), 200, apex_vaulting_together(5, :), 'Filled', 'v'); hold on
+scatter(sliding_together(19, :), sliding_together(1, :), 200, sliding_together(5, :), 'Filled', 'pentagram');
+cmap(size(together_plot_filtered,2)); 
+hcb=colorbar;
+title(hcb,'$Initial\ position\ (y_0/h_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
+set(gca,'FontSize',16);
+xlabel('$max\left|U_0-U(t)\right|/U_0$','FontSize', 22,'Interpreter', 'latex');
+ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
+legend({'Trapping','Passing Below','Passing Above (apex side)','Pole Vaulting','Apex Vaulting', ...
+    'Sliding'}, 'Location', 'southwest','FontSize', 14,'Interpreter', 'latex')
+% if range_L_low ~= 0; xlim([range_L_low range_L_up]); end
+% if range_y0_low ~= -10; ylim([range_y0_low range_y0_up]); end
+f=gcf;
+exportgraphics(f,'y0_vs_interaction2-delta_classification_datacleaning.png','Resolution',100)
 
 % plot the speed vs L & y_0: 
 figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
@@ -254,9 +350,9 @@ set(gca,'FontSize',16);
 xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
 % f=gcf;
-% exportgraphics(f,'Avespeed-ContourL-InitialY_Angle10-10_contourL0.5-1_Y0-1_AVG-L_without-incomplete-trajectory_alldata(till20221005).png','Resolution',100)
+% exportgraphics(f,'Ubar_vs_L-y0.png','Resolution',100)
 
-% plot (1-U_bar/U0) vs L & y_0:
+% plot (1-U_bar/U0) <interaction1> vs L & y_0:
 figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 cmap = cmocean('thermal');
 scatter(together_plot(2, :), together_plot(5, :), 200, together_plot(15, :), 'Filled', 'hexagram') % remember to change the 9th row of 'together'
@@ -268,8 +364,7 @@ set(gca,'FontSize',16);
 xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
 % f=gcf;
-% exportgraphics(f,['U_barU0-ContourL-InitialY_Angle',num2str(range_chi_up),num2str(range_chi_low),'' ...
-%     '_contourL0.5-1_Y0-1_AVG-L_without-incomplete-trajectory_alldata(till20221005).png'],'Resolution',100)
+% exportgraphics(f,'interaction_vs_L-y0.png','Resolution',100)
 
 % plot the delta Chi vs L & y_0:
 figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
@@ -283,8 +378,7 @@ set(gca,'FontSize',16);
 xlabel('$Contour\ length\ (L/l_{obs})$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
 % f=gcf;
-% exportgraphics(f,['DeltaChi-ContourL-InitialY_Angle',num2str(range_chi_up),num2str(range_chi_low), ...
-%     '_contourL0.5-1_Y0-1_AVG-L_without-incomplete-trajectory_alldata(till20221005).png'],'Resolution',100)
+% exportgraphics(f,'deltaChi_vs_L-y0.png','Resolution',100)
 
 
 
@@ -296,16 +390,27 @@ set(gca,'FontSize',16);
 xlabel('$\left|\chi_f - \chi_0 \right| (^{\circ})$','FontSize',22,'Interpreter', 'latex');
 ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
 % f=gcf;
-% exportgraphics(f,['DeltaChi-Deviation_Angle',num2str(range_chi_up),num2str(range_chi_low), ...
-%     '_contourL0.5-1_Y0-1_AVG-L_without-incomplete-trajectory_alldata(till20221005).png'],'Resolution',100)
+% exportgraphics(f,'absDeltaChi_vs_delta.png','Resolution',100)
 
-% plot the 1 - U_bar/U0 vs deviation
+% plot the (1 - U_bar/U0) <interaction1>  vs deviation
 figure('color', 'w'); set(gcf, 'Position', [100 100 600 400]);
 plot(together_plot(15, :), together_plot(1, :), 'Color','r', 'LineStyle','none', 'Marker','*', 'MarkerSize', 5)
 set(gca,'FontSize',16);
 xlabel('$1-\bar{U}/U_0$','FontSize',22,'Interpreter', 'latex');
 ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
-xlim([0 0.6])
 % f=gcf;
-% exportgraphics(f,['U_barU0-Deviation_Angle',num2str(range_chi_up),num2str(range_chi_low), ...
-%     '_contourL0.5-1_Y0-1_AVG-L_without-incomplete-trajectory_alldata(till20221005).png'],'Resolution',100)
+% exportgraphics(f,'interaction_vs_delta.png','Resolution',100)
+
+% plot the (speed_downstream-speed_upstream) vs Chi_0/Chi_f
+figure('color', 'w'); set(gcf, 'Position', [100 100 600 400]);
+yyaxis left
+plot((together_plot(17, :) - together_plot(16, :)), together_plot(3, :), 'LineStyle','none', 'Marker','*', 'MarkerSize', 7)
+ylabel('$\chi_0\ (^{\circ})$','FontSize', 22,'Interpreter', 'latex');
+yyaxis right
+plot((together_plot(17, :) - together_plot(16, :)), together_plot(18, :), 'LineStyle','none', 'Marker','o', 'MarkerSize', 7)
+ylabel('$\chi_f\ (^{\circ})$','FontSize', 22,'Interpreter', 'latex');
+set(gca,'FontSize',16);
+xlabel('$U_{downstream}-U_{upstream}\ (\mu{m}/s)$','FontSize',22,'Interpreter', 'latex');
+xlim([-300 300])
+% f=gcf;
+% exportgraphics(f,'deltaU_vs_chi0__eltaU_vs_chif.png','Resolution',100)
