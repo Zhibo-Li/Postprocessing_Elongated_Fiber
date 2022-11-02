@@ -1,3 +1,14 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Good_case: stored the absolute slice numbers of the calculated *.tif
+%             files. Get directly after running the 'Filament-detecting'
+%             (update parameters version). 
+%             * call in loop j: xy(1).frame(j)
+%
+%  Good_case_frm: stored the index of the 'Good_case' variable. Get from
+%                 the 'draw reconstruction and selection' process.
+%                 * call in loop j: xy(1).frame(Good_case_frm(j))
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %% Make a video (CoM fixed) ...
 clear; close all; clc;
 
@@ -24,7 +35,7 @@ v.Quality = 100;
 open(v);   % For the video.
 for j = 1:size(Good_case_frm,2)
 
-    i = Good_case_frm(j);% index of the 'good' cases
+    i = Good_case_frm(j);
 
     Foo = imread([basepath, tifname],xy(1).frame(i));
 
@@ -109,7 +120,7 @@ close(v);  % For the video.
 
 % for j = 1:size(Good_case_frm,2)
 % 
-%     i = Good_case_frm(j); % index of the 'good' cases
+%     i = Good_case_frm(j);
 %     spl1 = xy(1).spl{i}(:,1); spl2 = xy(1).spl{i}(:,2); % x-y coordinates of the B-spline
 %     T_spl1 = lzero+spl1;  T_spl2 = 2048-lzero-spl2;
 %     plot(T_spl1,T_spl2)
@@ -125,7 +136,7 @@ close(v);  % For the video.
 
 
 
-%% Make videos for all ...
+%% Make videos for all and wait for selecting good cases ...
 clear; close all; clc;
 
 the_folder = dir('F:\Experimental Data (EXTRACTED)\FSI - Rigid Fiber &  Individual Obstacle\20220913-SU8_Fibers-Individual_triangularPillar_uppoint\Inverted\*.tif');
@@ -147,9 +158,7 @@ for iiii = 1:length(the_folder)
         v.Quality = 100;
 
         open(v);   % For the video.
-        for j = 1:size(Good_case,2)
-
-            i = j;% index of the 'good' cases
+        for i = 1:size(Good_case,2)
 
             Foo = imread(fullfile(basepath, tifname),xy(1).frame(i));
 
