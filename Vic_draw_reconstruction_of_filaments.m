@@ -1,4 +1,15 @@
-%% Draw and select the good cases!!!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Good_case: stored the absolute slice numbers of the calculated *.tif
+%             files. Get directly after running the 'Filament-detecting'
+%             (update parameters version). 
+%             * call in loop j: xy(1).frame(j)
+%
+%  Good_case_frm: stored the index of the 'Good_case' variable. Get from
+%                 the 'draw reconstruction and selection' process.
+%                 * call in loop j: xy(1).frame(Good_case_frm(j))
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Draw reconstruction and selection !!!
 % This first part of the code is to select the nice cases after calculating
 % the shape based on Francesco's code, and then save these cases into 'Good_case'
 % Notice the different 'original points' for the image and coordinate
@@ -7,22 +18,16 @@
 clear; close all; clc;
 
 % The .tif file you just calculated.
-[filename, pathname]=uigetfile({'G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220217-Actin\AfterAveBGR\*.tif'}, 'Choose a file to be processed');  % input file
-
+[filename, pathname]=uigetfile({['G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)' ...
+    '\20220217-Actin\AfterAveBGR\*.tif']}, 'Choose a file to be processed');  % input file
 basepath=pathname;
 tifname=filename;
 
-% basepath='G:\PhD, PMMH, ESPCI\Experimental Data (EXTRACTED)\20220217-Actin\AfterAveBGR\';
-% tifname='M63_H40.44_Phi30_1nM_2nL2nL0.2nL_Expo20ms_11_no1018-no1085_AABGR.tif';
-
-
 % The .mat file where stores your results.
-[filename, pathname]=uigetfile({'G:\PhD, PMMH, ESPCI\Processing\20220217-Actin\results\Group_1\*.mat'}, 'Choose a file to be processed');  % input file
-% loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220217-Actin\results\',...
-%     'trajectory_M63_H40.44_Phi30_1nM_2nL2nL0.2nL_Expo20ms_11_no1018-no1085_AABGR_batch1.mat'];
+[filename, pathname]=uigetfile({['G:\PhD, PMMH, ESPCI\Processing\20220217-Actin' ...
+    '\results\Group_1\*.mat']}, 'Choose a file to be processed');  % input file
 load([pathname, filename]);
 
-close all;
 lzero = max(lobject,ceil(5*lnoise));
 jj = 1;
 
@@ -62,21 +67,14 @@ for i = 1:1:xy.nframe
 
     % Show the B-spline, the idea is to change the original point according
     % to the required window.
-    %     h = plot(T_spl1,T_spl2,'-','linewidth',6);
     h = plot(T_spl1-max(T_C1-xwin/2,1), T_spl2-max(T_C2-ywin/2,1),'-','linewidth',6);
     set(h,'marker','.');
-    title(['No.',num2str(xy.frame(i))],'Color','red','FontSize',14);
-    hold on
-
-    %     quiver(lzero+X(:,1),size(Foo,1)-lzero-X(:,2),K2(:,1),-K2(:,2));  % WHY it is '-K2(:,2)'??
-    %     hold on;
+    title(['No.',num2str(xy.frame(i))],'Color','red','FontSize',14); hold on
 
     plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin/2,1),T_spl2(RR2==min(RR2))...
-        -max(T_C2-ywin/2,1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
-    hold on;
+        -max(T_C2-ywin/2,1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5); hold on;
 
-    plot(T_C1-max(T_C1-xwin/2,1),T_C2-max(T_C2-ywin/2,1),'*','markeredgecolor','r','MarkerSize',5);
-    hold off;
+    plot(T_C1-max(T_C1-xwin/2,1),T_C2-max(T_C2-ywin/2,1),'*','markeredgecolor','r','MarkerSize',5); hold off;
 
     % This is to draw the relative positions between two neighbouring  figures
     % and check we always follow the same filament.
@@ -94,7 +92,7 @@ for i = 1:1:xy.nframe
         Inputnum = input('The B-spline fits well?: \n 1 = Yes \n 2 = No \n');
         switch Inputnum
             case 1
-                Good_case(jj) = i;
+                Good_case_frm(jj) = i;
                 jj = jj + 1;
                 close;
             case 2
@@ -105,7 +103,7 @@ for i = 1:1:xy.nframe
                 Inputnum = input('\n \n \n \n Be careful and input again!!! \n The B-spline fits well?: \n 1 = Yes \n 2 = No \n');
                 switch Inputnum
                     case 1
-                        Good_case(jj) = i;
+                        Good_case_frm(jj) = i;
                         jj = jj + 1;
                         close;
                     case 2
@@ -120,7 +118,7 @@ for i = 1:1:xy.nframe
         Inputnum = input('\n \n \n \n Be careful and input again!!! \n The B-spline fits well?: \n 1 = Yes \n 2 = No \n');
         switch Inputnum
             case 1
-                Good_case(jj) = i;
+                Good_case_frm(jj) = i;
                 jj = jj + 1;
                 close;
             case 2
@@ -129,56 +127,44 @@ for i = 1:1:xy.nframe
         end
         close;
     end
-
-
-    %     saveas(gcf,'F:\Code\tmpData\tmp','tiffn');
-    %     imwrite(imread('F:\Code\tmpData\tmp.tif'), [basepath,'results\Batch_1',tifname], 'writemode', 'append');
-
-    %     plot(lzero+xy(1).spl{i}(:,1),size(Foo,1)*1.5-lzero-xy(1).spl{i}(:,2),'-','linewidth',6)
-    %     hold on
-    %     plot(lzero+xy(1).crd{i}(:,1),size(Foo,1)*1.5-lzero-xy(1).crd{i}(:,2),'.','markeredgecolor','k','markerfacecolor','w','linewidth',2)
-    %     hold on
-
     close all;
-
 end
-
 
 save([pathname, filename],'thickness','structsensitivity','lnoise','lobject','threshold','ds',...
     'npnts','FilNum','initial_frame',...
     'frame_step','final_frame','framelist','improc','InfoImage',...,
     'sensitivity','MinBranchLength','ROI','missed_frames',...
     'xskip','yskip','xwin','ywin',...
-    'N_fil','prcs_img','xy','Good_case')
-
-
+    'N_fil','prcs_img','xy','Good_case_frm')
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Draw good cases!!!
+%% Make video (CoM fixed) (for the 'draw reconstruction and selection' process)!!!
 clear; close all; clc;
 
 % The .tif file you just calculated.
-% basepath='D:\Dropbox\tmp\AfterAveBGR\';
-% tifname='M63_H40.44_Phi30_1nM_2nL2nL0.2nL_Expo20ms_11_no721-no797_AABGR.tif';
-
+[filename, pathname]=uigetfile({['F:\Experimental Data (EXTRACTED)\Actin Filaments' ...
+    ' in Porous Media\20210413-Actin\AfterAveBGR\*.tif']}, 'Choose a *.tif to be processed');  % input file
+basepath=pathname;
+tifname=filename;
 
 % The .mat file where stores your results.
-[filename, pathname]=uigetfile({'D:\Dropbox\tmp\AfterAveBGR\results\*.mat'}, 'Choose a file to be processed');  % input file
+[filename, pathname]=uigetfile({['F:\Processing & Results\Actin Filaments in ' ...
+    'Porous Media\20210413-Actin\results\*.mat']}, 'Choose a *.mat to be processed');  % input file
 load([pathname, filename]);
-close all;
+
 lzero = max(lobject,ceil(5*lnoise));
 
-v = VideoWriter(strcat('M63_Phi20_T10_0.5nM_1.5nL_Expo20ms_11_no478-no517_AABGR_video2'),'MPEG-4');   % To make a video!
+v = VideoWriter(strcat(filename),'MPEG-4');   % To make a video!
 v.FrameRate = 24;  % Frame rate in the video.
 v.Quality = 100;
 
 open(v);   % For the video.
-for j = 1:size(Good_case,2)
+for j = 1:size(Good_case_frm,2)
 
-    i = Good_case(j);% index of the 'good' cases
+    i = Good_case_frm(j);% index of the 'good' cases
 
     Foo = imread([basepath, tifname],xy(1).frame(i));
 
@@ -204,7 +190,7 @@ for j = 1:size(Good_case,2)
 
     the_frame = uint16(zeros(ywin+1, xwin+1));  % Put the Zoom_in into this frame so that every figure has the same size to make the video.
     xy_mov = size(the_frame)-size(Zoom_in);  % How much should the plot be shifted.
-    if abs(j - 1)  < abs(j - size(Good_case,2))  % To fix the center-of-mass position in the video.
+    if abs(j - 1)  < abs(j - size(Good_case_frm,2))  % To fix the center-of-mass position in the video.
         the_frame(padarray(true(size(Zoom_in)), xy_mov, 'pre')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
 
         imshow(the_frame, 'InitialMagnification', 200); hold on;
@@ -241,14 +227,6 @@ for j = 1:size(Good_case,2)
         hold off;
     end
 
-    %     saveas(gcf,'F:\Code\tmpData\tmp','tiffn');
-    %     imwrite(imread('F:\Code\tmpData\tmp.tif'), [basepath,'results\Batch_1',tifname], 'writemode', 'append');
-
-    %     plot(lzero+xy(1).spl{i}(:,1),size(Foo,1)*1.5-lzero-xy(1).spl{i}(:,2),'-','linewidth',6)
-    %     hold on
-    %     plot(lzero+xy(1).crd{i}(:,1),size(Foo,1)*1.5-lzero-xy(1).crd{i}(:,2),'.','markeredgecolor','k','markerfacecolor','w','linewidth',2)
-    %     hold on
-
     pause(0.001);
     frame = getframe(gcf);
     writeVideo(v,frame);
@@ -257,13 +235,9 @@ for j = 1:size(Good_case,2)
 end
 close(v);  % For the video.
 
-% figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
-bgim=imread('D:\Dropbox\tmp\Tri_1 - Copy.tif');  % background image.
-imshow(bgim, []); hold on;
+for j = 1:size(Good_case_frm,2)
 
-for j = 1:size(Good_case,2)
-
-    i = Good_case(j); % index of the 'good' cases
+    i = Good_case_frm(j); % index of the 'good' cases
     spl1 = xy(1).spl{i}(:,1); spl2 = xy(1).spl{i}(:,2); % x-y coordinates of the B-spline
     T_spl1 = lzero+spl1;  T_spl2 = 2048-lzero-spl2;
     plot(T_spl1,T_spl2)
@@ -286,22 +260,21 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Draw good cases!!! (Postprocess code for https://github.com/Zhibo-Li/Filaments-Detecting.git)
+%% Make video (CoM fixed) (the update parameters version of 'Filament-detecting' )!
 clear; close all; clc;
 
 % The .tif file you just calculated.
-basepath='E:\Dropbox\tmp\';
-tifname='M63_Phi20_T20_0.5nM_1nL_Expo20ms_17_no333-no447_AABGR.tif';
-
+[filename, pathname]=uigetfile({['F:\Experimental Data (EXTRACTED)\Actin Filaments' ...
+    ' in Porous Media\20210914-Actin\AfterAveBGR\*.tif']}, 'Choose a *.tif to be processed');  % input file
+basepath=pathname;
+tifname=filename;
 
 % The .mat file where stores your results.
-loadfile = ['G:\PhD, PMMH, ESPCI\Processing\20220217-Actin\results\',...
-    'trajectory_M63_Phi20_T20_0.5nM_1nL_Expo20ms_17_no333-no447_AABGR_batch1.mat'];
-load(loadfile);
+[filename, pathname]=uigetfile({['F:\Processing & Results\Actin Filaments in ' ...
+    'Porous Media\20210914-Actin\results\*.mat']}, 'Choose a *.mat to be processed');  % input file
+load([pathname, filename]);
 
-close all;
-
-v = VideoWriter(strcat('M63_Phi20_T20_0.5nM_1nL_Expo20ms_17_no333-no447_AABGR_video'),'MPEG-4');   % To make a video!
+v = VideoWriter(strcat(filename),'MPEG-4');   % To make a video!
 v.FrameRate = 24;  % Frame rate in the video.
 v.Quality = 100;
 open(v);   % For the video.
