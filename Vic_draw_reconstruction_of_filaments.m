@@ -386,9 +386,12 @@ end
 close(v);  % For the video.
 
 figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
-for j = 1:xy.nframe
+Good_case_frm = find(ismember(xy(1).frame, Good_case));
+for j = 1:size(Good_case_frm,2)
 
-    plot(xy.spl{j}(:,1),xy.spl{j}(:,2))
+    i = Good_case_frm(j);% index of the 'good' cases
+
+    plot(xy.spl{i}(:,1),xy.spl{i}(:,2))
     hold on
 
     axis equal
