@@ -47,7 +47,7 @@ Chi = [All_data(:).Chi];
 for i = 1:length(Chi)
     dt = diff(timestamps{1, i}); % [time(i+1) - time(i)]
     dchi = diff(Chi{1, i})'; % chi(i+1) - chi(i)
-    dchi_dt = dchi ./ (dt * 100); % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. Here * 100 for convenience.
+%     dchi_dt = dchi ./ (dt * 100); % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. Here * 100 for convenience.
     n_plus = length(find(dchi<-60));  n_minus = length(find(dchi>60)); % check if there is a rotation and determine the direction via the value of d_chi
     delta_Chi(i) = Chi{1, i}(end) - Chi{1, i}(1) + n_plus*180 - n_minus*180;
     Chi_f(i) = - Chi{1, i}(end); % the orientation of the fiber in the last frame (most downstream)
@@ -95,6 +95,28 @@ for j = 1:length(CoM)
 %     close all
 end
 
+% % % plot the dx/dt (using movmean) and chi evolution
+% % % for k = 164:204
+% % %     dt = diff(timestamps{1, k}); % [time(i+1) - time(i)]
+% % %     dx = diff(CoM{1, k}(1, :))'; % [x(i+1) - x(i)]
+% % %     dx_dt = movmean(dx, 7) ./ movmean(dt, 7) * Obj_Mag; % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. 
+% % %     % plot the dx/dt evolution.
+% % %     figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
+% % %     yyaxis left
+% % %     plot(timestamps{1, k}(1:end-1), dx_dt, 'LineStyle','none', 'Marker','.', 'MarkerSize', 20); 
+% % %     ylabel('$U_x\ (\mu{m}/s)$','FontSize', 22,'Interpreter', 'latex');
+% % %     ylim([0 1200])
+% % %     yyaxis right
+% % %     plot(timestamps{1, k}(1:end-1), Chi{1, k}(1:end-1), 'LineStyle','none', 'Marker','.', 'MarkerSize', 20); 
+% % %     xlim([0 3]); 
+% % %     ylim([-100 100])
+% % %     xlabel('$Time\ (s)$','FontSize', 22,'Interpreter', 'latex');
+% % %     ylabel('$\chi\ (^{\circ})$','FontSize', 22,'Interpreter', 'latex');
+% % %     f=gcf;
+% % %     exportgraphics(f,['20221005_',names{1, k}(1:end-4)  ,'_U_x_Chi.png'],'Resolution',100)
+% % %     close all
+% % % end
+
 % put all the information in a matrix
 together = [norm_delta_y; norm_contourL; Chi_0; norm_initial_x; norm_initial_y;...
     norm_final_x; norm_final_y; bypass_tip_together; speed_ave_all;...
@@ -110,8 +132,6 @@ names(together(4, :) > range_upstream) = [];
 together(:, together(4, :) > range_upstream) = []; % remove the cases too close to the obstacle on the upstream side.
 names(together(6, :) < range_downstream) = [];
 together(:, together(6, :) < range_downstream) = []; % remove the cases too close to the obstacle on the downstream side.
-
-
 
 % % % %% statistics
 % % % % Contour length L
@@ -287,7 +307,7 @@ scatter(pole_vaulting_together(15, :), pole_vaulting_together(1, :), 200, pole_v
 scatter(apex_vaulting_together(15, :), apex_vaulting_together(1, :), 200, apex_vaulting_together(5, :), 'Filled', 'v'); hold on
 scatter(sliding_together(15, :), sliding_together(1, :), 200, sliding_together(5, :), 'Filled', 'pentagram');
 cmap(size(together_plot_filtered,2)); 
-hcb=colorbar;
+hcb=colorbar; caxis([0 1])
 title(hcb,'$Initial\ position\ (y_0/h_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
 set(gca,'FontSize',16);
 xlabel('$1-\bar{U}/U_0$','FontSize', 22,'Interpreter', 'latex');
@@ -301,7 +321,8 @@ legend({'Trapping','Passing Below','Passing Above (apex side)','Pole Vaulting','
 
 % plot the y_0 vs deviation & max(abs(U0-U(t)))/U0 <interaction2> (with classification and further data cleaning !!!):
 figure('color', 'w'); set(gcf, 'Position', [100 100 1200 600]);
-cmap = cmocean('thermal');
+% cmap = cmocean('thermal');
+cmap = colormap("jet");
 together_plot_filtered = together_plot;
 together_plot_filtered(:, together_plot_filtered(9, :) > 800) = []; % remove the cases that are too fast
 together_plot_filtered(:, together_plot_filtered(9, :) < 400) = []; % remove the cases that are too slow
@@ -317,26 +338,31 @@ scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
 scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
 scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
 scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
-scatter(nan, nan, 1, nan, 'filled', 'k', 'v'); hold on % for legend only
-scatter(nan, nan, 1, nan, 'filled', 'k', 'pentagram'); hold on % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k', 'v'); hold on % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k', 'pentagram'); hold on % for legend only
 scatter(trapped_together(19, :), trapped_together(1, :), 200, trapped_together(5, :), 'Filled', 'diamond'); hold on 
 scatter(bypass_edge_together(19, :), bypass_edge_together(1, :), 200, bypass_edge_together(5, :), 'Filled'); hold on
 scatter(bypass_tip_together(19, :), bypass_tip_together(1, :), 200, bypass_tip_together(5, :), 'Filled', 'square'); hold on
 scatter(pole_vaulting_together(19, :), pole_vaulting_together(1, :), 200, pole_vaulting_together(5, :), 'Filled', '^'); hold on
-scatter(apex_vaulting_together(19, :), apex_vaulting_together(1, :), 200, apex_vaulting_together(5, :), 'Filled', 'v'); hold on
-scatter(sliding_together(19, :), sliding_together(1, :), 200, sliding_together(5, :), 'Filled', 'pentagram');
+% scatter(apex_vaulting_together(19, :), apex_vaulting_together(1, :), 200, apex_vaulting_together(5, :), 'Filled', 'v'); hold on
+% scatter(sliding_together(19, :), sliding_together(1, :), 200, sliding_together(5, :), 'Filled', 'pentagram');
 cmap(size(together_plot_filtered,2)); 
-hcb=colorbar;
+hcb=colorbar; caxis([0 1])
 title(hcb,'$Initial\ position\ (y_0/h_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
 set(gca,'FontSize',16);
 xlabel('$max\left|U_0-U(t)\right|/U_0$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
-legend({'Trapping','Passing Below','Passing Above (apex side)','Pole Vaulting','Apex Vaulting', ...
-    'Sliding'}, 'Location', 'southwest','FontSize', 14,'Interpreter', 'latex')
+legend({'Trapping','Below','Above','Pole-vaulting'...
+    }, 'Location', 'southwest','FontSize', 14,'Interpreter', 'latex')
+% title('$-10<{\chi}_0<10,\ 0.5<L<1$','FontSize', 22,'Interpreter', 'latex')
 % if range_L_low ~= 0; xlim([range_L_low range_L_up]); end
 % if range_y0_low ~= -10; ylim([range_y0_low range_y0_up]); end
-f=gcf;
-exportgraphics(f,'y0_vs_interaction2-delta_classification_datacleaning.png','Resolution',100)
+% f=gcf;
+% exportgraphics(f,'y0_vs_interaction2-delta_classification_datacleaning_Chi0-m10to10_L-0p5to1.png','Resolution',100)
+[the_inter2, the_delta] = ginput(1); % pick up the point you want to show the trajectory.
+the_loc = intersect(find(together_plot(19, :)>the_inter2*0.98 & together_plot(19, :)<the_inter2*1.02),...
+    find(together_plot(1, :)>the_delta*0.98 & together_plot(1, :)<the_delta*1.02));  % Change the control range if there is an error.
+names_plot(the_loc)     % show the file
 
 % plot the speed vs L & y_0: 
 figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
