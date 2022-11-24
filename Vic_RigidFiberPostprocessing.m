@@ -8,6 +8,7 @@ bg = imread(fullfile(pathname, 'results', "The Pillar.tif"));
 the_excel = readcell(fullfile(pathname, 'PoleVaultingCheck.xls'), 'NumHeaderLines', 1);
 avi_names = the_excel(:, 1);
 im_BW = imbinarize(bg);
+[row, col] = find(im_BW); obs_2d = [col, 2048-row];
 LL = regionprops(im_BW, 'Centroid');
 Pillar_CoM  = LL.Centroid;
 the_pillar_im = imcomplement(imfill(im_BW, 'holes'));
@@ -21,7 +22,8 @@ for ii = 1:length(Files)
     avi_No = find(cellfun(@(x) any(strcmp(x, append(extractBetween(Files(ii).name, ...
         'trajectory_', '_AABGR'), '.avi'))), avi_names));
     All_data.PoleVaulting(ii) = the_excel{avi_No, 2};
-    All_data.Trapping(ii) = the_excel{avi_No, 3};
+    ifTrapping = the_excel{avi_No, 3};
+    All_data.Trapping(ii) = ifTrapping;
     All_data.Sliding(ii) = the_excel{avi_No, 4};
     All_data.ApexVaulting(ii) = the_excel{avi_No, 5};
 
@@ -61,7 +63,8 @@ for ii = 1:length(Files)
     All_data.filename{ii} = Files(ii).name;    
 
     % add the timestamps
-    All_data.timestamps{ii} = Good_case_frm_time - min(Good_case_frm_time);
+    timestamps = Good_case_frm_time - min(Good_case_frm_time);
+    All_data.timestamps{ii} = timestamps;
 
     % add the contour lengths 
     sorted_lengths = sort(xy.arclen_spl(Good_case_frm));
@@ -77,6 +80,52 @@ for ii = 1:length(Files)
     All_data.final_x(ii) = (centroidxy(1, end) - Pillar_CoM(1)) * Obj_Mag;
     All_data.CoM{ii} = centroidxy;
     %     hold on; plot(centroidxy(1,:), 2048-centroidxy(2,:)-800, "Color",'k', 'LineStyle','--');
+
+    % calculate the interaction index
+    dt = diff(timestamps); % [time(i+1) - time(i)]
+    dx = diff(centroidxy(1, :))'; % [x(i+1) - x(i)]
+    dx_dt = movmean(dx, 7) ./ movmean(dt, 7) * Obj_Mag; % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. 
+    num_up_obs = sum(centroidxy(1, :) < 300); % set range (without the perturbation of the obstacle) for average speed calculation (in pixel).
+    speed_upstream = mean(dx_dt(1:num_up_obs)); % average speed (without the perturbation of the obstacle)
+    num_down_obs = sum(centroidxy(1, :) > 1749); % set range (without the perturbation of the obstacle) for average speed calculation (in pixel).
+    if ifTrapping == 1
+        speed_downstream = speed_upstream;
+    else
+        speed_downstream = mean(dx_dt(end-num_down_obs+1:end)); % average speed (without the perturbation of the obstacle)
+    end
+    U0 = 0.5 * (speed_upstream + speed_downstream); % U0: average of speed_upstream and speed_downstream
+    speed_ave_all = mean(dx_dt); % average all instantaneous speeds
+    All_data.speed_ave_all(ii) = speed_ave_all;
+    All_data.speed_upstream(ii) = speed_upstream;
+    All_data.speed_downstream(ii) = speed_downstream;
+    interaction1 = 1-speed_ave_all/U0;
+    interaction2 = max(abs(dx_dt-U0))/U0; % interaction2 defines as max(abs(U0-U(t)))/U0;
+    All_data.interaction1(ii) = interaction1;
+    All_data.interaction2(ii) = interaction2;
+
+    circle_intersec = 0; line_intersec = 0;
+    for jj = 1:size(centroidxy, 2)
+
+        XY = xy.spl{1, Good_case_frm(jj)}; 
+        Half_L = sqrt((XY(1,1)-XY(end,1))^2 + (XY(1,2)-XY(end,2))^2) / 2 + 8;
+
+        theta = linspace(0,2*pi,300);
+        circle_x = Half_L*cos(theta); circle_x = circle_x + centroidxy(1, jj);
+        circle_y = Half_L*sin(theta); circle_y = circle_y + centroidxy(2, jj);
+        [intersec_cir_x, intersec_cir_y] = polyxpoly(obs_2d(:,1), obs_2d(:,2), circle_x, circle_y);
+        if ~isempty(intersec_cir_y)
+            circle_intersec = circle_intersec + 1;
+            if min(pdist2(XY,obs_2d,'euclidean','Smallest',1)) < 8
+                line_intersec = line_intersec + 1;
+            end
+        end
+    end
+    if circle_intersec == 0
+        interaction3 = 0;
+    else
+        interaction3 = line_intersec / circle_intersec;
+    end
+    All_data.interaction3(ii) = interaction3;
 
     % calculate the average speed along x-direction (UNIT: um/s)
     All_data.ave_speed(ii) = ((centroidxy(1, end) - Pillar_CoM(1)) - (centroidxy(1, 1) - Pillar_CoM(1))) * Obj_Mag / (max(Good_case_frm_time) - min(Good_case_frm_time));
@@ -119,4 +168,4 @@ for ii = 1:length(Files)
 
 end
 
-% save([pathname, '_infos_contourL-fromAVG_with_all-Chi_timestamps.mat'], 'All_data');
+save([pathname, '_information_full.mat'], 'All_data');
