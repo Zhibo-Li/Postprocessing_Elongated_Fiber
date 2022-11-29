@@ -15,6 +15,9 @@ the_pillar_im = imcomplement(imfill(im_BW, 'holes'));
 % cmap = cmocean('thermal');
 Obj_Mag = 0.63;
 
+% load LBM simulation data 
+load('D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo\LBM data\LBM_midplane.mat');
+
 im_no = 1:length(Files);
 for ii = 1:length(Files)
 
@@ -102,7 +105,8 @@ for ii = 1:length(Files)
     interaction2 = max(abs(dx_dt-U0))/U0; % interaction2 defines as max(abs(U0-U(t)))/U0;
     All_data.interaction1(ii) = interaction1;
     All_data.interaction2(ii) = interaction2;
-
+    
+    % interaction index 3
     circle_intersec = 0; line_intersec = 0;
     for jj = 1:size(centroidxy, 2)
 
@@ -126,6 +130,27 @@ for ii = 1:length(Files)
         interaction3 = line_intersec / circle_intersec;
     end
     All_data.interaction3(ii) = interaction3;
+
+    % interaction index 4
+    I_a = sum(U0.*diff(timestamps(1:end-1))); % integral of the speed
+    I_b = sum(abs(dx_dt(1:end-1)-U0).*diff(timestamps(1:end-1))); % integral of the speed-U0 difference.
+    All_data.interaction4(ii) = I_b/I_a;
+
+    % interaction index 5
+    relative_x = (centroidxy(1, :) - Pillar_CoM(1)) * Obj_Mag; 
+    relative_y = (2048 - centroidxy(2, :) - Pillar_CoM(1)) * Obj_Mag; % relative x & y to the obstacle center.
+
+    obs_simu_ctr = [XX(1, 151), YY(51, 1)]; % The obstacle center in the simulation.
+
+    Ux_simu = zeros(size(relative_x, 2), 1); Uy_simu = Ux_simu;
+    for kk = 1:size(relative_x, 2)
+        XY_simu = [relative_x(kk) + obs_simu_ctr(1); relative_y(kk) + obs_simu_ctr(2)];
+
+        Ux_simu(kk) = interp2(XX, YY, UX_midplane, XY_simu(1), XY_simu(2));
+        Uy_simu(kk) = interp2(XX, YY, UY_midplane, XY_simu(1), XY_simu(2));
+    end
+    Ux_simu = Ux_simu / Ux_simu(1) * U0; Uy_simu = Uy_simu / Uy_simu(1) * U0;
+    All_data.interaction5(ii) = sum(abs(Ux_simu(1:end-1) - dx_dt) .* diff(timestamps)) / (timestamps(end) * U0);
 
     % calculate the average speed along x-direction (UNIT: um/s)
     All_data.ave_speed(ii) = ((centroidxy(1, end) - Pillar_CoM(1)) - (centroidxy(1, 1) - Pillar_CoM(1))) * Obj_Mag / (max(Good_case_frm_time) - min(Good_case_frm_time));
