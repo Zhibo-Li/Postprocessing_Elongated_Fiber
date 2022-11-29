@@ -132,7 +132,7 @@ for ii = 1:length(Files)
     All_data.interaction3(ii) = interaction3;
 
     % interaction index 4
-    I_a = sum(U0.*diff(timestamps(1:end-1))); % integral of the speed
+    I_a = sum(U0.*diff(timestamps(1:end-1))); % integral of the U0.
     I_b = sum(abs(dx_dt(1:end-1)-U0).*diff(timestamps(1:end-1))); % integral of the speed-U0 difference.
     All_data.interaction4(ii) = I_b/I_a;
 
@@ -149,7 +149,7 @@ for ii = 1:length(Files)
         Ux_simu(kk) = interp2(XX, YY, UX_midplane, XY_simu(1), XY_simu(2));
         Uy_simu(kk) = interp2(XX, YY, UY_midplane, XY_simu(1), XY_simu(2));
     end
-    Ux_simu = Ux_simu / Ux_simu(1) * U0; Uy_simu = Uy_simu / Uy_simu(1) * U0;
+    Ux_simu = Ux_simu / Ux_simu(1) * U0; Uy_simu = Uy_simu / Uy_simu(1) * U0; % scale the simulation velocity.
     All_data.interaction5(ii) = sum(abs(Ux_simu(1:end-1) - dx_dt) .* diff(timestamps)) / (timestamps(end) * U0);
 
     % calculate the average speed along x-direction (UNIT: um/s)
