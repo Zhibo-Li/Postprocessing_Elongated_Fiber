@@ -47,6 +47,7 @@ Trapping = [All_data(:).Trapping]; % if it's trapping
 interaction1 = [All_data(:).interaction1]; % interaction index 1
 interaction2 = [All_data(:).interaction2]; % interaction index 2
 interaction3 = [All_data(:).interaction3]; % interaction index 3
+CoMs = [All_data(:).CoM];
 
 % calculate the delta chi (between chi_f and chi_0)
 Chi = [All_data(:).Chi];
@@ -153,6 +154,28 @@ together = [norm_delta_y; norm_contourL; Chi_0; norm_initial_x; norm_initial_y;.
 
 trapped_names = names(logical(Trapping));  % extract the trapping case names
 trapped_together = together(:, logical(Trapping)); % extract the trapping case information
+
+% select reasonable cases (use this loop only for interaction index 3).
+ifOK = zeros(1, length(CoMs));
+for i = 1:length(CoMs)
+    xxx = CoMs{1, i}(1, :);
+    if i < 26
+        num = length(find(xxx > 1030 & xxx < 1170));  % the numbers are the CoM of the obstacle.
+    elseif i < 111
+        num = length(find(xxx > 993 & xxx < 1133));
+    elseif i < 164
+        num = length(find(xxx > 922 & xxx < 1062));
+    else
+        num = length(find(xxx > 934 & xxx < 1074));
+    end
+
+    if num > 12  % the acceptable minimum frame number in the near-obstacle-region.
+        ifOK(i) = 1;
+    end
+end
+
+names = names(logical(ifOK));  
+together = together(:, logical(ifOK));
 
 % select reasonable cases.
 range_upstream = -5; range_downstream = 5; % set acceptable range (norm_initial_x and norm_final_x)
