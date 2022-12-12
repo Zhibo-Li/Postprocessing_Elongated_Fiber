@@ -16,7 +16,7 @@ the_pillar_im = imcomplement(imfill(im_BW, 'holes'));
 Obj_Mag = 0.63;
 
 % load LBM simulation data 
-load('D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo\LBM data\LBM_midplane.mat');
+load('D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\LBM data\LBM_midplane.mat');
 
 im_no = 1:length(Files);
 for ii = 1:length(Files)
@@ -101,12 +101,15 @@ for ii = 1:length(Files)
     All_data.speed_ave_all(ii) = speed_ave_all;
     All_data.speed_upstream(ii) = speed_upstream;
     All_data.speed_downstream(ii) = speed_downstream;
+    % interaction index 1 (defines as 1-speed_ave_all/U0)
     interaction1 = 1-speed_ave_all/U0;
-    interaction2 = max(abs(dx_dt-U0))/U0; % interaction2 defines as max(abs(U0-U(t)))/U0;
     All_data.interaction1(ii) = interaction1;
+
+    % interaction index 2 (defines as max(abs(U0-U(t)))/U0)
+    interaction2 = max(abs(dx_dt-U0))/U0; 
     All_data.interaction2(ii) = interaction2;
     
-    % interaction index 3
+    % interaction index 3 (defines as contact probability -- varying layer thickness)
     circle_intersec = 0; line_intersec = 0;
     for jj = 1:size(centroidxy, 2)
 
@@ -131,17 +134,15 @@ for ii = 1:length(Files)
     end
     All_data.interaction3(ii) = interaction3;
 
-    % interaction index 4
+    % interaction index 4 (defines as the ratio of 'integral of the speed-U0 difference' and 'integral of the U0')
     I_a = sum(U0.*diff(timestamps(1:end-1))); % integral of the U0.
     I_b = sum(abs(dx_dt(1:end-1)-U0).*diff(timestamps(1:end-1))); % integral of the speed-U0 difference.
     All_data.interaction4(ii) = I_b/I_a;
 
-    % interaction index 5
+    % interaction index 5 (defines as the normalized integral of speed difference compared to the streamline)
     relative_x = (centroidxy(1, :) - Pillar_CoM(1)) * Obj_Mag; 
     relative_y = (2048 - centroidxy(2, :) - Pillar_CoM(1)) * Obj_Mag; % relative x & y to the obstacle center.
-
     obs_simu_ctr = [XX(1, 151), YY(51, 1)]; % The obstacle center in the simulation.
-
     Ux_simu = zeros(size(relative_x, 2), 1); Uy_simu = Ux_simu;
     for kk = 1:size(relative_x, 2)
         XY_simu = [relative_x(kk) + obs_simu_ctr(1); relative_y(kk) + obs_simu_ctr(2)];
@@ -151,6 +152,26 @@ for ii = 1:length(Files)
     end
     Ux_simu = Ux_simu / Ux_simu(1) * U0; Uy_simu = Uy_simu / Uy_simu(1) * U0; % scale the simulation velocity.
     All_data.interaction5(ii) = sum(abs(Ux_simu(1:end-1) - dx_dt) .* diff(timestamps)) / (timestamps(end) * U0);
+
+    % interaction index 6 (defines as contact probability -- fixed layer thickness of 40um)
+    circle_intersec = 0; line_intersec = 0;
+    for jj = 1:size(centroidxy, 2)
+
+        XY = xy.spl{1, Good_case_frm(jj)};
+        
+        if min(pdist2(centroidxy(:, jj)',obs_2d,'euclidean','Smallest',1)) < (40 / Obj_Mag)
+            circle_intersec = circle_intersec + 1;
+            if min(pdist2(XY,obs_2d,'euclidean','Smallest',1)) < 8
+                line_intersec = line_intersec + 1;
+            end
+        end
+    end
+    if circle_intersec == 0
+        interaction6 = 0;
+    else
+        interaction6 = line_intersec / circle_intersec;
+    end
+    All_data.interaction6(ii) = interaction6;
 
     % calculate the average speed along x-direction (UNIT: um/s)
     All_data.ave_speed(ii) = ((centroidxy(1, end) - Pillar_CoM(1)) - (centroidxy(1, 1) - Pillar_CoM(1))) * Obj_Mag / (max(Good_case_frm_time) - min(Good_case_frm_time));
