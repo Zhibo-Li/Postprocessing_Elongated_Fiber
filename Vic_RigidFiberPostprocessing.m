@@ -4,54 +4,56 @@ clear; close all; clc;
 
 pathname = uigetdir('F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle', 'Choose a folder');  % input file
 Files = dir(fullfile(pathname, 'results with timestamps', '*.mat'));
-bg = imread(fullfile(pathname, 'results', "The Pillar.tif"));
 the_excel = readcell(fullfile(pathname, 'PoleVaultingCheck.xls'), 'NumHeaderLines', 1);
 avi_names = the_excel(:, 1);
-im_BW = imbinarize(bg);
-[row, col] = find(im_BW); obs_2d = [col, 2048-row];
-LL = regionprops(im_BW, 'Centroid');
-Pillar_CoM  = LL.Centroid;
-the_pillar_im = imcomplement(imfill(im_BW, 'holes'));
-% cmap = cmocean('thermal');
-Obj_Mag = 0.63;
-
+cmap = cmocean('thermal');
+Obj_Mag = 0.42;
 % load LBM simulation data 
 load('D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\LBM data\LBM_midplane.mat');
 
 im_no = 1:length(Files);
 for ii = 1:length(Files)
 
+    bg = imread(['F:\Processing & Results\FSI - Rigid Fiber &  Individual ' ...
+        'Obstacle\202208-202209_SU8fibre-and-Tracer-Individual_triangularPillar' ...
+        '_uppoint\results\The pillar\',Files(ii).name(1:8),Files(ii).name(20:end-19) ...
+        ,'Tracer=1.1um_Atte=100_Z=mid_Phi100um',Files(ii).name(end-19:end-17),'.tif']);
+    im_BW = imbinarize(bg);
+    LL = regionprops(im_BW, 'Centroid');
+    Pillar_CoM  = LL.Centroid;
+    [row, col] = find(im_BW); obs_2d = [col, 2024-row];
+    the_pillar_im = imcomplement(imfill(im_BW, 'holes'));
+
     load([Files(ii).folder, filesep, Files(ii).name]);
-    avi_No = find(cellfun(@(x) any(strcmp(x, append(extractBetween(Files(ii).name, ...
-        'trajectory_', '_AABGR'), '.avi'))), avi_names));
+    avi_No = find(cellfun(@(x) any(strcmp(x, Files(ii).name)), avi_names));
     All_data.PoleVaulting(ii) = the_excel{avi_No, 2};
     ifTrapping = the_excel{avi_No, 3};
     All_data.Trapping(ii) = ifTrapping;
     All_data.Sliding(ii) = the_excel{avi_No, 4};
     All_data.ApexVaulting(ii) = the_excel{avi_No, 5};
 
-%     %%% Plot trajectories
-%     the_time = Good_case_frm_time * 100; % Here * 100 for convenience.
-%     the_time = round(the_time - min(the_time));
-%     
+    %%% Plot trajectories
+    the_time = Good_case_frm_time * 100; % Here * 100 for convenience.
+    the_time = round(the_time - min(the_time));
+    
 %     figure('color', 'w'); set(gcf, 'Position', [300 300 600 100]);
-%     imshow(the_pillar_im(801:1200, :)); hold on
+%     imshow(the_pillar_im(801:1600, :)); hold on
 %     %%% define the range of loop indicator k based on the colormap
 % %     if max(the_time) > 255
 % %         k_range = find(the_time > 255, 1) - 1;
 % %         for k =1:min(k_range, length(Good_case_frm))
-% %             plot(xy.spl{Good_case_frm(k)}(:,1),2048-xy.spl{Good_case_frm(k)}(:,2)-800,'Color',cmap(the_time(k)+1,:),'LineWidth',1.5)
+% %             plot(xy.spl{Good_case_frm(k)}(:,1),2024-xy.spl{Good_case_frm(k)}(:,2)-800,'Color',cmap(the_time(k)+1,:),'LineWidth',1.5)
 % %             hold on
 % %         end
 % %     else
 % %         for k =1:length(Good_case_frm)
-% %             plot(xy.spl{Good_case_frm(k)}(:,1),2048-xy.spl{Good_case_frm(k)}(:,2)-800,'Color',cmap(the_time(k)+1,:),'LineWidth',1.5)
+% %             plot(xy.spl{Good_case_frm(k)}(:,1),2024-xy.spl{Good_case_frm(k)}(:,2)-800,'Color',cmap(the_time(k)+1,:),'LineWidth',1.5)
 % %             hold on
 % %         end
 % %     end
 %     %%% draw trajectories with looping the colormap
 %     for k =1:length(Good_case_frm)
-%         plot(xy.spl{Good_case_frm(k)}(:,1),2048-xy.spl{Good_case_frm(k)}(:,2)-800,'Color',cmap(mod(the_time(k)+1, 256)+1,:),'LineWidth',1.5)
+%         plot(xy.spl{Good_case_frm(k)}(:,1),2024-xy.spl{Good_case_frm(k)}(:,2)-800,'Color',cmap(mod(the_time(k)+1, 256)+1,:),'LineWidth',1.5)
 %         hold on
 %     end
 %     axis equal
@@ -76,13 +78,13 @@ for ii = 1:length(Files)
     % add the position information
     centroidxy = reshape(cell2mat(xy.centroid),2,numel(xy.centroid));
     centroidxy = centroidxy(:, Good_case_frm);
-    All_data.delta_y(ii) = (centroidxy(2, 1) - centroidxy(2,end)) * Obj_Mag;
-    All_data.initial_y(ii) = ((2048-centroidxy(2, 1)) - Pillar_CoM(2)) * Obj_Mag + 25; % Definition of y0 is the distance between CoM and the edge, so +25.
+    All_data.delta_y(ii) = -(centroidxy(2, 1) - centroidxy(2,end)) * Obj_Mag;
+    All_data.initial_y(ii) = -((2024-centroidxy(2, 1)) - Pillar_CoM(2)) * Obj_Mag + 25; % Definition of y0 is the distance between CoM and the edge, so +25.
     All_data.initial_x(ii) = (centroidxy(1, 1) - Pillar_CoM(1)) * Obj_Mag;
-    All_data.final_y(ii) = ((2048-centroidxy(2, end)) - Pillar_CoM(2)) * Obj_Mag + 25; % Definition of y0 is the distance between CoM and the edge, so +25.
+    All_data.final_y(ii) = -((2024-centroidxy(2, end)) - Pillar_CoM(2)) * Obj_Mag + 25; % Definition of y0 is the distance between CoM and the edge, so +25.
     All_data.final_x(ii) = (centroidxy(1, end) - Pillar_CoM(1)) * Obj_Mag;
     All_data.CoM{ii} = centroidxy;
-    %     hold on; plot(centroidxy(1,:), 2048-centroidxy(2,:)-800, "Color",'k', 'LineStyle','--');
+    %     hold on; plot(centroidxy(1,:), 2024-centroidxy(2,:)-800, "Color",'k', 'LineStyle','--');
 
     % calculate the interaction index
     dt = diff(timestamps); % [time(i+1) - time(i)]
@@ -90,7 +92,7 @@ for ii = 1:length(Files)
     dx_dt = movmean(dx, 7) ./ movmean(dt, 7) * Obj_Mag; % [chi(i+1) - chi(i)] / [time(i+1) - time(i)]. 
     num_up_obs = sum(centroidxy(1, :) < 300); % set range (without the perturbation of the obstacle) for average speed calculation (in pixel).
     speed_upstream = mean(dx_dt(1:num_up_obs)); % average speed (without the perturbation of the obstacle)
-    num_down_obs = sum(centroidxy(1, :) > 1749); % set range (without the perturbation of the obstacle) for average speed calculation (in pixel).
+    num_down_obs = sum(centroidxy(1, :) > 1725); % set range (without the perturbation of the obstacle) for average speed calculation (in pixel).
     if ifTrapping == 1
         speed_downstream = speed_upstream;
     else
@@ -141,7 +143,7 @@ for ii = 1:length(Files)
 
     % interaction index 5 (defines as the normalized integral of speed difference compared to the streamline)
     relative_x = (centroidxy(1, :) - Pillar_CoM(1)) * Obj_Mag; 
-    relative_y = (2048 - centroidxy(2, :) - Pillar_CoM(1)) * Obj_Mag; % relative x & y to the obstacle center.
+    relative_y = (2024 - centroidxy(2, :) - Pillar_CoM(1)) * Obj_Mag; % relative x & y to the obstacle center.
     obs_simu_ctr = [XX(1, 151), YY(51, 1)]; % The obstacle center in the simulation.
     Ux_simu = zeros(size(relative_x, 2), 1); Uy_simu = Ux_simu;
     for kk = 1:size(relative_x, 2)
@@ -177,10 +179,10 @@ for ii = 1:length(Files)
     All_data.ave_speed(ii) = ((centroidxy(1, end) - Pillar_CoM(1)) - (centroidxy(1, 1) - Pillar_CoM(1))) * Obj_Mag / (max(Good_case_frm_time) - min(Good_case_frm_time));
 
     % check if the fiber bypass the obtacle tip
-    if 2048 - mean(centroidxy(2, and(Pillar_CoM(1)-100 < centroidxy(1, :), centroidxy(1, :) < Pillar_CoM(1)+100))) > Pillar_CoM(2) % if it goes below (in image system).
-        bypass_tip = true;
-    else
+    if 2024 - mean(centroidxy(2, and(Pillar_CoM(1)-100 < centroidxy(1, :), centroidxy(1, :) < Pillar_CoM(1)+100))) > Pillar_CoM(2) % if it goes below (in image system).
         bypass_tip = false;
+    else
+        bypass_tip = true;
     end
     All_data.bypass_tip(ii) = bypass_tip;
 
@@ -194,7 +196,7 @@ for ii = 1:length(Files)
     [d,ind] = sort(diag(eigenD));
     Ds = eigenD(ind,ind);
     Vs = eigenV(:,ind);
-    All_data.Chi_0(ii)  = atan(Vs(2,2)/Vs(1,2))/pi*180;
+    All_data.Chi_0(ii)  = -atan(Vs(2,2)/Vs(1,2))/pi*180;
 
     % calculate all the angles
     for jj = 1:length(Good_case_frm)
@@ -209,7 +211,7 @@ for ii = 1:length(Files)
         Vs = eigenV(:,ind);
         Chi(jj) = atan(Vs(2,2)/Vs(1,2))/pi*180;
     end
-    All_data.Chi{ii}  = Chi;
+    All_data.Chi{ii}  = -Chi;
     clearvars Chi
 
 end
