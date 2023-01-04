@@ -139,13 +139,13 @@ close(v);  % For the video.
 %% Make videos for all and wait for selecting good cases ...
 clear; close all; clc;
 
-the_folder = dir('F:\Experimental Data (EXTRACTED)\FSI - Rigid Fiber &  Individual Obstacle\20220913-SU8_Fibers-Individual_triangularPillar_uppoint\Inverted\*.tif');
+the_folder = dir('F:\Experimental Data (EXTRACTED)\FSI - Rigid Fiber &  Individual Obstacle\20230102-SU8_Fibers-Individual_triangularPillar_uppoint\Inverted\*.tif');
 basepath=the_folder(1).folder;
 for iiii = 1:length(the_folder)
 
     tifname=the_folder(iiii).name;
     % The .mat file where stores your results.
-    pathname = 'F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\20220913-SU8_Fibers-Individual_triangularPillar_uppoint\results\';
+    pathname = 'F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\20230102-SU8_Fibers-Individual_triangularPillar_uppoint\results\';
     % if exist([pathname, 'trajectory_', tifname(1:end-4), '_batch1.mat'], 'file')
     if isfile([pathname, 'trajectory_', tifname(1:end-4), '_AABGR_batch1.mat'])
         load([pathname, 'trajectory_', tifname(1:end-4), '_AABGR_batch1.mat']);
@@ -158,20 +158,20 @@ for iiii = 1:length(the_folder)
         v.Quality = 100;
 
         open(v);   % For the video.
-        for i = 1:size(Good_case,2)
+        for j = 1:size(Good_case,2)
 
-            Foo = imread(fullfile(basepath, tifname),xy(1).frame(i));
+            Foo = imread(fullfile(basepath, tifname),xy(1).frame(j));
 
-            C1 = xy(1).centroid{i}(:,1); C2 = xy(1).centroid{i}(:,2); % Center-of-mass
+            C1 = xy(1).centroid{j}(:,1); C2 = xy(1).centroid{j}(:,2); % Center-of-mass
             T_C1 = lzero+C1;  T_C2 = size(Foo,1)-lzero-C2;
             % Count in the Isero and tranfrom the coordinate because of the different
             % original point between the image and plot
-            spl1 = xy(1).spl{i}(:,1); spl2 = xy(1).spl{i}(:,2); % x-y coordinates of the B-spline
+            spl1 = xy(1).spl{j}(:,1); spl2 = xy(1).spl{j}(:,2); % x-y coordinates of the B-spline
             T_spl1 = lzero+spl1;  T_spl2 = size(Foo,1)-lzero-spl2;
             % Same as above
 
             % calculate the curvature
-            X = xy(1).spl{i};
+            X = xy(1).spl{j};
             [L2,R2,K2] = curvature(X);
             RR2 = movmean(R2,ceil(size(X,1)/100));
 
@@ -193,7 +193,7 @@ for iiii = 1:length(the_folder)
                 % h = plot(T_spl1,T_spl2,'-','linewidth',6);
                 h = plot(T_spl1-max(T_C1-xwin/2,1) + xy_mov(2), T_spl2-max(T_C2-ywin/2,1) + xy_mov(1),'-m','linewidth', 2);
                 set(h,'marker','.');
-                % title(['No.',num2str(xy.frame(i))],'Color','red','FontSize',14);
+                % title(['No.',num2str(xy.frame(j))],'Color','red','FontSize',14);
 
                 title(['No.',num2str(j)],'Color','red','FontSize',14);
                 hold on
