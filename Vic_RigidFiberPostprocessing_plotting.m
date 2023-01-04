@@ -8,14 +8,18 @@ h_obs = 75; l_obs = 86.6; Obj_Mag = 0.63;
 
 % laod data and put all in one.
 load('F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\20220624-SU8_Fibers-Individual_triangularPillar_uppoint_information_full.mat');
-All_data1 = All_data;
+All_data1 = delta_correction(All_data, 0);
 load('F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\20220913-SU8_Fibers-Individual_triangularPillar_uppoint_information_full.mat');
 All_data2 = All_data;
 load('F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\20221004-SU8_Fibers-Individual_triangularPillar_uppoint_information_full.mat');
 All_data3 = All_data;
 load('F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\20221005-SU8_Fibers-Individual_triangularPillar_uppoint_information_full.mat');
 All_data4 = All_data;
-All_data = [All_data1, All_data2, All_data3, All_data4];
+load('F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\20230102-SU8_Fibers-Individual_triangularPillar_uppoint_information_full.mat');
+All_data5 = delta_correction(All_data, 0);
+load('F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\202208-202209_SU8fibre-and-Tracer-Individual_triangularPillar_uppoint_information_full.mat');
+All_data6 = All_data;
+All_data = [All_data1, All_data2, All_data3, All_data4, All_data5, All_data6];
 
 % get names of the data.
 names = [All_data(:).filename];
@@ -229,7 +233,7 @@ names_plot = names; together_plot = together;
 prompt = {'The lower bound of the initial angle:', 'The upper bound of the initial angle:', ...
     'The lower bound of the contour length:','The upper bound of the contour length:'...
     'The lower bound of the initial position:','The upper bound of the initial position:'};
-definput = {'-10', '10', '0.45', '1.05', '0', '1'};
+definput = {'nan', 'nan', '0.45', '1.05', '0', '1'};
 % definput = {'nan', 'nan', 'nan', 'nan', 'nan', 'nan'};
 answer = inputdlg(prompt, 'Input (please input NaN if there is no bound)', [1 35] , definput);
 
@@ -636,3 +640,14 @@ xlabel('$U_{downstream}-U_{upstream}\ (\mu{m}/s)$','FontSize',22,'Interpreter', 
 xlim([-300 300])
 % f=gcf;
 % exportgraphics(f,'deltaU_vs_chi0__eltaU_vs_chif.png','Resolution',100)
+
+
+function data_out = delta_correction(data_in, slope)
+% Only for obstacle points below!
+% data_in should be 'All_data'.
+% slope is a number (notice about the sign!).
+data_out = data_in;
+for foo = 1:length(data_in.delta_y)
+    data_out.delta_y(foo) = data_in.delta_y(foo) - slope * (data_in.final_x(foo) - data_in.initial_x(foo));
+end
+end
