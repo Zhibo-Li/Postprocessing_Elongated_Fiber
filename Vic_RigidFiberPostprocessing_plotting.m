@@ -155,15 +155,19 @@ together = [norm_delta_y; norm_contourL; Chi_0; norm_initial_x; norm_initial_y;.
 % %     No.20 row: upstream speed
 % %     No.21 row: downstream speed
 
-ToBeDiscarded = [7 11 14 17 20 31 35 38 41 42 46 72 82 85 99 106 129 133 ... 
-    138 142 148 149 157 158 161 163 165 172 178 182 184 186 197 201 202]; 
-names(ToBeDiscarded) = [];
-together(:, ToBeDiscarded) = []; % these cases are not in the channel mid-plane by manual selection.
-
 trapped_names = names(logical(Trapping));  % extract the trapping case names
 trapped_together = together(:, logical(Trapping)); % extract the trapping case information
+
+ToBeDiscarded = [7 11 14 17 20 31 35 38 40 41 42 46 72 82 85 99 106 113 114 115 ...
+    116 117 118 119 120 121 129 133 138 142 143 148 149 157 158 161 163 164 165 ...
+    166 172 178 182 184 186 197 201 202 213 216 217]; 
+names(ToBeDiscarded) = [];
+together(:, ToBeDiscarded) = []; 
+% these cases are not in the channel mid-plane by manual selection.
+% In the excel of PoleVaultingCheck.xls, their 'Deviation correction based on tracers' are NaN.
+
 names(logical(Trapping)) = [];
-together(:, logical(Trapping)) = []; % remove the cases too close to the obstacle on the upstream side.
+together(:, logical(Trapping)) = []; % remove trapping cases
 
 % select reasonable cases (use this loop only for interaction index 3).
 % ifOK = zeros(1, length(CoMs));
@@ -188,7 +192,7 @@ together(:, logical(Trapping)) = []; % remove the cases too close to the obstacl
 % together = together(:, logical(ifOK));
 
 % select reasonable cases.
-range_upstream = -5; range_downstream = 5; % set acceptable range (norm_initial_x and norm_final_x)
+range_upstream = -3; range_downstream = 3; % set acceptable range (norm_initial_x and norm_final_x)
 names(together(4, :) > range_upstream) = [];
 together(:, together(4, :) > range_upstream) = []; % remove the cases too close to the obstacle on the upstream side.
 names(together(6, :) < range_downstream) = [];
@@ -233,7 +237,7 @@ names_plot = names; together_plot = together;
 prompt = {'The lower bound of the initial angle:', 'The upper bound of the initial angle:', ...
     'The lower bound of the contour length:','The upper bound of the contour length:'...
     'The lower bound of the initial position:','The upper bound of the initial position:'};
-definput = {'nan', 'nan', '0.45', '1.05', '0', '1'};
+definput = {'nan', 'nan', 'nan', 'nan', '0', '1'};
 % definput = {'nan', 'nan', 'nan', 'nan', 'nan', 'nan'};
 answer = inputdlg(prompt, 'Input (please input NaN if there is no bound)', [1 35] , definput);
 
@@ -293,7 +297,7 @@ if range_L_low ~= 0; xlim([range_L_low range_L_up]); end
 if range_y0_low ~= -10; ylim([range_y0_low range_y0_up]); end
 % f=gcf;
 % exportgraphics(f,'delta_vs_L-y0.png','Resolution',100)
-% % %%%%%% pick the data point on the last plot to get the case name %%%%%%%
+%%%%%% pick the data point on the last plot to get the case name %%%%%%%
 % % [the_L, the_y0] = ginput(1); % pick up the point you want to show the trajectory.
 % % the_loc = intersect(find(together_plot(2, :)>the_L*0.98 & together_plot(2, :)<the_L*1.02),...
 % %     find(together_plot(5, :)>the_y0*0.98 & together_plot(5, :)<the_y0*1.02));  % Change the control range if there is an error.
@@ -338,7 +342,7 @@ legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'southeast','Fo
 if range_L_low ~= 0; xlim([range_L_low range_L_up]); end
 if range_y0_low ~= -10; ylim([range_y0_low range_y0_up]); end
 % f=gcf;
-% exportgraphics(f,'delta_vs_L-y0_classification.png','Resolution',100)
+% exportgraphics(f,'delta_vs_L-y0_classification_alldata_20230105.png','Resolution',100)
 
 %% plot the deviation vs chi_0 & y_0 (with classification and further data cleaning (optional)):
 figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
@@ -375,11 +379,11 @@ title(hcb,'$Deviation\ (\delta/h_{obs})$','FontSize', 20,'Interpreter', 'latex')
 set(gca,'FontSize',16);
 xlabel('$Initial\ angle\ \theta_0\ (^{\circ})$','FontSize', 24,'Interpreter', 'latex');
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 24,'Interpreter', 'latex');
-title('$0.45<L/l_{obs}<1.05$','FontSize', 20,'Interpreter', 'latex')
+% title('$0.45<L/l_{obs}<1.05$','FontSize', 20,'Interpreter', 'latex')
 legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'southeast','FontSize', 14,'Interpreter', 'latex')
-xlim([-10 10]); ylim([0 1]); caxis([-0.2 0.2]);
+% xlim([-10 10]); ylim([0 1]); caxis([-0.2 0.2]);
 % f=gcf;
-% exportgraphics(f,'delta_vs_chi0-y0_classification_L0.45-1.05_filtered_20221204.png','Resolution',100)
+% exportgraphics(f,'delta_vs_chi0-y0_classification_alldata_20230105.png','Resolution',100)
 
 %% plot the y_0 vs L & deviation (with classification and further data cleaning (optional)):
 figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
