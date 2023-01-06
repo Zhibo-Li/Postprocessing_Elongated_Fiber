@@ -157,6 +157,8 @@ together = [norm_delta_y; norm_contourL; Chi_0; norm_initial_x; norm_initial_y;.
 
 trapped_names = names(logical(Trapping));  % extract the trapping case names
 trapped_together = together(:, logical(Trapping)); % extract the trapping case information
+trapped_names([3 4 5]) = [];
+trapped_together(:, [3 4 5]) = [];
 
 ToBeDiscarded = [7 11 14 17 20 31 35 38 40 41 42 46 72 82 85 99 106 113 114 115 ...
     116 117 118 119 120 121 129 133 138 142 143 148 149 157 158 161 163 164 165 ...
