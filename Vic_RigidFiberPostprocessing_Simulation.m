@@ -51,7 +51,7 @@ for sub1Path_i = 3:length(sub1_path)
 % 
 %                 [intersec_cir_x, intersec_cir_y] = polyxpoly(obs_2d(:,1), obs_2d(:,2), circle_x, circle_y);
 %                 if ~isempty(intersec_cir_y)
-                if min(pdist2(CoM(:, ii)',obs_2d,'euclidean','Smallest',1)) < 40
+                if min(pdist2(CoM(:, ii)',obs_2d,'euclidean','Smallest',1)) * 1e6 < 40
                     circle_intersec = circle_intersec + 1; 
                     if min(pdist2(XY,obs_2d,'euclidean','Smallest',1)) < fiber_beads_size
                         line_intersec = line_intersec + 1;
@@ -106,7 +106,7 @@ together_plot = together_plot';
 prompt = {'The lower bound of the initial angle:', 'The upper bound of the initial angle:', ...
     'The lower bound of the contour length:','The upper bound of the contour length:'...
     'The lower bound of the initial position:','The upper bound of the initial position:'};
-definput = {'-10', '10', '0.5', '1.4', '0', '1'};
+definput = {'-10', '10', '0.5', '1.5', '0', '1'};
 answer = inputdlg(prompt, 'Input (please input NaN if there is no bound)', [1 35] , definput);
 
 %%%%%%%%%%%%%%%%%%%%%%%%% assign the values %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -155,6 +155,6 @@ xlabel('$Contact\ probability\ (disturbed\ layer = 40\mu{m}) $','FontSize', 22,'
 % ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
 legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'southwest','FontSize', 14,'Interpreter', 'latex')
 % title('$0.5<L<1$','FontSize', 22,'Interpreter', 'latex')
-% xlim([0 1]); ylim([-0.6 0.8])
-% f=gcf;
-% exportgraphics(f,'y0_vs_contactprobability(layer40um)-delta_simulationdata.png','Resolution',100)
+% xlim([0 1]); ylim([-0.4 0.8])
+f=gcf;
+exportgraphics(f,'y0_vs_contactprobability(layer50um)-delta_simulation_chi0-m10to10.png','Resolution',100)
