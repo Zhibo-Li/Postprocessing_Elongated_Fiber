@@ -31,6 +31,7 @@ for ii = 1:length(Files)
     All_data.Trapping(ii) = ifTrapping;
     All_data.Sliding(ii) = the_excel{avi_No, 4};
     All_data.ApexVaulting(ii) = the_excel{avi_No, 5};
+    All_data.acceptability{ii} = the_excel{avi_No, 7};
 
     %%% Plot trajectories
     the_time = Good_case_frm_time * 100; % Here * 100 for convenience.
