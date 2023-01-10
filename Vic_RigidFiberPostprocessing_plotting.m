@@ -383,9 +383,17 @@ xlabel('$Initial\ angle\ \theta_0\ (^{\circ})$','FontSize', 24,'Interpreter', 'l
 ylabel('$Initial\ position\ (y_0/h_{obs})$','FontSize', 24,'Interpreter', 'latex');
 % title('$0.45<L/l_{obs}<1.05$','FontSize', 20,'Interpreter', 'latex')
 legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'southeast','FontSize', 14,'Interpreter', 'latex')
-% xlim([-10 10]); ylim([0 1]); caxis([-0.2 0.2]);
+% xlim([-10 10]); ylim([0 1]); caxis([-0.3 0.3]);
 % f=gcf;
-% exportgraphics(f,'delta_vs_chi0-y0_classification_alldata_20230105.png','Resolution',100)
+% exportgraphics(f,'delta_vs_theta0-y0_L0.5-1.5_20230110.png','Resolution',100)
+
+% % %% save the data
+% % Trappping = [trapped_together(3, :)', trapped_together(5, :)', trapped_together(1, :)', trapped_together(2, :)'];
+% % Below = [bypass_edge_together(3, :)', bypass_edge_together(5, :)', bypass_edge_together(1, :)', bypass_edge_together(2, :)'];
+% % Above = [bypass_tip_together(3, :)', bypass_tip_together(5, :)', bypass_tip_together(1, :)', bypass_tip_together(2, :)'];
+% % Pole_vaulting = [pole_vaulting_together(3, :)', pole_vaulting_together(5, :)', pole_vaulting_together(1, :)', pole_vaulting_together(2, :)'];
+% % readme = '1st column: theta_0;   2nd col: y_0;   3rd col: delta;   4th col: L.';
+% % save('D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\Data & Figures\delta_vs_theta0-y0_alldata_20230110.mat','Trappping','Below','Above','Pole_vaulting', 'readme');
 
 %% plot the y_0 vs L & deviation (with classification and further data cleaning (optional)):
 figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
