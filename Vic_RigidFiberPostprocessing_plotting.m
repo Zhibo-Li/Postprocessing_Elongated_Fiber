@@ -23,6 +23,7 @@ All_data = [All_data1, All_data2, All_data3, All_data4, All_data5, All_data6];
 
 % get names of the data.
 names = [All_data(:).filename];
+acceptability = cellfun(@isnumeric, [All_data(:).acceptability]);
 
 % get other information.
 delta_y = [All_data(:).delta_y];
@@ -155,19 +156,14 @@ together = [norm_delta_y; norm_contourL; Chi_0; norm_initial_x; norm_initial_y;.
 % %     No.20 row: upstream speed
 % %     No.21 row: downstream speed
 
-trapped_names = names(logical(Trapping));  % extract the trapping case names
-trapped_together = together(:, logical(Trapping)); % extract the trapping case information
-trapped_names([3 4 5]) = [];
-trapped_together(:, [3 4 5]) = [];
-
-ToBeDiscarded = [7 11 14 17 20 31 35 38 40 41 42 46 72 82 85 99 106 113 114 115 ...
-    116 117 118 119 120 121 129 133 138 142 143 148 149 157 158 161 163 164 165 ...
-    166 172 178 182 184 186 197 201 202 213 216 217]; 
-names(ToBeDiscarded) = [];
-together(:, ToBeDiscarded) = []; 
+names(~logical(acceptability)) = [];
+together(:, ~logical(acceptability)) = [];
+Trapping(~logical(acceptability)) = [];
 % these cases are not in the channel mid-plane by manual selection.
 % In the excel of PoleVaultingCheck.xls, their 'Deviation correction based on tracers' are NaN.
 
+trapped_names = names(logical(Trapping));  % extract the trapping case names
+trapped_together = together(:, logical(Trapping)); % extract the trapping case information
 names(logical(Trapping)) = [];
 together(:, logical(Trapping)) = []; % remove trapping cases
 
