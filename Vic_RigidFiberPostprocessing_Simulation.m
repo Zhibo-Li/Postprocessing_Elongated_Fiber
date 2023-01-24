@@ -98,7 +98,7 @@ end
 clear; close all; clc;
 xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'results_more-data.xlsx'],'Sheet','Sheet1','NumHeaderLines',1); 
-together_plot = [cell2mat(xlsfile(:, 1:4)), cell2mat(xlsfile(:, 13)), cell2mat(xlsfile(:, 30))]; 
+together_plot = [cell2mat(xlsfile(:, 1:4)), cell2mat(xlsfile(:, 13)), cell2mat(xlsfile(:, 27))]; 
 together_plot = together_plot';
 % thedeg = cell2mat(xlsfile(:, 1)); 
 % theL = round(cell2mat(xlsfile(:, 2)), 1); 
@@ -129,7 +129,7 @@ together_plot(:, together_plot(3, :) < range_y0_low) = [];
 together_plot(:, together_plot(3, :) > range_y0_up) = [];
 
 
-figure('color', 'w'); set(gcf, 'Position', [100 100 1200 600]);
+figure('color', 'w'); set(gcf, 'Position', [100 100 1000 600]);
 % cmap = cmocean('thermal');
 cmap = colormap("jet");
 
@@ -143,7 +143,7 @@ scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
 scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
 scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
 
-scatter(trapped_together(6, :), trapped_together(4, :), 220, trapped_together(3, :), 'Filled', 'diamond','MarkerEdgeColor','k','MarkerFaceColor',[.7 .7 .7]); hold on 
+scatter(trapped_together(6, :), trapped_together(4, :), 220, trapped_together(3, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
 scatter(bypass_edge_together(6, :), bypass_edge_together(4, :), 200, bypass_edge_together(3, :), 'Filled','MarkerEdgeColor','k'); hold on
 scatter(bypass_tip_together(6, :), bypass_tip_together(4, :), 200, bypass_tip_together(3, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
 scatter(pole_vaulting_together(6, :), pole_vaulting_together(4, :), 220, pole_vaulting_together(3, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
@@ -154,12 +154,12 @@ title(hcb,'$Initial\ position\ (y_0/h_{obs})$','FontSize', 16,'Interpreter', 'la
 set(gca,'FontSize',16);
 % xlabel('$max\left|U_0-U(t)\right|/U_0$','FontSize', 22,'Interpreter', 'latex');
 % xlabel('$Contact\ probability\ (disturbed\ layer = 40\mu{m}) $','FontSize', 22,'Interpreter', 'latex');  % for interaction3
-xlabel('$Normalized\ direct\ contact\ duration$','FontSize', 22,'Interpreter', 'latex');  
-% xlabel('$Normalized\ perturbed\ duration$','FontSize', 22,'Interpreter', 'latex'); 
+% xlabel('$Normalized\ direct\ contact\ duration$','FontSize', 22,'Interpreter', 'latex');  
+xlabel('$Normalized\ perturbed\ duration$','FontSize', 22,'Interpreter', 'latex'); 
 % xlabel('$Interaction\ index$','FontSize', 22,'Interpreter', 'latex'); 
 ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
 legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northeast','FontSize', 14,'Interpreter', 'latex')
 % title('$0.5<L<1$','FontSize', 22,'Interpreter', 'latex')
 % xlim([0 12]); %ylim([-0.4 0.8])
 % f=gcf;
-% exportgraphics(f,'F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\Figures\about interaction index\direct contact duration.png','Resolution',100)
+% exportgraphics(f,'F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\Figures\about interaction index\perturbed duration (0o30).png','Resolution',100)
