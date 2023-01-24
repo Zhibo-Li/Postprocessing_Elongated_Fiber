@@ -174,6 +174,23 @@ for ii = 1:length(Files)
     end
     All_data.interaction6(ii) = interaction6;
 
+    % interaction index 7 (defines as normalized contact duration)
+    line_intersec = 0;
+    for jj = 1:size(centroidxy, 2)
+        XY = xy.spl{1, Good_case_frm(jj)};
+        if min(pdist2(XY,obs_2d,'euclidean','Smallest',1)) < 8
+            line_intersec = line_intersec + 1;
+            contact_time(line_intersec) = Good_case_frm_time(jj);
+        end
+    end
+    if line_intersec == 0
+        interaction7 = 0;
+    else
+        interaction7 = (contact_time(end)-contact_time(1)) / (86.6/speed_ave_all);
+    end
+    clearvars contact_time
+    All_data.interaction7(ii) = interaction7;
+
     % calculate the average speed along x-direction (UNIT: um/s)
     All_data.ave_speed(ii) = ((centroidxy(1, end) - Pillar_CoM(1)) - (centroidxy(1, 1) - Pillar_CoM(1))) * Obj_Mag / (max(Good_case_frm_time) - min(Good_case_frm_time));
 
@@ -215,4 +232,4 @@ for ii = 1:length(Files)
 
 end
 
-save([pathname, '_information_full.mat'], 'All_data');
+save([pathname, '_uppoint_information_full.mat'], 'All_data');
