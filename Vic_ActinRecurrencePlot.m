@@ -10,6 +10,7 @@ ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 
+n = 1;
 for no_Group = [7 8 14 15 16 17 18]
     % Square-based array 0°, 10°, and 20°
     % No.13 needed to be recalculated (20230125)
@@ -29,7 +30,6 @@ for no_Group = [7 8 14 15 16 17 18]
     % list of the .mat files which contain the reconstruction information
     % (came from 'Filaments detection' code) in one group.
 
-    n = 1;
     for no_Case = 1:length(filelist)
 
         filename = filelist(no_Case).name;
