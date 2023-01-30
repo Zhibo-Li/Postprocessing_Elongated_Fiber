@@ -199,12 +199,12 @@ together(:, together(6, :) < range_downstream) = []; % remove the cases too clos
 % % % %% statistics
 % % % % Contour length L
 % % % figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
-% % % edges = 20:20:180;
-% % % histogram(contourL,edges);
+% % % edges = [0:17.32:190.52]/l_obs;
+% % % histogram(contourL/l_obs,edges);
 % % % set(gca,'FontSize',16);
-% % % xlabel('$Contour\ length\ L\ ({\mu}m)$','FontSize', 22,'Interpreter', 'latex');
+% % % xlabel('$Contour\ length\ L$','FontSize', 22,'Interpreter', 'latex');
 % % % ylabel('$Number\ of\ cases$','FontSize', 22,'Interpreter', 'latex');
-% % % xlim([20 160]);
+% % % xlim([0 2.2]);
 % % % % f=gcf;
 % % % % exportgraphics(f,'Statistics_contourL.png','Resolution',100)
 % % % 
