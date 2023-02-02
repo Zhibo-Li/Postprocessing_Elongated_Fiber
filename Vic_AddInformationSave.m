@@ -46,8 +46,8 @@ for no_Group = 1: NumGroup
             clearvars -except PAsPath storePath NumGroup no_Group no_Case filelist
         end
 
-    elseif no_Group == 14 || no_Group == 15 || no_Group == 17 || no_Group == 18
-        % experiments on 2022.02.16 Group2 & Group3 and experiments on 2022.02.17 Group2 & Group3
+    elseif no_Group == 13 || no_Group == 14 || no_Group == 15 || no_Group == 17 || no_Group == 18
+        % experiments on 2022.02.16 Group1, Group2 & Group3 and experiments on 2022.02.17 Group2 & Group3
 
         for no_Case = 1:length(filelist)
 
@@ -58,32 +58,6 @@ for no_Group = 1: NumGroup
 
             Good_case_frm = find(ismember(xy(1).frame, Good_case));
             lzero = zeros(size(Good_case_frm,2), 1);
-
-            % save ...
-%             save([storePath{no_Group}, filesep , save_filename], 'framelist', ...
-%                 'Good_case','InfoImage','prcs_img','prmt','ROI','xy','centers', ...
-%                 "circleMask",'metric','radii','Good_case_frm','lzero')
-
-            % clear the saved variables
-            clearvars -except PAsPath storePath NumGroup no_Group no_Case filelist
-        end
-
-    elseif no_Group == 13  % experiments before 2022.02.16 Group1
-
-        for no_Case = 1:length(filelist)
-            
-            load(PAsPath{no_Group}); % Load the pillar array information.
-            load([storePath{no_Group}, filesep , filelist(no_Case).name])
-            filename = filelist(no_Case).name;
-            save_filename = ['PAsInfoAdded_', filename];
-
-            Good_case_frm = find(ismember(xy(1).frame, Good_case));
-
-            lzero = zeros(size(Good_case_frm,2), 1);
-            for frm_ind = 1:size(Good_case_frm,2)
-                xy_ind = Good_case_frm(frm_ind);
-                lzero(frm_ind) = max(prmt(xy_ind).lobject,ceil(5*prmt(xy_ind).lnoise));
-            end
 
             % save ...
 %             save([storePath{no_Group}, filesep , save_filename], 'framelist', ...
