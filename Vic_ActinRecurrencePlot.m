@@ -11,13 +11,13 @@ storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 
 n = 1;
-for no_Group = [7 8 14 15 16 17 18]
+for no_Group = [7 8 13 14 15 16 17 18]
     % Square-based array 0°, 10°, and 20°
     % No.13 needed to be recalculated (20230125)
 
     if no_Group == 7 || no_Group == 8
         Array_angle = 0;
-    elseif no_Group == 14 || no_Group == 15
+    elseif no_Group == 13 || no_Group == 14 || no_Group == 15
         Array_angle = 10;
     elseif no_Group == 16 || no_Group == 17 || no_Group == 18
         Array_angle = 20;
