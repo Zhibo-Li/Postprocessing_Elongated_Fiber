@@ -67,7 +67,7 @@ for no_Group = [7 8 13 14 15 16 17 18]
             viscircles(centers, radii,'LineStyle','--', 'LineWidth', 0.5, 'Color', 'k'); hold on
 
             f=gcf;
-            exportgraphics(f,[pathname, filesep, filename(1: end-4), '_Lee_PossibleGreaterThanOne.png'],'Resolution',100)
+            exportgraphics(f,[pathname, filesep, filename(14: end-4), '_Lee_PossibleGreaterThanOne.png'],'Resolution',100)
 
             close all
             clearvars CoM_x Energy xy centers radii
