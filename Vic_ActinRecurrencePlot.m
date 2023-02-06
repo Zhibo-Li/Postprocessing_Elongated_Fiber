@@ -124,6 +124,130 @@ end
 
 save('Poincare_Map_data.mat', 'Info')
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%%%% draw Poincare Map for each flow angle
+clear; close all; clc;
+
+load('Poincare_Map_data.mat');
+
+thedate = Info.date;
+[C, ia, ic] = unique(thedate,'stable');
+ia = [ia; length(ic)+1];
+
+for ii = 1:length(ia)-1
+
+    Lattice_in_all = []; Lattice_out_all = [];
+
+    proc_date = C(ii);
+    L_all = Info.L(ia(ii):ia(ii+1)-1);
+    for jj = ia(ii):ia(ii+1)-1
+        Lattice_in = Info.map{1, jj};
+        Lattice_out = [[Lattice_in(2:end, 1);nan], Lattice_in(:, 2:3)];
+        out_in_diff = Lattice_out(:, 2) - Lattice_in(:, 2);
+
+        Lattice_in = Lattice_in(out_in_diff==0)';
+        Lattice_out = Lattice_out(out_in_diff==0)';
+
+        Lattice_in_all = [Lattice_in_all, Lattice_in];
+        Lattice_out_all = [Lattice_out_all, Lattice_out];
+
+    end
+
+    figure('color', 'w'); set(gcf, 'Position', [100 100 500 500]);
+    plot(Lattice_in_all, Lattice_out_all, '.', 'LineStyle', 'none','MarkerSize', 13);
+    axis equal; grid on
+    xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
+    xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
+    ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
+    if ii == 1
+        title_txt = '$\theta=0^{\circ}$';
+    elseif ii == 2
+        title_txt = '$\theta=10^{\circ}$';
+    else
+        title_txt = '$\theta=20^{\circ}$';
+    end
+    title(title_txt,'FontSize', 22,'Interpreter', 'latex');
+
+%     f=gcf;
+%     exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Poincare plots\',title_txt(2:end-9),'_all.png'],'Resolution',100)
+
+end
+
+%%%%% draw Poincare Map based on contour length at flow angle = 20
+clear; close all; clc;
+
+load('Poincare_Map_data.mat');
+
+thedate = Info.date;
+[C, ia, ic] = unique(thedate,'stable');
+ia = [ia; length(ic)+1];
+
+ii = 3; % choose theta = 20 
+
+proc_date = C(ii);
+L_all = Info.L(ia(ii):ia(ii+1)-1);
+longer_ind = find(L_all >= 130);
+shorter_ind = find(L_all < 130);
+
+map_data = Info.map(1, ia(ii):ia(ii+1)-1);
+
+%%%%% draw longer fiber 
+Lattice_in_all = []; Lattice_out_all = [];
+for jj = 1:length(longer_ind)
+
+    Lattice_in = map_data{longer_ind(jj)};
+    Lattice_out = [[Lattice_in(2:end, 1);nan], Lattice_in(:, 2:3)];
+    out_in_diff = Lattice_out(:, 2) - Lattice_in(:, 2);
+
+    Lattice_in = Lattice_in(out_in_diff==0)';
+    Lattice_out = Lattice_out(out_in_diff==0)';
+
+    Lattice_in_all = [Lattice_in_all, Lattice_in];
+    Lattice_out_all = [Lattice_out_all, Lattice_out];
+end
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 500 500]);
+plot(Lattice_in_all, Lattice_out_all, '.', 'LineStyle', 'none','MarkerSize', 13);
+axis equal; grid on
+xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
+xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
+ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
+title('$\theta=20^{\circ}\ (longer\ filament)$','FontSize', 20,'Interpreter', 'latex');
+% f=gcf;
+% exportgraphics(f,'D:\Dropbox\PROCESS remotely\20230126\theta=20_longer.png','Resolution',100)
+
+%%%%% draw shorter fiber 
+Lattice_in_all = []; Lattice_out_all = [];
+for jj = 1:length(shorter_ind)
+
+    Lattice_in = map_data{shorter_ind(jj)};
+    Lattice_out = [[Lattice_in(2:end, 1);nan], Lattice_in(:, 2:3)];
+    out_in_diff = Lattice_out(:, 2) - Lattice_in(:, 2);
+
+    Lattice_in = Lattice_in(out_in_diff==0)';
+    Lattice_out = Lattice_out(out_in_diff==0)';
+
+    Lattice_in_all = [Lattice_in_all, Lattice_in];
+    Lattice_out_all = [Lattice_out_all, Lattice_out];
+end
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 500 500]);
+plot(Lattice_in_all, Lattice_out_all, '.', 'LineStyle', 'none','MarkerSize', 13);
+axis equal; grid on
+xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
+xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
+ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
+title('$\theta=20^{\circ}\ (shorter\ filament)$','FontSize', 20,'Interpreter', 'latex');
+% f=gcf;
+% exportgraphics(f,'D:\Dropbox\PROCESS remotely\20230126\theta=20_shorter.png','Resolution',100)
+
+
+
+
+%% functions
 function L_0 = Vic_Get_ave_cutExtreme(spl_Ls, threshold)
 % the function is used to calculte the contour lenght of the filament based
 % on the average without the extrame values.
