@@ -10,7 +10,6 @@ xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLine
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
 ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
-PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 
 for no_Group = [7 8 13 14 15 16 17 18]
 
