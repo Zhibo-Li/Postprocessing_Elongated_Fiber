@@ -78,7 +78,7 @@ for no_Group = [7 8 13 14 15 16 17 18]
             end
 
             f=gcf;
-            exportgraphics(f,[savepath, filesep, filename(14: end-4), '_E_Lee.png'],'Resolution',100)
+            exportgraphics(f,[savepath, filesep, filename(1: end-4), '_E_Lee.png'],'Resolution',100)
 
             close all
             clearvars CoM_x Energy xy centers radii
