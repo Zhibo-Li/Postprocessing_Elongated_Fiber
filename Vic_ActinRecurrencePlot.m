@@ -11,7 +11,7 @@ storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 
 n = 1;
-for no_Group = [7 8 13 14 15 16 17 18]
+for no_Group = [19 20]
     % Square-based array 0°, 10°, and 20°
     % No.13 needed to be recalculated (20230125)
 
@@ -21,6 +21,8 @@ for no_Group = [7 8 13 14 15 16 17 18]
         Array_angle = 10;
     elseif no_Group == 16 || no_Group == 17 || no_Group == 18
         Array_angle = 20;
+    elseif no_Group == 19 || no_Group == 20
+        Array_angle = 15;
     end
     RotMatrix_init = rotz(-Array_angle); RotMatrix_init = RotMatrix_init(1:2, 1:2);
     % to rotate the pillar array
@@ -122,7 +124,8 @@ for no_Group = [7 8 13 14 15 16 17 18]
     end
 end
 
-save('Poincare_Map_data.mat', 'Info')
+% save(['F:\Processing & Results\Actin Filaments in Porous Media\Figures\' ...
+%     'Poincare plots\Poincare_Map_data_20230213.mat'], 'Info')
 
 
 
@@ -131,7 +134,7 @@ save('Poincare_Map_data.mat', 'Info')
 %%%%% draw Poincare Map for each flow angle
 clear; close all; clc;
 
-load('Poincare_Map_data.mat');
+load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data_20230213.mat');
 
 thedate = Info.date;
 [C, ia, ic] = unique(thedate,'stable');
@@ -166,26 +169,28 @@ for ii = 1:length(ia)-1
         title_txt = '$\theta=0^{\circ}$';
     elseif ii == 2
         title_txt = '$\theta=10^{\circ}$';
-    else
+    elseif ii == 3
         title_txt = '$\theta=20^{\circ}$';
+    else
+        title_txt = '$\theta=15^{\circ}$';
     end
     title(title_txt,'FontSize', 22,'Interpreter', 'latex');
 
 %     f=gcf;
-%     exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Poincare plots\',title_txt(2:end-9),'_all.png'],'Resolution',100)
+%     exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\',title_txt(2:end-9),'_all.png'],'Resolution',100)
 
 end
 
-%%%%% draw Poincare Map based on contour length at flow angle = 20
+%%%%% draw Poincare Map based on contour length at flow angle = 10
 clear; close all; clc;
 
-load('Poincare_Map_data.mat');
+load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data_20230213.mat');
 
 thedate = Info.date;
 [C, ia, ic] = unique(thedate,'stable');
 ia = [ia; length(ic)+1];
 
-ii = 3; % choose theta = 20 
+ii = 2; % choose theta = 10 
 
 proc_date = C(ii);
 L_all = Info.L(ia(ii):ia(ii+1)-1);
@@ -215,9 +220,9 @@ axis equal; grid on
 xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
 xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-title('$\theta=20^{\circ}\ (longer\ filament)$','FontSize', 20,'Interpreter', 'latex');
+title('$\theta=10^{\circ}\ (longer\ filament)$','FontSize', 20,'Interpreter', 'latex');
 % f=gcf;
-% exportgraphics(f,'D:\Dropbox\PROCESS remotely\20230126\theta=20_longer.png','Resolution',100)
+% exportgraphics(f,'F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=10_longer.png','Resolution',100)
 
 %%%%% draw shorter fiber 
 Lattice_in_all = []; Lattice_out_all = [];
@@ -240,9 +245,9 @@ axis equal; grid on
 xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
 xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-title('$\theta=20^{\circ}\ (shorter\ filament)$','FontSize', 20,'Interpreter', 'latex');
+title('$\theta=10^{\circ}\ (shorter\ filament)$','FontSize', 20,'Interpreter', 'latex');
 % f=gcf;
-% exportgraphics(f,'D:\Dropbox\PROCESS remotely\20230126\theta=20_shorter.png','Resolution',100)
+% exportgraphics(f,'F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=10_shorter.png','Resolution',100)
 
 
 
