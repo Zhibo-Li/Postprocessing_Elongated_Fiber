@@ -357,26 +357,26 @@ trapped_together = together_plot(:, together_plot(4, :)==3);
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
 % for legend
-plot(nan, nan, 'diamond','MarkerSize', 5,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); 
-plot(nan, nan, 'o','MarkerSize', 5,'MarkerEdgeColor','k','MarkerFaceColor','red');
-plot(nan, nan,  '.','MarkerSize', 20,'MarkerEdgeColor', [0 .5 0]); 
-plot(nan, nan,  '^','MarkerSize', 5,'MarkerEdgeColor','k','MarkerFaceColor','blue');  
+plot(nan, nan, 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); 
+plot(nan, nan, 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red');
+plot(nan, nan,  'square','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); 
+plot(nan, nan,  '^','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','blue');  
 % for plot
-plot(trapped_together(6, :), trapped_together(5, :), 'diamond','MarkerSize', 5,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); hold on 
-plot(bypass_edge_together(6, :), bypass_edge_together(5, :), 'o','MarkerSize', 5,'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
-plot(bypass_tip_together(6, :), bypass_tip_together(5, :),  '.','MarkerSize', 20,'MarkerEdgeColor', [0 .5 0]); hold on
-plot(pole_vaulting_together(6, :), pole_vaulting_together(5, :),  '^','MarkerSize', 5,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
+plot(trapped_together(6, :), trapped_together(5, :), 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); hold on 
+plot(bypass_edge_together(6, :), bypass_edge_together(5, :), 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
+plot(bypass_tip_together(6, :), bypass_tip_together(5, :),  'square','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); hold on
+plot(pole_vaulting_together(6, :), pole_vaulting_together(5, :),  '^','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
 
 xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
 ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
-title_txt = ['$-10 < \theta_0 < 10$'];
+title_txt = ['$-90 < \theta_0 < 90$'];
 title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 xlim([-90 90]); ylim([-0.1 1.1]);
 legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_dyn.png'],'Resolution',100)
+%     '\Figures\about contact information vs initial condition\theta_0m90to90_theta_c-y_c_dyn.png'],'Resolution',100)
 
 
 
