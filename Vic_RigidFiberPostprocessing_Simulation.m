@@ -320,7 +320,8 @@ clear; close all; clc;
 xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'results_2023_01_24.xlsx'],'Sheet','Sheet1','NumHeaderLines',1);
 mask = cellfun(@ismissing, xlsfile); xlsfile(mask) = {nan};
-together_plot = [cell2mat(xlsfile(:, 1:3)), cell2mat(xlsfile(:, 7)), cell2mat(xlsfile(:, 9:10))]; 
+together_plot = [cell2mat(xlsfile(:, 1:3)), cell2mat(xlsfile(:, 7)), ...
+    cell2mat(xlsfile(:, 9:10)), cell2mat(xlsfile(:, 4))]; 
 together_plot = together_plot';
 prompt = {'The lower bound of the initial angle:', 'The upper bound of the initial angle:', ...
     'The lower bound of the contour length:','The upper bound of the contour length:'...
@@ -394,7 +395,7 @@ scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_to
 scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(3, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
 
 % cmap(size(together_plot,2)); 
-hcb=colorbar; caxis([0 1])
+hcb=colorbar; caxis([0 1]); colormap jet
 title(hcb,'$Initial\ position\ (y_0/h_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
 
 xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
@@ -425,7 +426,7 @@ scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_to
 scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(1, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
 
 % cmap(size(together_plot,2)); 
-hcb=colorbar; caxis([-10 10])
+hcb=colorbar; caxis([-10 10]); colormap jet
 title(hcb,'$Initial\ angle\ ({\theta}_0)$','FontSize', 16,'Interpreter', 'latex'); grid on
 
 xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
@@ -456,7 +457,7 @@ scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_to
 scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(2, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
 
 % cmap(size(together_plot,2)); 
-hcb=colorbar; caxis([0.5 1.5])
+hcb=colorbar; caxis([0.5 1.5]); colormap jet
 title(hcb,'$Contour\ length\ (L/l_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
 
 xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
@@ -469,6 +470,37 @@ legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','Fo
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 %     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_L.png'],'Resolution',100)
+
+
+
+%%%%%%%%%%%%%%% plot theta_c vs y_c (with deviation delta) %%%%%%%%%%%%%%%%%
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
+% for legend
+scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
+scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
+
+scatter(trapped_together(6, :), trapped_together(5, :), 150, trapped_together(7, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
+scatter(bypass_edge_together(6, :), bypass_edge_together(5, :), 130, bypass_edge_together(7, :), 'Filled','MarkerEdgeColor','k'); hold on
+scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_together(7, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
+scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(7, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
+
+% cmap(size(together_plot,2)); 
+hcb=colorbar; caxis([-0.6 0.6]); colormap jet
+title(hcb,'$Deviation\ (\delta)$','FontSize', 16,'Interpreter', 'latex'); grid on
+
+xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
+ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
+title_txt = ['$-10 < \theta_0 < 10$'];
+title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+xlim([-90 90]); ylim([-0.1 1.1]);
+legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
+
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+%     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_delta.png'],'Resolution',100)
 
 
 
