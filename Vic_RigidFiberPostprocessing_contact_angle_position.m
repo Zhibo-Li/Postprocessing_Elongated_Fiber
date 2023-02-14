@@ -119,7 +119,10 @@ for ii = 1:length(Files)
             L_start = [com_XY(1) - cosd(-Chi_contact) * L_current, com_XY(2) - sind(-Chi_contact)  * L_current];
             L_end = [com_XY(1) + cosd(-Chi_contact) * L_current, com_XY(2) + sind(-Chi_contact)  * L_current];
 
-            P_inter = InterX(obs_2d', [L_start; L_end]'); 
+            P = polyfit(obs_2d(:,1),obs_2d(:,2),1);
+            yfit = polyval(P, [900 1200]);
+
+            P_inter = InterX([900 1200; yfit], [L_start; L_end]'); 
 
             if isempty(P_inter)
                 y_contact = nan; 
@@ -267,7 +270,7 @@ names_plot = names; together_plot = together;
 prompt = {'The lower bound of the initial angle:', 'The upper bound of the initial angle:', ...
     'The lower bound of the contour length:','The upper bound of the contour length:'...
     'The lower bound of the initial position:','The upper bound of the initial position:'};
-definput = {'nan', 'nan', 'nan', 'nan', '0', '1'};
+definput = {'-10', '10', 'nan', 'nan', '0', '1'};
 % definput = {'nan', 'nan', 'nan', 'nan', 'nan', 'nan'};
 answer = inputdlg(prompt, 'Input (please input NaN if there is no bound)', [1 35] , definput);
 
@@ -311,7 +314,7 @@ trapped_together(:, trapped_together(5, :) > range_y0_up) = [];
 
 
 % plot the chi_c vs  y_c (with classification and further data cleaning (optional)):
-figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
+figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
 % cmap = cmocean('thermal');
 cmap = colormap("jet");
 together_plot_filtered = together_plot;
@@ -345,11 +348,15 @@ plot(pole_vaulting_together(17, :)', pole_vaulting_together(18, :)', 'LineStyle'
 % hcb=colorbar;
 % title(hcb,'$Deviation\ (\delta/h_{obs})$','FontSize', 20,'Interpreter', 'latex'); grid on
 set(gca,'FontSize',16);
-xlabel('$Contact\ angle\ (\theta_c ^{\circ})$','FontSize', 24,'Interpreter', 'latex');
-ylabel('$Contact\ position\ (y_c/h_{obs})$','FontSize', 24,'Interpreter', 'latex');
+xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
+ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
+title_txt = ['$-10 < \theta_0 < 10$'];
+title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+xlim([-90 90]); ylim([-0.1 1.1]);
 legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'southeast','FontSize', 14,'Interpreter', 'latex')
-f=gcf;
-exportgraphics(f,'theta_c-y_c_classification_alldata.png','Resolution',100)
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+%     '\Figures\about contact information vs initial condition\exp_theta_0m10to10_theta_c-y_c.png'],'Resolution',100)
 
 % [the_L, the_y0] = ginput(1); % pick up the point you want to show the trajectory.
 % the_loc = intersect(find(together_plot(17, :)<the_L*0.98 & together_plot(17, :)>the_L*1.02),...
