@@ -498,7 +498,7 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\thetac-theta0_color-y0.png'],'Resolution',100)
+%     '\Figures\Paper\contact information vs initial condition\thetac-theta0_color-y0.png'],'Resolution',100)
 
 
 
@@ -506,12 +506,12 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 
-together_plot_less_theta0 = together_plot(:, or(or(or(or(or(together_plot(1, :)==-60, together_plot(1, :)==-30), ...
-together_plot(3, :)==0), together_plot(1, :)==30), together_plot(1, :)==60), together_plot(3, :)==90)); % choose theta_0
+% together_plot_less_theta0 = together_plot(:, or(or(or(or(or(together_plot(1, :)==-60, together_plot(1, :)==-30), ...
+% together_plot(3, :)==0), together_plot(1, :)==30), together_plot(1, :)==60), together_plot(3, :)==90)); % choose theta_0
 
-% together_plot_less_theta0 = together_plot(:, or(or(or(or(or(or(or(or(together_plot(1, :)==-10, together_plot(1, :)==-7.5), ...
-% together_plot(3, :)==-5), together_plot(1, :)==-2.5), together_plot(1, :)==0), ...
-% together_plot(3, :)==2.5), together_plot(3, :)==5), together_plot(3, :)==7.5), together_plot(3, :)==10)); % choose theta_0
+together_plot_less_theta0 = together_plot(:, or(or(or(or(or(or(or(or(together_plot(1, :)==-10, together_plot(1, :)==-7.5), ...
+together_plot(3, :)==-5), together_plot(1, :)==-2.5), together_plot(1, :)==0), ...
+together_plot(3, :)==2.5), together_plot(3, :)==5), together_plot(3, :)==7.5), together_plot(3, :)==10)); % choose theta_0
 
 L1_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.5); % classify contour length and indicate by symbols
 L2_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.6); 
@@ -538,13 +538,13 @@ scatter(L7_together(3, :), L7_together(5, :), 100, L7_together(1, :), 'Filled', 
 % scatter(L8_together(3, :), L8_together(5, :), 100, L8_together(1, :), '^','LineWidth',2); hold on
 
 % cmap(size(together_plot,2)); 
-hcb=colorbar; caxis([-60 90]); colormap jet
-% hcb=colorbar; caxis([-10 10]); colormap jet
+% hcb=colorbar; caxis([-60 90]); colormap jet
+hcb=colorbar; caxis([-10 10]); colormap jet
 ax = gca; ax.FontSize = 16;
 title(hcb,'$\theta_0$','FontSize', 24,'Interpreter', 'latex'); grid on
 
-xlabel('$y_0$','FontSize', 24,'Interpreter', 'latex'); 
-ylabel('$y_c$','FontSize', 24,'Interpreter', 'latex');
+xlabel('$y_0/h_{obs}$','FontSize', 24,'Interpreter', 'latex'); 
+ylabel('$y_c/h_{obs}$','FontSize', 24,'Interpreter', 'latex');
 % title_txt = ['$-10 < \theta_0 < 10$'];
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 % xlim([-90 90]); ylim([-0.1 1.1]);
@@ -552,7 +552,7 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\yc-y0_color-theta_c_2.png'],'Resolution',100)
+%     '\Figures\Paper\contact information vs initial condition\yc-y0_color-theta_c_1.png'],'Resolution',100)
 
 
 
