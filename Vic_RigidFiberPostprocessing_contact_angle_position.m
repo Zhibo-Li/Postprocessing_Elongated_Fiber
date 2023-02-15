@@ -314,7 +314,7 @@ trapped_together(:, trapped_together(5, :) > range_y0_up) = [];
 
 
 % plot the chi_c vs  y_c (with classification and further data cleaning (optional)):
-figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
+figure('color', 'w'); set(gcf, 'Position', [100 100 420 315]);
 % cmap = cmocean('thermal');
 cmap = colormap("jet");
 together_plot_filtered = together_plot;
@@ -330,33 +330,29 @@ bypass_tip_together = together_plot_filtered(:, and(logical(together_plot_filter
 pole_vaulting_together = together_plot_filtered(:, logical(together_plot_filtered(12, :))); 
 % apex_vaulting_together = together_plot_filtered(:, logical(together_plot_filtered(13, :)));
 % sliding_together = together_plot_filtered(:, logical(together_plot_filtered(14, :)));
-plot(nan, nan, 'LineStyle', 'none', 'Marker', 'diamond', 'MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on  % for legend only
-plot(nan, nan, 'LineStyle', 'none', 'Marker', 'o', 'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on % for legend only
-plot(nan, nan, 'LineStyle', 'none', 'Marker', 'square', 'MarkerEdgeColor','k','MarkerFaceColor',[0 .5 0]); hold on % for legend only
-plot(nan, nan, 'LineStyle', 'none', 'Marker', '^', 'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on % for legend only
 
-plot(trapped_together(17, :)', trapped_together(18, :)', 'LineStyle', 'none', ...
-    'MarkerSize', 20, 'Marker', 'diamond', 'MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on 
-plot(bypass_edge_together(17, :)', bypass_edge_together(18, :)', 'LineStyle', 'none', ...
-    'MarkerSize', 20, 'Marker', 'o', 'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
-plot(bypass_tip_together(17, :)', bypass_tip_together(18, :)', 'LineStyle', 'none', ...
-    'MarkerSize', 20, 'Marker', 'square', 'MarkerEdgeColor','k','MarkerFaceColor',[0 .5 0]); hold on
-plot(pole_vaulting_together(17, :)', pole_vaulting_together(18, :)', 'LineStyle', 'none', ...
-    'MarkerSize', 20, 'Marker', '^', 'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
+% for legend
+plot(nan, nan, 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); 
+plot(nan, nan, 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red');
+plot(nan, nan,  'square','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); 
+plot(nan, nan,  '^','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','blue');  
+% for plot
+plot(trapped_together(17, :), trapped_together(18, :), 'diamond','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); hold on 
+plot(bypass_edge_together(17, :), bypass_edge_together(18, :), 'o','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
+plot(bypass_tip_together(17, :), bypass_tip_together(18, :),  'square','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); hold on
+plot(pole_vaulting_together(17, :), pole_vaulting_together(18, :),  '^','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
 
-% cmap(size(together_plot,2)); 
-% hcb=colorbar;
-% title(hcb,'$Deviation\ (\delta/h_{obs})$','FontSize', 20,'Interpreter', 'latex'); grid on
-set(gca,'FontSize',16);
 xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
-ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
-title_txt = ['$-10 < \theta_0 < 10$'];
-title(title_txt,'FontSize', 18,'Interpreter', 'latex');
-xlim([-90 90]); ylim([-0.1 1.1]);
-legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'southeast','FontSize', 14,'Interpreter', 'latex')
+ylabel('$y_c/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$-90 < \theta_0 < 90$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+xlim([-50 50]); ylim([0 1]);
+xticks([-45 -30 -15 0 15 30 45])
+% legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
+
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\exp_theta_0m10to10_theta_c-y_c.png'],'Resolution',100)
+%     '\Figures\Paper\contact information vs initial condition\thetaC-yC_dyn_exp_theta_0m10to10.png'],'Resolution',100)
 
 % [the_L, the_y0] = ginput(1); % pick up the point you want to show the trajectory.
 % the_loc = intersect(find(together_plot(17, :)<the_L*0.98 & together_plot(17, :)>the_L*1.02),...

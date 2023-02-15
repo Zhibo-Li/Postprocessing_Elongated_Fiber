@@ -326,7 +326,7 @@ together_plot = together_plot';
 prompt = {'The lower bound of the initial angle:', 'The upper bound of the initial angle:', ...
     'The lower bound of the contour length:','The upper bound of the contour length:'...
     'The lower bound of the initial position:','The upper bound of the initial position:'};
-definput = {'-10', '10', 'nan', 'nan', 'nan', 'nan'};
+definput = {'nan', 'nan', 'nan', 'nan', 'nan', 'nan'};
 answer = inputdlg(prompt, 'Input (please input NaN if there is no bound)', [1 35] , definput);
 
 %%%%%%%%%%%%%%%%%%%%%%%%% assign the values %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -355,195 +355,326 @@ trapped_together = together_plot(:, together_plot(4, :)==3);
 
 %%%%%%%%%%%%%%% plot theta_c vs y_c (with dynamics) %%%%%%%%%%%%%%%%%
 
-figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
+figure('color', 'w'); set(gcf, 'Position', [100 100 420 315]);
 % for legend
 plot(nan, nan, 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); 
 plot(nan, nan, 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red');
 plot(nan, nan,  'square','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); 
 plot(nan, nan,  '^','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','blue');  
 % for plot
-plot(trapped_together(6, :), trapped_together(5, :), 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); hold on 
-plot(bypass_edge_together(6, :), bypass_edge_together(5, :), 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
-plot(bypass_tip_together(6, :), bypass_tip_together(5, :),  'square','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); hold on
-plot(pole_vaulting_together(6, :), pole_vaulting_together(5, :),  '^','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
+plot(trapped_together(6, :), trapped_together(5, :), 'diamond','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); hold on 
+plot(bypass_edge_together(6, :), bypass_edge_together(5, :), 'o','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
+plot(bypass_tip_together(6, :), bypass_tip_together(5, :),  'square','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); hold on
+plot(pole_vaulting_together(6, :), pole_vaulting_together(5, :),  '^','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
 
 xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
-ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
-title_txt = ['$-90 < \theta_0 < 90$'];
-title(title_txt,'FontSize', 18,'Interpreter', 'latex');
-xlim([-90 90]); ylim([-0.1 1.1]);
-legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
+ylabel('$y_c/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$-90 < \theta_0 < 90$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+xlim([-50 50]); ylim([0 1]);
+xticks([-45 -30 -15 0 15 30 45])
+% legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\theta_0m90to90_theta_c-y_c_dyn.png'],'Resolution',100)
+%     '\Figures\Paper\contact information vs initial condition\thetaC-yC_dyn_simu_from_far_theta_0m10to10_L1.png'],'Resolution',100)
 
 
 
-%%%%%%%%%%%% plot theta_c vs y_c (with initial position y_0) %%%%%%%%%%%%%%
+%%%%%%%%%%%%%% plot theta_c vs y_c (with dynamics) ALL DATA %%%%%%%%%%%%%%
 
-figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
+figure('color', 'w'); set(gcf, 'Position', [100 100 600 450]);
+% for legend
+plot(nan, nan, 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); 
+plot(nan, nan, 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red');
+plot(nan, nan,  'square','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); 
+plot(nan, nan,  '^','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','blue');  
+% for plot
+plot(trapped_together(6, :), trapped_together(5, :), 'diamond','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); hold on 
+plot(bypass_edge_together(6, :), bypass_edge_together(5, :), 'o','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
+plot(bypass_tip_together(6, :), bypass_tip_together(5, :),  'square','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); hold on
+plot(pole_vaulting_together(6, :), pole_vaulting_together(5, :),  '^','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
+
+xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
+ylabel('$y_c/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$-90 < \theta_0 < 90$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+xlim([-90 90]); ylim([-0.1 1.1])
+% xticks([-45 -30 -15 0 15 30 45])
+% legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
+
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+%     '\Figures\Paper\contact information vs initial condition\thetaC-yC_dyn_simu_from_far_alldata.png'],'Resolution',100)
+
+
+
+%%%%%%% plot theta_0 vs y_0 (with dynamics) which contact the obstacle %%%%%%%
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 600 450]);
+% for legend
+plot(nan, nan, 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); 
+plot(nan, nan, 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red');
+plot(nan, nan,  'square','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); 
+plot(nan, nan,  '^','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','blue'); 
+% choose the contact cases
+together_plot_contact = together_plot;
+together_plot_contact(:, isnan(together_plot_contact(5, :))) = [];
+bypass_edge_together_contact = together_plot_contact(:, together_plot_contact(4, :)==0); 
+bypass_tip_together_contact = together_plot_contact(:, together_plot_contact(4, :)==1);
+pole_vaulting_together_contact = together_plot_contact(:, together_plot_contact(4, :)==2); 
+trapped_together_contact = together_plot_contact(:, together_plot_contact(4, :)==3);
+
+% for plot
+plot(trapped_together_contact(1, :), trapped_together_contact(3, :), ...
+    'diamond','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); hold on 
+plot(bypass_edge_together_contact(1, :), bypass_edge_together_contact(3, :), ...
+    'o','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
+plot(bypass_tip_together_contact(1, :), bypass_tip_together_contact(3, :), ...
+    'square','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); hold on
+plot(pole_vaulting_together_contact(1, :), pole_vaulting_together_contact(3, :), ...
+    '^','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
+
+xlabel('$\theta_0$','FontSize', 18,'Interpreter', 'latex'); 
+ylabel('$y_0/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$-90 < \theta_0 < 90$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+xlim([-90 90]); ylim([-0.1 1.1])
+% xticks([-45 -30 -15 0 15 30 45])
+% legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
+
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+%     '\Figures\Paper\contact information vs initial condition\theta0-y0_dyn_simu_from_far_contactcases.png'],'Resolution',100)
+
+
+
+%%%%%%%%%%%% plot theta_c vs theta_0 (with color y_0) %%%%%%%%%%%%%%
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 % for legend
 scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
 scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
 scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
 scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
 
-scatter(trapped_together(6, :), trapped_together(5, :), 150, trapped_together(3, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
-scatter(bypass_edge_together(6, :), bypass_edge_together(5, :), 130, bypass_edge_together(3, :), 'Filled','MarkerEdgeColor','k'); hold on
-scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_together(3, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
-scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(3, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
+scatter(trapped_together(1, :), trapped_together(6, :), 150, trapped_together(3, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
+scatter(bypass_edge_together(1, :), bypass_edge_together(6, :), 130, bypass_edge_together(3, :), 'Filled','MarkerEdgeColor','k'); hold on
+scatter(bypass_tip_together(1, :), bypass_tip_together(6, :), 130, bypass_tip_together(3, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
+scatter(pole_vaulting_together(1, :), pole_vaulting_together(6, :), 150, pole_vaulting_together(3, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
 
 % cmap(size(together_plot,2)); 
 hcb=colorbar; caxis([0 1]); colormap jet
-title(hcb,'$Initial\ position\ (y_0/h_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
+title(hcb,'$y_0/h_{obs}$','FontSize', 16,'Interpreter', 'latex'); grid on
 
-xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
-ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
-title_txt = ['$-10 < \theta_0 < 10$'];
-title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+xlabel('$\theta_0$','FontSize', 18,'Interpreter', 'latex'); 
+ylabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$-10 < \theta_0 < 10$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 xlim([-90 90]); ylim([-0.1 1.1]);
 legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_y_0.png'],'Resolution',100)
+%     '\Figures\about contact information vs initial condition\thetac-theta0_color-y0.png'],'Resolution',100)
 
 
 
-%%%%%%%%%%%% plot theta_c vs y_c (with initial position theta_0) %%%%%%%%%%%%%%
+%%%%%%%%%%%% plot y_c vs y_0 (with color theta_0) %%%%%%%%%%%%%%
 
-figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
+figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 % for legend
 scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
 scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
 scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
 scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
 
-scatter(trapped_together(6, :), trapped_together(5, :), 150, trapped_together(1, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
-scatter(bypass_edge_together(6, :), bypass_edge_together(5, :), 130, bypass_edge_together(1, :), 'Filled','MarkerEdgeColor','k'); hold on
-scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_together(1, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
-scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(1, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
+scatter(trapped_together(3, :), trapped_together(5, :), 150, trapped_together(1, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
+scatter(bypass_edge_together(3, :), bypass_edge_together(5, :), 130, bypass_edge_together(1, :), 'Filled','MarkerEdgeColor','k'); hold on
+scatter(bypass_tip_together(3, :), bypass_tip_together(5, :), 130, bypass_tip_together(1, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
+scatter(pole_vaulting_together(3, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(1, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
 
 % cmap(size(together_plot,2)); 
-hcb=colorbar; caxis([-10 10]); colormap jet
-title(hcb,'$Initial\ angle\ ({\theta}_0)$','FontSize', 16,'Interpreter', 'latex'); grid on
+hcb=colorbar; caxis([-60 90]); colormap jet
+title(hcb,'$\theta_0$','FontSize', 16,'Interpreter', 'latex'); grid on
 
-xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
-ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
-title_txt = ['$-10 < \theta_0 < 10$'];
-title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+xlabel('$\y_0$','FontSize', 18,'Interpreter', 'latex'); 
+ylabel('$\y_c$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$-10 < \theta_0 < 10$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 xlim([-90 90]); ylim([-0.1 1.1]);
 legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_theta_0.png'],'Resolution',100)
+%     '\Figures\about contact information vs initial condition\yc-y0_color-theta_c.png'],'Resolution',100)
 
 
 
-%%%%%%%%%%%%%%% plot theta_c vs y_c (with contour length L) %%%%%%%%%%%%%%%%%
-
-figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
-% for legend
-scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
-scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
-scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
-scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
-
-scatter(trapped_together(6, :), trapped_together(5, :), 150, trapped_together(2, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
-scatter(bypass_edge_together(6, :), bypass_edge_together(5, :), 130, bypass_edge_together(2, :), 'Filled','MarkerEdgeColor','k'); hold on
-scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_together(2, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
-scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(2, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
-
-% cmap(size(together_plot,2)); 
-hcb=colorbar; caxis([0.5 1.5]); colormap jet
-title(hcb,'$Contour\ length\ (L/l_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
-
-xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
-ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
-title_txt = ['$-10 < \theta_0 < 10$'];
-title(title_txt,'FontSize', 18,'Interpreter', 'latex');
-xlim([-90 90]); ylim([-0.1 1.1]);
-legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
-
-% f=gcf;
-% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_L.png'],'Resolution',100)
-
-
-
-%%%%%%%%%%%%%%% plot theta_c vs y_c (with deviation delta) %%%%%%%%%%%%%%%%%
-
-figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
-% for legend
-scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
-scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
-scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
-scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
-
-scatter(trapped_together(6, :), trapped_together(5, :), 150, trapped_together(7, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
-scatter(bypass_edge_together(6, :), bypass_edge_together(5, :), 130, bypass_edge_together(7, :), 'Filled','MarkerEdgeColor','k'); hold on
-scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_together(7, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
-scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(7, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
-
-% cmap(size(together_plot,2)); 
-hcb=colorbar; caxis([-0.6 0.6]); colormap jet
-title(hcb,'$Deviation\ (\delta)$','FontSize', 16,'Interpreter', 'latex'); grid on
-
-xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
-ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
-title_txt = ['$-10 < \theta_0 < 10$'];
-title(title_txt,'FontSize', 18,'Interpreter', 'latex');
-xlim([-90 90]); ylim([-0.1 1.1]);
-legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
-
-% f=gcf;
-% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_delta.png'],'Resolution',100)
-
-
-
-%%%%%%%%%%%%%%% plot (theta_0, y_0) vs (theta_c, y_c) in vector field %%%%%%%%%%%%%%%%%
-
-% let the data 'align' for reshape
-together_plot(:, together_plot(3, :) == 0.1875) = [];
-together_plot(:, together_plot(3, :) == 0.3125) = [];
-together_plot(:, together_plot(3, :) == 0.4375) = [];
-together_plot(:, together_plot(3, :) == 0.21875) = [];
-together_plot(:, together_plot(3, :) == 0.28125) = [];
-together_plot(:, together_plot(3, :) == 0.34375) = [];
-together_plot(:, together_plot(3, :) == 0.40625) = [];
-
-% choose an 'L' to plot:
-choose_L = 0.5;
-together_plot(:, together_plot(2, :) ~= choose_L) = [];
-
-toPlot_theta_0 = together_plot(1, :);
-toPlot_L_0 = together_plot(2, :);
-toPlot_y_0 = together_plot(3, :);
-toPlot_y_c = together_plot(5, :);
-toPlot_theta_c = together_plot(6, :);
-
-[toPlot_y_0_X,toPlot_theta_0_Y] = meshgrid(unique(toPlot_theta_0),unique(toPlot_y_0));
-
-toPlot_theta_c = reshape(toPlot_theta_c, [length(unique(toPlot_y_0)), length(unique(toPlot_theta_0))]);
-toPlot_y_c = reshape(toPlot_y_c, [length(unique(toPlot_y_0)), length(unique(toPlot_theta_0))]);
-toPlot_contact_X = toPlot_y_c .* sind(toPlot_theta_c);
-toPlot_contact_Y = toPlot_y_c .* cosd(toPlot_theta_c);
-
-toPlot_contact_X_base = ~isnan(toPlot_y_c) .* ones(size(toPlot_y_c,1), size(toPlot_y_c,2)) .* sind(toPlot_theta_c);
-toPlot_contact_Y_base = ~isnan(toPlot_y_c) .* ones(size(toPlot_y_c,1), size(toPlot_y_c,2)) .* cosd(toPlot_theta_c);
-
-figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
-quiver(toPlot_y_0_X,toPlot_theta_0_Y,toPlot_contact_Y_base,toPlot_contact_X_base, ...
-    'k','LineWidth', 1, 'ShowArrowHead','off'); hold on
-quiver(toPlot_y_0_X,toPlot_theta_0_Y,toPlot_contact_Y,toPlot_contact_X,'m','LineWidth', 2); axis equal
-xlabel('$Initial\ angle\ (\theta_0)$','FontSize', 18,'Interpreter', 'latex'); 
-ylabel('$Initial\ position\ (y_0)$','FontSize', 18,'Interpreter', 'latex');
-title_txt = ['$Length\ L = ',num2str(choose_L), '$'];
-title(title_txt,'FontSize', 18,'Interpreter', 'latex');
-xlim([-12 12]); ylim([-0.1 2.1]); grid on
-% f=gcf;
-% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\contourL_', num2str(choose_L) ,'.png'],'Resolution',100)
+% %%%%%%%%%%%% plot theta_c vs y_c (with initial position y_0) %%%%%%%%%%%%%%
+% 
+% figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
+% % for legend
+% scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
+% 
+% scatter(trapped_together(6, :), trapped_together(5, :), 150, trapped_together(3, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
+% scatter(bypass_edge_together(6, :), bypass_edge_together(5, :), 130, bypass_edge_together(3, :), 'Filled','MarkerEdgeColor','k'); hold on
+% scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_together(3, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
+% scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(3, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
+% 
+% % cmap(size(together_plot,2)); 
+% hcb=colorbar; caxis([0 1]); colormap jet
+% title(hcb,'$Initial\ position\ (y_0/h_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
+% 
+% xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
+% ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$-10 < \theta_0 < 10$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+% xlim([-90 90]); ylim([-0.1 1.1]);
+% legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
+% 
+% % f=gcf;
+% % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+% %     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_y_0.png'],'Resolution',100)
+% 
+% 
+% 
+% %%%%%%%%%%%% plot theta_c vs y_c (with initial position theta_0) %%%%%%%%%%%%%%
+% 
+% figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
+% % for legend
+% scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
+% 
+% scatter(trapped_together(6, :), trapped_together(5, :), 150, trapped_together(1, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
+% scatter(bypass_edge_together(6, :), bypass_edge_together(5, :), 130, bypass_edge_together(1, :), 'Filled','MarkerEdgeColor','k'); hold on
+% scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_together(1, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
+% scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(1, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
+% 
+% % cmap(size(together_plot,2)); 
+% hcb=colorbar; caxis([-10 10]); colormap jet
+% title(hcb,'$Initial\ angle\ ({\theta}_0)$','FontSize', 16,'Interpreter', 'latex'); grid on
+% 
+% xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
+% ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$-10 < \theta_0 < 10$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+% xlim([-90 90]); ylim([-0.1 1.1]);
+% legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
+% 
+% % f=gcf;
+% % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+% %     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_theta_0.png'],'Resolution',100)
+% 
+% 
+% 
+% %%%%%%%%%%%%%%% plot theta_c vs y_c (with contour length L) %%%%%%%%%%%%%%%%%
+% 
+% figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
+% % for legend
+% scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
+% 
+% scatter(trapped_together(6, :), trapped_together(5, :), 150, trapped_together(2, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
+% scatter(bypass_edge_together(6, :), bypass_edge_together(5, :), 130, bypass_edge_together(2, :), 'Filled','MarkerEdgeColor','k'); hold on
+% scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_together(2, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
+% scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(2, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
+% 
+% % cmap(size(together_plot,2)); 
+% hcb=colorbar; caxis([0.5 1.5]); colormap jet
+% title(hcb,'$Contour\ length\ (L/l_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
+% 
+% xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
+% ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$-10 < \theta_0 < 10$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+% xlim([-90 90]); ylim([-0.1 1.1]);
+% legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
+% 
+% % f=gcf;
+% % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+% %     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_L.png'],'Resolution',100)
+% 
+% 
+% 
+% %%%%%%%%%%%%%%% plot theta_c vs y_c (with deviation delta) %%%%%%%%%%%%%%%%%
+% 
+% figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
+% % for legend
+% scatter(nan, nan, 1, nan, 'filled', 'k', 'diamond'); hold on  % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k'); hold on % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k', 'square'); hold on % for legend only
+% scatter(nan, nan, 1, nan, 'filled', 'k', '^'); hold on % for legend only
+% 
+% scatter(trapped_together(6, :), trapped_together(5, :), 150, trapped_together(7, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
+% scatter(bypass_edge_together(6, :), bypass_edge_together(5, :), 130, bypass_edge_together(7, :), 'Filled','MarkerEdgeColor','k'); hold on
+% scatter(bypass_tip_together(6, :), bypass_tip_together(5, :), 130, bypass_tip_together(7, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
+% scatter(pole_vaulting_together(6, :), pole_vaulting_together(5, :), 150, pole_vaulting_together(7, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
+% 
+% % cmap(size(together_plot,2)); 
+% hcb=colorbar; caxis([-0.6 0.6]); colormap jet
+% title(hcb,'$Deviation\ (\delta)$','FontSize', 16,'Interpreter', 'latex'); grid on
+% 
+% xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
+% ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$-10 < \theta_0 < 10$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+% xlim([-90 90]); ylim([-0.1 1.1]);
+% legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
+% 
+% % f=gcf;
+% % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+% %     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_delta.png'],'Resolution',100)
+% 
+% 
+% 
+% %%%%%%%%%%%%%%% plot (theta_0, y_0) vs (theta_c, y_c) in vector field %%%%%%%%%%%%%%%%%
+% 
+% % let the data 'align' for reshape
+% together_plot(:, together_plot(3, :) == 0.1875) = [];
+% together_plot(:, together_plot(3, :) == 0.3125) = [];
+% together_plot(:, together_plot(3, :) == 0.4375) = [];
+% together_plot(:, together_plot(3, :) == 0.21875) = [];
+% together_plot(:, together_plot(3, :) == 0.28125) = [];
+% together_plot(:, together_plot(3, :) == 0.34375) = [];
+% together_plot(:, together_plot(3, :) == 0.40625) = [];
+% 
+% % choose an 'L' to plot:
+% choose_L = 0.5;
+% together_plot(:, together_plot(2, :) ~= choose_L) = [];
+% 
+% toPlot_theta_0 = together_plot(1, :);
+% toPlot_L_0 = together_plot(2, :);
+% toPlot_y_0 = together_plot(3, :);
+% toPlot_y_c = together_plot(5, :);
+% toPlot_theta_c = together_plot(6, :);
+% 
+% [toPlot_y_0_X,toPlot_theta_0_Y] = meshgrid(unique(toPlot_theta_0),unique(toPlot_y_0));
+% 
+% toPlot_theta_c = reshape(toPlot_theta_c, [length(unique(toPlot_y_0)), length(unique(toPlot_theta_0))]);
+% toPlot_y_c = reshape(toPlot_y_c, [length(unique(toPlot_y_0)), length(unique(toPlot_theta_0))]);
+% toPlot_contact_X = toPlot_y_c .* sind(toPlot_theta_c);
+% toPlot_contact_Y = toPlot_y_c .* cosd(toPlot_theta_c);
+% 
+% toPlot_contact_X_base = ~isnan(toPlot_y_c) .* ones(size(toPlot_y_c,1), size(toPlot_y_c,2)) .* sind(toPlot_theta_c);
+% toPlot_contact_Y_base = ~isnan(toPlot_y_c) .* ones(size(toPlot_y_c,1), size(toPlot_y_c,2)) .* cosd(toPlot_theta_c);
+% 
+% figure('color', 'w'); set(gcf, 'Position', [100 100 1500 300]);
+% quiver(toPlot_y_0_X,toPlot_theta_0_Y,toPlot_contact_Y_base,toPlot_contact_X_base, ...
+%     'k','LineWidth', 1, 'ShowArrowHead','off'); hold on
+% quiver(toPlot_y_0_X,toPlot_theta_0_Y,toPlot_contact_Y,toPlot_contact_X,'m','LineWidth', 2); axis equal
+% xlabel('$Initial\ angle\ (\theta_0)$','FontSize', 18,'Interpreter', 'latex'); 
+% ylabel('$Initial\ position\ (y_0)$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$Length\ L = ',num2str(choose_L), '$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+% xlim([-12 12]); ylim([-0.1 2.1]); grid on
+% % f=gcf;
+% % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+% %     '\Figures\about contact information vs initial condition\contourL_', num2str(choose_L) ,'.png'],'Resolution',100)
