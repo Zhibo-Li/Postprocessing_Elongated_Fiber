@@ -507,11 +507,11 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 
 % together_plot_less_theta0 = together_plot(:, or(or(or(or(or(together_plot(1, :)==-60, together_plot(1, :)==-30), ...
-% together_plot(3, :)==0), together_plot(1, :)==30), together_plot(1, :)==60), together_plot(3, :)==90)); % choose theta_0
+% together_plot(1, :)==0), together_plot(1, :)==30), together_plot(1, :)==60), together_plot(1, :)==90)); % choose theta_0
 
 together_plot_less_theta0 = together_plot(:, or(or(or(or(or(or(or(or(together_plot(1, :)==-10, together_plot(1, :)==-7.5), ...
-together_plot(3, :)==-5), together_plot(1, :)==-2.5), together_plot(1, :)==0), ...
-together_plot(3, :)==2.5), together_plot(3, :)==5), together_plot(3, :)==7.5), together_plot(3, :)==10)); % choose theta_0
+together_plot(1, :)==-5), together_plot(1, :)==-2.5), together_plot(1, :)==0), ...
+together_plot(1, :)==2.5), together_plot(1, :)==5), together_plot(1, :)==7.5), together_plot(1, :)==10)); % choose theta_0
 
 L1_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.5); % classify contour length and indicate by symbols
 L2_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.6); 
