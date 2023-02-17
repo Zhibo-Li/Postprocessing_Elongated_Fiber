@@ -11,7 +11,7 @@ storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 
 n = 1;
-for no_Group = [19 20]
+for no_Group = [7 8 13 14 15 16 17 18 19 20]
     % Square-based array 0°, 10°, and 20°
     % No.13 needed to be recalculated (20230125)
 
@@ -105,7 +105,8 @@ for no_Group = [19 20]
                 to_be_fitted2 = fiber_center(abs(fiber_X-PAs_X(kk))<=60, :);
                 if ~isempty(to_be_fitted2) && numel(to_be_fitted2) > 2
                     fit_linear2 = fit(to_be_fitted2(:, 1), to_be_fitted2(:, 2), 'poly1');
-                    For_Poincare(kk, 1) = mod(fit_linear2(PAs_X(kk)), ave_y_gap) / ave_y_gap;
+                    For_Poincare(kk, 1) = mod((fit_linear2(PAs_X(kk))-PAs_Y(1)), ave_y_gap) / ave_y_gap;
+                    % Correct: add '-PAs_Y(1)' @ 20230217 
                     For_Poincare(kk, 2) = kk;
                     For_Poincare(kk, 3) = fiber_Y_indicator(kk);
                 end
@@ -115,6 +116,7 @@ for no_Group = [19 20]
             Info.L(n) = L_0;
             Info.map{n} = For_Poincare;
             Info.date(n) = the_exp_date;
+            Info.name{n} = filename(14:end-4);
             n = n + 1;
 
             % f=gcf;
@@ -124,8 +126,8 @@ for no_Group = [19 20]
     end
 end
 
-% save(['F:\Processing & Results\Actin Filaments in Porous Media\Figures\' ...
-%     'Poincare plots\Poincare_Map_data_20230213.mat'], 'Info')
+save(['F:\Processing & Results\Actin Filaments in Porous Media\Figures\' ...
+    'Poincare plots\Poincare_Map_data.mat'], 'Info')
 
 
 
@@ -134,7 +136,7 @@ end
 %%%%% draw Poincare Map for each flow angle
 clear; close all; clc;
 
-load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data_20230213.mat');
+load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data.mat');
 
 thedate = Info.date;
 [C, ia, ic] = unique(thedate,'stable');
@@ -153,6 +155,11 @@ for ii = 1:length(ia)-1
 
         Lattice_in = Lattice_in(out_in_diff==0)';
         Lattice_out = Lattice_out(out_in_diff==0)';
+
+%         figure('color', 'w'); set(gcf, 'Position', [100 100 500 500]);
+%         plot(Lattice_in, Lattice_out, '.', 'LineStyle', 'none','MarkerSize', 13);
+%         xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
+%         Info.name{jj}
 
         Lattice_in_all = [Lattice_in_all, Lattice_in];
         Lattice_out_all = [Lattice_out_all, Lattice_out];
@@ -184,7 +191,7 @@ end
 %%%%% draw Poincare Map based on contour length at flow angle = 10
 clear; close all; clc;
 
-load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data_20230213.mat');
+load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data.mat');
 
 thedate = Info.date;
 [C, ia, ic] = unique(thedate,'stable');
