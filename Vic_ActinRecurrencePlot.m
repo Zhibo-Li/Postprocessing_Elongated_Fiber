@@ -108,7 +108,8 @@ for no_Group = [7 8 13 14 15 16 17 18 19 20]
                     For_Poincare(kk, 1) = mod((fit_linear2(PAs_X(kk))-PAs_Y(1)), ave_y_gap) / ave_y_gap;
                     % Correct: add '-PAs_Y(1)' @ 20230217 
                     For_Poincare(kk, 2) = kk;
-                    For_Poincare(kk, 3) = fiber_Y_indicator(kk);
+                    For_Poincare(kk, 3) = fiber_Y_indicator(to_be_fitted2(1,1)==fiber_center(:,1));
+                    % Correct: change 'fiber_Y_indicator(kk)' to fiber_Y_indicator(to_be_fitted2(1,1)==XXYY_Simu_i(:,1))
                 end
             end
             For_Poincare(:, 3) = For_Poincare(:, 3) - min(For_Poincare(:, 3)) + 1;
@@ -198,6 +199,7 @@ thedate = Info.date;
 ia = [ia; length(ic)+1];
 
 ii = 2; % choose theta = 10 
+PAs_deg = 10;
 
 proc_date = C(ii);
 L_all = Info.L(ia(ii):ia(ii+1)-1);
@@ -227,9 +229,9 @@ axis equal; grid on
 xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
 xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-title('$\theta=10^{\circ}\ (longer\ filament)$','FontSize', 20,'Interpreter', 'latex');
+title(['$\theta=',num2str(PAs_deg),'^{\circ}\ (longer\ filament)$'],'FontSize', 20,'Interpreter', 'latex');
 % f=gcf;
-% exportgraphics(f,'F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=10_longer.png','Resolution',100)
+% exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=',num2str(PAs_deg),'_longer.png'],'Resolution',100)
 
 %%%%% draw shorter fiber 
 Lattice_in_all = []; Lattice_out_all = [];
@@ -252,11 +254,74 @@ axis equal; grid on
 xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
 xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-title('$\theta=10^{\circ}\ (shorter\ filament)$','FontSize', 20,'Interpreter', 'latex');
+title(['$\theta=',num2str(PAs_deg),'^{\circ}\ (shorter\ filament)$'],'FontSize', 20,'Interpreter', 'latex');
 % f=gcf;
-% exportgraphics(f,'F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=10_shorter.png','Resolution',100)
+% exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=',num2str(PAs_deg),'_shorter.png'],'Resolution',100)
 
 
+
+%% Draw Poincare for tracer from simulation
+clear; close all; clc;
+
+Simu_deg = 10;
+Simu_data = readmatrix(['F:\Simulation\202208_differentFlowangles_relatedto_' ...
+    '0811exp_45deg\',num2str(Simu_deg),'deg\Data\Streamline_forPoincare.csv']);
+XXYY_Simu = Simu_data(1:end, 13:14);  % (x, y) of the streamline
+IntegrationTime = Simu_data(1:end, 4);  % use to separate the different streamlines
+
+% [pks,locs] = findpeaks(-diff(IntegrationTime), 'MinPeakHeight', 50);
+locs = find(IntegrationTime==0);
+ave_ele = size(XXYY_Simu, 1) / (length(locs)-1);  % average element number of each trajectory
+
+RotMatrix = rotz(-Simu_deg); RotMatrix = RotMatrix(1:2, 1:2);
+XXYY_Simu = (RotMatrix * XXYY_Simu')';  % after rotation
+
+PAs_X = (-30:3:30)*1e-4; PAs_Y = (-30:3:30)*1e-4;  % pillar positions
+ave_y_gap = 3e-4;
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 500 500]);
+for streamline_i = 2:length(locs)-1
+
+    XXYY_Simu_i = XXYY_Simu(locs(streamline_i):locs(streamline_i+1)-1, :);
+%     plot(XXYY_Simu_i(:, 1), XXYY_Simu_i(:, 2))
+
+    XXYY_Simu_i(XXYY_Simu_i(:, 1) > 0.0025, :) = [];  % remove the points out of the pillar array
+    % divide the trajectory into pieces according to their y-position
+    fiber_Y_indicator = XXYY_Simu_i(:, 2);
+    for kk = 1: length(PAs_Y)-1
+        fiber_Y_indicator(fiber_Y_indicator > PAs_Y(kk) & fiber_Y_indicator < PAs_Y(kk+1)) = kk;
+    end
+
+    % the 'entering lattice' positions
+    ind_ToBeMoved = min(abs(repmat(XXYY_Simu_i(:, 1), 1, length(PAs_X)) - PAs_X), [], 2) > 6e-6;
+    XXYY_Simu_i(ind_ToBeMoved, :) = [];  % only keep the cases that close to the lattice verticle edge
+    fiber_Y_indicator(ind_ToBeMoved) = [];  % Y indicator as well
+    fiber_X = XXYY_Simu_i(:, 1);
+    For_Poincare = nan(length(PAs_X), 3);
+    for kk = 1: length(PAs_X)
+        to_be_fitted2 = XXYY_Simu_i(abs(fiber_X-PAs_X(kk))<=6e-6, :);
+        if ~isempty(to_be_fitted2) && numel(to_be_fitted2) > 2
+            fit_linear2 = fit(to_be_fitted2(:, 1), to_be_fitted2(:, 2), 'poly1');
+            For_Poincare(kk, 1) = mod((fit_linear2(PAs_X(kk))-PAs_Y(1)), ave_y_gap) / ave_y_gap;
+            % Correct: add '-PAs_Y(1)' @ 20230217
+            For_Poincare(kk, 2) = kk;
+            For_Poincare(kk, 3) = fiber_Y_indicator(to_be_fitted2(1,1)==XXYY_Simu_i(:,1));
+            % Correct: change 'fiber_Y_indicator(kk)' to fiber_Y_indicator(to_be_fitted2(1,1)==XXYY_Simu_i(:,1))
+        end
+    end
+
+    For_Poincare(:, 3) = For_Poincare(:, 3) - min(For_Poincare(:, 3)) + 1;
+    Lattice_in = For_Poincare;
+    Lattice_out = [[Lattice_in(2:end, 1);nan], Lattice_in(:, 2:3)];
+    out_in_diff = Lattice_out(:, 2) - Lattice_in(:, 2);
+
+    Lattice_in = Lattice_in(out_in_diff==0)';
+    Lattice_out = Lattice_out(out_in_diff==0)';
+
+    plot(Lattice_in, Lattice_out, '.', 'LineStyle', 'none','MarkerSize', 13); hold on
+
+end
+xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
 
 
 %% functions
