@@ -263,9 +263,9 @@ title(['$\theta=',num2str(PAs_deg),'^{\circ}\ (shorter\ filament)$'],'FontSize',
 %% Draw Poincare for tracer from simulation
 clear; close all; clc;
 
-Simu_deg = 10;
+Simu_deg = 40;  % Change this to choose the PAs angle (flow angle)
 Simu_data = readmatrix(['F:\Simulation\202208_differentFlowangles_relatedto_' ...
-    '0811exp_45deg\',num2str(Simu_deg),'deg\Data\Streamline_forPoincare.csv']);
+    '0811exp_45deg\',num2str(Simu_deg),'deg\Data\Streamline_forPoincare_moreLines.csv']);
 XXYY_Simu = Simu_data(1:end, 13:14);  % (x, y) of the streamline
 IntegrationTime = Simu_data(1:end, 4);  % use to separate the different streamlines
 
@@ -280,12 +280,13 @@ PAs_X = (-30:3:30)*1e-4; PAs_Y = (-30:3:30)*1e-4;  % pillar positions
 ave_y_gap = 3e-4;
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 500 500]);
-for streamline_i = 2:length(locs)-1
+for streamline_i = 250:length(locs)-249  % choose streamlines not too close to the sidewalls (sometimes needs change)
 
     XXYY_Simu_i = XXYY_Simu(locs(streamline_i):locs(streamline_i+1)-1, :);
 %     plot(XXYY_Simu_i(:, 1), XXYY_Simu_i(:, 2))
 
-    XXYY_Simu_i(XXYY_Simu_i(:, 1) > 0.0025, :) = [];  % remove the points out of the pillar array
+    XXYY_Simu_i(XXYY_Simu_i(:, 1) > 0.0015, :) = []; 
+    XXYY_Simu_i(XXYY_Simu_i(:, 1) < -0.0015, :) = [];  % remove the points out of the pillar array (sometimes needs change)
     % divide the trajectory into pieces according to their y-position
     fiber_Y_indicator = XXYY_Simu_i(:, 2);
     for kk = 1: length(PAs_Y)-1
@@ -318,10 +319,17 @@ for streamline_i = 2:length(locs)-1
     Lattice_in = Lattice_in(out_in_diff==0)';
     Lattice_out = Lattice_out(out_in_diff==0)';
 
-    plot(Lattice_in, Lattice_out, '.', 'LineStyle', 'none','MarkerSize', 13); hold on
+    plot(Lattice_in, Lattice_out, 'b.', 'LineStyle', 'none','MarkerSize', 13); hold on
 
 end
-xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
+ax=gca; ax.FontSize = 15; axis equal; grid on 
+xlim([0 1]); ylim([0 1]); 
+xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
+ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
+title(['$Simulation:\ \theta=',num2str(Simu_deg),'^{\circ}$'],'FontSize', 20,'Interpreter', 'latex');
+
+f=gcf;
+exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Simu_theta=',num2str(Simu_deg),'_tracer.png'],'Resolution',100)
 
 
 %% functions
