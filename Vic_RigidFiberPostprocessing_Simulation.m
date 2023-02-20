@@ -282,20 +282,55 @@ for sub1Path_i = 3:length(sub1_path)
                     Ds = eigenD(ind,ind);
                     Vs = eigenV(:,ind);
                     theta_c = atan(Vs(2,2)/Vs(1,2))/pi*180; % calculate theta_c
-                    
+
                     L_start = [com_XY(1) - cosd(theta_c) * L_current, com_XY(2) - sind(theta_c)  * L_current];
                     L_end = [com_XY(1) + cosd(theta_c) * L_current, com_XY(2) + sind(theta_c)  * L_current];
 
-                    P_inter = InterX([L_start_obsedge; L_end_obsedge]', [L_start; L_end]'); 
+                    P_inter = InterX([L_start_obsedge; L_end_obsedge]', [L_start; L_end]');
                     if ~isempty(P_inter)
                         y_c = (P_inter(2)- windward_edge_y(end)) / abs(windward_edge_y(1) - windward_edge_y(end)); % calculate y_c
                     else
                         y_c = nan;
                     end
 
-                    break 
-                end
+                    ite_contact = ii;  % the frame number of the contact case
 
+                    XY_1 = snapshot.points(1, 1:2);  % fiber head
+                    XY_2 = snapshot.points(end, 1:2);  % fiber tail
+
+                    if XY_2(1)-XY_1(1) > 0 && XY_2(2)-XY_1(2) >= 0  % the first quadrant
+                        ori_ee_contact = atand((XY_2(2)-XY_1(2)) / (XY_2(1)-XY_1(1)));  % ori_ee: [0, 360); X positive is 0°.
+                    elseif XY_2(1)-XY_1(1) <= 0 && XY_2(2)-XY_1(2) > 0  % the second quadrant
+                        ori_ee_contact = 180 + atand((XY_2(2)-XY_1(2)) / (XY_2(1)-XY_1(1)));
+                    elseif XY_2(1)-XY_1(1) < 0 && XY_2(2)-XY_1(2) <= 0  % the third quadrant
+                        ori_ee_contact = 180 + atand((XY_2(2)-XY_1(2)) / (XY_2(1)-XY_1(1)));
+                    elseif XY_2(1)-XY_1(1) >= 0 && XY_2(2)-XY_1(2) < 0  % the fourth quadrant
+                        ori_ee_contact = 360 + atand((XY_2(2)-XY_1(2)) / (XY_2(1)-XY_1(1)));
+                    end
+%                     % draw the fibers with the direction
+%                     d_XY = XY_2-XY_1;  % Difference
+%                     quiver(XY_1(1),XY_2(2),d_XY(1),d_XY(2),0); hold on
+
+                    break
+                end
+            end
+
+            if exist('ite_contact','var')
+                if deg_num >= 0
+                    ori_ini = deg_num;
+                else 
+                    ori_ini = 360 + deg_num;  % convert initial angle to range of [0 ,360)
+                end
+                rotation_before_contact = ori_ee_contact - ori_ini;  % the rotation angle before the contact
+                if abs(rotation_before_contact) > 180  % correct the real rotation angles
+                    rotation_before_contact = -sign(rotation_before_contact)*(360-abs(rotation_before_contact));
+                end
+                tmp_index =  thetheta0==deg_num & theL==L_num & they0==y0_num;
+                Ind = find(tmp_index==1);
+                Loc = ['K', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+                writematrix(ite_contact,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
+                Loc = ['L', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+                writematrix(rotation_before_contact,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
             end
 
             if exist('theta_c','var')
@@ -307,7 +342,7 @@ for sub1Path_i = 3:length(sub1_path)
                 writematrix(theta_c,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
             end
 
-            clearvars theta_c y_c
+            clearvars theta_c y_c ite_contact 
 
         end
     end
