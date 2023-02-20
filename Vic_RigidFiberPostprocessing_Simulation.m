@@ -321,7 +321,7 @@ xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\'
     'results_2023_01_24.xlsx'],'Sheet','Sheet1','NumHeaderLines',1);
 mask = cellfun(@ismissing, xlsfile); xlsfile(mask) = {nan};
 together_plot = [cell2mat(xlsfile(:, 1:3)), cell2mat(xlsfile(:, 7)), ...
-    cell2mat(xlsfile(:, 9:10)), cell2mat(xlsfile(:, 4))]; 
+    cell2mat(xlsfile(:, 9:10)), cell2mat(xlsfile(:, 4)), cell2mat(xlsfile(:, 12))]; 
 together_plot = together_plot';
 prompt = {'The lower bound of the initial angle:', 'The upper bound of the initial angle:', ...
     'The lower bound of the contour length:','The upper bound of the contour length:'...
@@ -499,6 +499,60 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 %     '\Figures\Paper\contact information vs initial condition\thetac-theta0_color-y0.png'],'Resolution',100)
+
+
+
+%%%%%%%%%%%% plot (theta_c-theta_0) vs theta_0 (with color y_0) %%%%%%%%%%%%%%
+% (theta_c-theta_0): the rotation angle before the first contact
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
+
+together_plot_less_y0 = together_plot(:, or(or(or(or(or(or(together_plot(3, :)==0.125, together_plot(3, :)==0.250), ...
+together_plot(3, :)==0.375), together_plot(3, :)==0.5), together_plot(3, :)==0.625), ...
+together_plot(3, :)==0.75),together_plot(3, :)==0.875)); % choose y_0
+
+% together_plot_less_y0 = together_plot(:, or(or(or(together_plot(3, :)==0.125, ...
+% together_plot(3, :)==0.375), together_plot(3, :)==0.625), together_plot(3, :)==0.875));  % choose y_0
+
+L1_together = together_plot_less_y0(:, together_plot_less_y0(2, :)==0.5); % classify contour length and indicate by symbols
+L2_together = together_plot_less_y0(:, together_plot_less_y0(2, :)==0.6); 
+L3_together = together_plot_less_y0(:, together_plot_less_y0(2, :)==0.7); 
+L4_together = together_plot_less_y0(:, together_plot_less_y0(2, :)==0.8); 
+L5_together = together_plot_less_y0(:, together_plot_less_y0(2, :)==0.9); 
+L6_together = together_plot_less_y0(:, together_plot_less_y0(2, :)==1); 
+L7_together = together_plot_less_y0(:, together_plot_less_y0(2, :)==1.2);
+L8_together = together_plot_less_y0(:, together_plot_less_y0(2, :)==1.4);
+
+% for legend
+scatter(nan, nan, 1, nan, 'Filled', 'diamond','MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on  % for legend only
+scatter(nan, nan, 1, nan, 'Filled', 'o', 'MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on % for legend only
+scatter(nan, nan, 1, nan, 'Filled', 'square','MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on % for legend only
+scatter(nan, nan, 1, nan, 'Filled', '^','MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on % for legend only
+
+scatter(L1_together(1, :), L1_together(8, :), 100, L1_together(3, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
+scatter(L3_together(1, :), L3_together(8, :), 100, L3_together(3, :), 'Filled','o', 'MarkerEdgeColor','k'); hold on
+scatter(L5_together(1, :), L5_together(8, :), 100, L5_together(3, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
+scatter(L7_together(1, :), L7_together(8, :), 100, L7_together(3, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
+% scatter(L2_together(1, :), L2_together(8, :), 100, L2_together(3, :), 'diamond','LineWidth',2); hold on 
+% scatter(L4_together(1, :), L4_together(8, :), 100, L4_together(3, :), 'o', 'LineWidth',2); hold on
+% scatter(L6_together(1, :), L6_together(8, :), 100, L6_together(3, :), 'square','LineWidth',2); hold on
+% scatter(L8_together(1, :), L8_together(8, :), 100, L8_together(3, :), '^','LineWidth',2); hold on
+
+% cmap(size(together_plot,2)); 
+hcb=colorbar; caxis([0 1]); colormap jet
+ax = gca; ax.FontSize = 16;
+title(hcb,'$y_0/h_{obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
+xlabel('$\theta_0$','FontSize', 24,'Interpreter', 'latex'); 
+ylabel('$\theta_c-\theta_0$','FontSize', 24,'Interpreter', 'latex');
+
+% title_txt = ['$-10 < \theta_0 < 10$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+% xlim([-90 90]); ylim([-0.1 1.1]);
+legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
+
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+%     '\Figures\Paper\contact information vs initial condition\delta-theta-theta0_color-y0.png'],'Resolution',100)
 
 
 
