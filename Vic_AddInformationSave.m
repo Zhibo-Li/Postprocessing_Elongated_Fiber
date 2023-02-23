@@ -46,8 +46,9 @@ for no_Group = 1: NumGroup
             clearvars -except PAsPath storePath NumGroup no_Group no_Case filelist
         end
 
-    elseif no_Group == 13 || no_Group == 14 || no_Group == 15 || no_Group == 17 || no_Group == 18
+    else
         % experiments on 2022.02.16 Group1, Group2 & Group3 and experiments on 2022.02.17 Group2 & Group3
+        % and all the other data except 'experiments before 2022.01.04 and experiments on 2022.02.17 Group1'
 
         for no_Case = 1:length(filelist)
 
@@ -87,7 +88,7 @@ ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 
-for no_Group = 1: NumGroup
+for no_Group = 21:22%1: NumGroup
 
     the_exp_date = yyyymmdd(ExpDate{no_Group, 1});
     filelist = dir(fullfile(storePath{no_Group},'*.mat'));
