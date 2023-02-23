@@ -9,21 +9,15 @@ NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
 ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
+Array_angles = xlsfile(:, 14);  % The flow angles.
 
 n = 1;
-for no_Group = [7 8 13 14 15 16 17 18 19 20]
+for no_Group = [7 8 13 14 15 16 17 18 19 20 21 22]
     % Square-based array 0°, 10°, and 20°
     % No.13 needed to be recalculated (20230125)
 
-    if no_Group == 7 || no_Group == 8
-        Array_angle = 0;
-    elseif no_Group == 13 || no_Group == 14 || no_Group == 15
-        Array_angle = 10;
-    elseif no_Group == 16 || no_Group == 17 || no_Group == 18
-        Array_angle = 20;
-    elseif no_Group == 19 || no_Group == 20
-        Array_angle = 15;
-    end
+    Array_angle = Array_angles{no_Group};
+
     RotMatrix_init = rotz(-Array_angle); RotMatrix_init = RotMatrix_init(1:2, 1:2);
     % to rotate the pillar array
 
@@ -179,8 +173,10 @@ for ii = 1:length(ia)-1
         title_txt = '$\theta=10^{\circ}$';
     elseif ii == 3
         title_txt = '$\theta=20^{\circ}$';
-    else
+    elseif ii == 4
         title_txt = '$\theta=15^{\circ}$';
+    else
+        title_txt = '$\theta=35^{\circ}$';
     end
     title(title_txt,'FontSize', 22,'Interpreter', 'latex');
 
@@ -203,8 +199,9 @@ PAs_deg = 10;
 
 proc_date = C(ii);
 L_all = Info.L(ia(ii):ia(ii+1)-1);
-longer_ind = find(L_all >= 130);
-shorter_ind = find(L_all < 130);
+Contour_L_divide = 150;
+longer_ind = find(L_all >= Contour_L_divide);
+shorter_ind = find(L_all < Contour_L_divide);
 
 map_data = Info.map(1, ia(ii):ia(ii+1)-1);
 
@@ -229,7 +226,7 @@ axis equal; grid on
 xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
 xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-title(['$\theta=',num2str(PAs_deg),'^{\circ}\ (longer\ filament)$'],'FontSize', 20,'Interpreter', 'latex');
+title(['$\theta=',num2str(PAs_deg),'^{\circ}:\ L>', num2str(Contour_L_divide*0.1),'\mu{m}$'],'FontSize', 20,'Interpreter', 'latex');
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=',num2str(PAs_deg),'_longer.png'],'Resolution',100)
 
@@ -254,7 +251,7 @@ axis equal; grid on
 xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
 xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-title(['$\theta=',num2str(PAs_deg),'^{\circ}\ (shorter\ filament)$'],'FontSize', 20,'Interpreter', 'latex');
+title(['$\theta=',num2str(PAs_deg),'^{\circ}:\ L<', num2str(Contour_L_divide*0.1),'\mu{m}$'],'FontSize', 20,'Interpreter', 'latex');
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=',num2str(PAs_deg),'_shorter.png'],'Resolution',100)
 
