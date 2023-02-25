@@ -1,2 +1,2 @@
-# Postprocessing_Actin
-This is post-processing code for the actin filaments after reconstruction of the conformation.
+# Postprocessing_Elongated Fiber
+This is post-processing code for the actin filaments and rigid SU8 fiber after reconstruction of the conformation.
