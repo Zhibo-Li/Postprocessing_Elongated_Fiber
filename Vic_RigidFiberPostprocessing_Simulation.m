@@ -1,42 +1,36 @@
 clear; close all; clc;
 
 [excelname, excelpathname] = uigetfile(['D:\Dropbox\Collaboration - LadHyX\' ...
-    'Give_to_Zhibo_nonShared\.xlsx'], 'Please choose the excel accordingly and carefully!!');
+    'Give_to_Zhibo_nonShared\Data_Give_to_Zhibo_20230223\.xlsx'], ...
+    'Please choose the excel accordingly and carefully!!');
 xlsfile = readcell([excelpathname, excelname],'Sheet','Sheet1','NumHeaderLines',1); 
 thedeg = cell2mat(xlsfile(:, 1)); 
 theL = round(cell2mat(xlsfile(:, 2)), 1); 
 they0 = round(cell2mat(xlsfile(:, 3)), 3); 
 
-% obs = readVTK('D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\obstacle_beads.vtk');
-% obs_beads_size = 1.5e-6; % notice here (radius)
-fiber_beads_size = 0.8e-6; % notice here (radius)
-% obs_2d = obs.points(1:267, 1:2); obs_2d_center = mean(obs_2d, 1);
-% obs_2d = obs_2d * 8e-6;
-% obs_2d_center = obs_2d_center * 8e-6;
-% obs_2d(:, 1) = (obs_2d(:, 1) - obs_2d_center(1)) * ...
-%     (2.5e-5 + obs_beads_size) / 2.5e-5 + obs_2d_center(1);
-% obs_2d(:, 2) = (obs_2d(:, 2) - obs_2d_center(2)) * ...
-%     (2.5e-5 + obs_beads_size) / 2.5e-5 + obs_2d_center(2); 
-% %%% 2.5e-5 is the 1/3 the height of the equilateral triangle
-% obs_2d = [obs_2d; obs_2d(1, :)];
-load(['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
-    'Figures\about interaction index\obs_2d.mat']);
-load(['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
-    'Figures\about interaction index\pert_cont (50%).mat'])
+% obs_beads_size = 0.6e-6; % notice here (radius)
+fiber_beads_size = 2e-6; % notice here (radius)
+
+load(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
+    'Data_Give_to_Zhibo_20230223\input_data\obs_2d_20230223.mat']); 
+% get this file based on the following code in 'plot contact infromation vs
+% initial condition' part.
+load(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
+    'Data_Give_to_Zhibo_20230223\input_data\pert_cont (50%).mat'])
 l_obstacle = 86.6; % um
 time_step = 0.01; % s
 
-parent_path = 'D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\data';
+parent_path = 'D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\Data_Give_to_Zhibo_20230223\simulations';
 sub1_path = dir(parent_path);
 for sub1Path_i = 3:length(sub1_path)
     current_deg = sub1_path(sub1Path_i).name; 
     newStr = strrep(current_deg,'o','.'); newStr = strrep(newStr,'m','-'); 
-    deg_num = str2double(newStr(6:end));
+    deg_num = str2double(newStr(8:end));
     sub2_path = dir(fullfile(parent_path, current_deg));
     for sub2Path_i = 3:length(sub2_path)
         current_L = sub2_path(sub2Path_i).name;
         newStr = strrep(current_L,'o','.');
-        L_num = str2double(newStr(13:end));
+        L_num = str2double(newStr(3:end));
         sub3_path = dir(fullfile(parent_path, current_deg, current_L));
         for sub3Path_i = 3:length(sub3_path)
             current_y0 = sub3_path(sub3Path_i).name;
@@ -49,7 +43,7 @@ for sub1Path_i = 3:length(sub1_path)
                 snapshot = readVTK(fullfile(fileinfo(ii).folder, fileinfo(ii).name));
                 XY = snapshot.points(:, 1:2);
 
-                if_direct_contect = min(pdist2(XY,obs_2d,'euclidean','Smallest',1)) < fiber_beads_size * 1.25; % if it's direct contact.
+                if_direct_contect = min(pdist2(XY,obs_2d,'euclidean','Smallest',1)) < fiber_beads_size * 1.1; % if it's direct contact.
                 if if_direct_contect
                     direct_contact = direct_contact + 1;
                 end
@@ -59,7 +53,7 @@ for sub1Path_i = 3:length(sub1_path)
 %                 if_inbetween_twolines = and(~logical(in_triangle), logical(in_perturb_C1)); % the fiber is in between the two contours
 %                 if_inbetween_twolines = logical(sum(if_inbetween_twolines));
 % 
-%                 if min(pdist2(XY,pert_C1,'euclidean','Smallest',1)) < fiber_beads_size * 1.25 || ...
+%                 if min(pdist2(XY,pert_C1,'euclidean','Smallest',1)) < fiber_beads_size * 1.1 || ...
 %                     if_direct_contect || if_inbetween_twolines
 %                     perturb_contact = perturb_contact + 1;
 %                 end
@@ -67,7 +61,7 @@ for sub1Path_i = 3:length(sub1_path)
                 in_perturb_C2 = inpolygon(XY(:,1),XY(:,2),pert_C2(:,1),pert_C2(:,2)); % the points on the fiber which are inside the perturbed line 2
                 if_in_C2 = logical(sum(logical(in_perturb_C2)));
 
-                if (min(pdist2(XY,pert_C2,'euclidean','Smallest',1)) < fiber_beads_size * 1.25 || if_in_C2) && ~if_direct_contect % counting number of perturbed contact
+                if (min(pdist2(XY,pert_C2,'euclidean','Smallest',1)) < fiber_beads_size * 1.1 || if_in_C2) && ~if_direct_contect % counting number of perturbed contact
                     perturb_contact = perturb_contact + 1;
                 end
 
@@ -77,7 +71,7 @@ for sub1Path_i = 3:length(sub1_path)
             interaction2 = direct_contact * time_step / (l_obstacle / U_max_phy);
 %             interaction3 = interaction1 + interaction2;
 
-            tmp_index =  thedeg==deg_num & theL==L_num & they0==y0_num;
+            tmp_index =  thedeg==deg_num & theL==L_num & ismembertol(y0_num,they0,0.0125);
             Ind = find(tmp_index==1);
             Loc = ['AD', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
             writematrix(interaction1,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
@@ -97,7 +91,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear; close all; clc;
 xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
-    'results_more-data.xlsx'],'Sheet','Sheet1','NumHeaderLines',1); 
+    'Data_Give_to_Zhibo_20230223\results_2023_02_23_Zhibo.xlsx'], ...
+    'Sheet','Sheet1','NumHeaderLines',1); 
 together_plot = [cell2mat(xlsfile(:, 1:4)), cell2mat(xlsfile(:, 13)), cell2mat(xlsfile(:, 27))]; 
 together_plot = together_plot';
 % thedeg = cell2mat(xlsfile(:, 1)); 
@@ -167,59 +162,6 @@ legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northeast','Fo
 
 
 
-%% ???
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%% plot contact infromation vs initial condition %%%%%%%%%%%%%%%
-%%% based on the information in excel from Clement (need to be checked)
-
-clear; close all; clc;
-xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
-    'results_2023_01_24.xlsx'],'Sheet','Sheet1','NumHeaderLines',1); 
-
-%%%%%%%%%%%%%%%%%%%%%%%%% calculate the y_c %%%%%%%%%%%%%%%%%%%%%%%%%%
-load(['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
-    'Figures\about interaction index\obs_2d.mat']);
-
-ver_ind = find(obs_2d(:,2) == max(obs_2d(:,2))); % index of the vertex
-windward_edge_x = obs_2d(ver_ind:end,1); windward_edge_y = obs_2d(ver_ind:end,2);
-% the edge of the obstacle to calculate y_c.
-
-initial_info = [cell2mat(xlsfile(:, 1:3)), cell2mat(xlsfile(:, 5:6))]; 
-
-for case_no = 1:size(initial_info, 1)
-
-    theta0 = initial_info(case_no, 1);
-    theta0_str = strrep(num2str(theta0),'.','o'); theta0_str = strrep(num2str(theta0_str),'-','m'); 
-    L0 = initial_info(case_no, 2);
-    L0_str = strrep(num2str(L0),'.','o');
-    y0 = initial_info(case_no, 3);
-    y0 = num2str(y0,'%5.3f');
-    y0_str = strrep(num2str(y0),'.','o');
-    theta_c = initial_info(case_no, 4);
-    frame_no = initial_info(case_no, 5);
- 
-    filename =['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
-        'simulations_latest\theta',theta0_str, '\L_over_l_obs', L0_str, ...
-        '\y0_', y0_str, '\output_data\fibers_000', num2str(frame_no,'%03.f'), '.vtk'];
-
-    snapshot = readVTK(filename);
-    XY = snapshot.points(:, 1:2);
-
-    L_current = sqrt((XY(1,1)-XY(end,1))^2 + (XY(1,2)-XY(end,2))^2);
-
-    com_XY = mean(XY, 1); 
-    L_start = [com_XY(1) - cosd(theta_c) * L_current, com_XY(2) - sind(theta_c)  * L_current];
-    L_end = [com_XY(1) + cosd(theta_c) * L_current, com_XY(2) + sind(theta_c)  * L_current];
-            
-%     plot(windward_edge_x, windward_edge_y); hold on;
-%     plot([L_start(1) L_end(1)], [L_start(2) L_end(2)]); hold on
-%     plot(XY(:,1), XY(:,2))
-%     close;
-
-end
-
-
-
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%% plot contact infromation vs initial condition %%%%%%%%%%%%%%%
@@ -227,36 +169,55 @@ end
 clear; close all; clc;
 
 [excelname, excelpathname] = uigetfile(['D:\Dropbox\Collaboration - LadHyX\' ...
-    'Give_to_Zhibo_nonShared\.xlsx'], 'Please choose the excel accordingly and carefully!!');
+    'Give_to_Zhibo_nonShared\Data_Give_to_Zhibo_20230223\.xlsx'], ...
+    'Please choose the excel accordingly and carefully!!');
 xlsfile = readcell([excelpathname, excelname],'Sheet','Sheet1','NumHeaderLines',1); 
 thetheta0 = cell2mat(xlsfile(:, 1)); 
 theL = round(cell2mat(xlsfile(:, 2)), 1); 
 they0 = round(cell2mat(xlsfile(:, 3)), 8); 
 
-% obs_beads_size = 1.5e-6; % notice here (radius)
-fiber_beads_size = 0.8e-6; % notice here (radius)
+% obs_beads_size = 0.6e-6; % notice here (radius)
+fiber_beads_size = 2e-6; % notice here (radius)
 
-load(['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
-    'Figures\about interaction index\obs_2d.mat']);
+% %%% obstacle position and save it as *.mat file
+% obs = readVTK('D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\Data_Give_to_Zhibo_20230223\input_data\obstacle_beads.vtk');
+% obs_beads_size = 0.6e-6; % notice here (radius)
+% obs_2d = obs.points(1:208, 1:2); obs_2d_center = mean(obs_2d, 1);  % 208 because there are multiple layers.
+% % sort the coordinates clockwise
+% [theta, ~] = cart2pol(obs_2d(:,1)-obs_2d_center(1), obs_2d(:,2)-obs_2d_center(2));
+% obs_2d = sortrows([obs_2d, theta], 3); obs_2d = obs_2d(:, 1:2);
+% % obstacle outer edge
+% obs_2d(:, 1) = (obs_2d(:, 1) - obs_2d_center(1)) * ...
+%     (2.5e-5 + obs_beads_size) / 2.5e-5 + obs_2d_center(1);
+% obs_2d(:, 2) = (obs_2d(:, 2) - obs_2d_center(2)) * ...
+%     (2.5e-5 + obs_beads_size) / 2.5e-5 + obs_2d_center(2);  % 2.5e-5 is the 1/3 the height of the equilateral triangle
+% obs_2d = [obs_2d; obs_2d(1, :)];
+% save(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
+%     'Data_Give_to_Zhibo_20230223\input_data\obs_2d_20230223.mat'], 'obs_2d')
+
+load(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
+    'Data_Give_to_Zhibo_20230223\input_data\obs_2d_20230223.mat']);
 ver_ind = find(obs_2d(:,2) == max(obs_2d(:,2))); % index of the vertex
-windward_edge_x = obs_2d(ver_ind:end,1); windward_edge_y = obs_2d(ver_ind:end,2);
+obs_2d = [obs_2d(ver_ind:end, :); obs_2d(1:ver_ind-1, :)]; % re-order the coordinates (highest apex first).
+windward_edge_x = obs_2d(1:round(size(obs_2d, 1)/3)+2,1); % 1/3 of all the points; +2 is to extend the edge a bit more.
+windward_edge_y = obs_2d(1:round(size(obs_2d, 1)/3)+2,2);
 % the edge of the obstacle to calculate y_c.
 L_edge = sqrt((windward_edge_x(1)-windward_edge_x(end))^2 + (windward_edge_y(1)-windward_edge_y(end))^2);
 L_edge_X = mean(windward_edge_x);  L_edge_Y = mean(windward_edge_y);
 L_start_obsedge = [L_edge_X - cosd(60) * L_edge, L_edge_Y - sind(60)  * L_edge];
 L_end_obsedge = [L_edge_X + cosd(60) * L_edge, L_edge_Y + sind(60)  * L_edge];
 
-parent_path = 'D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\simulations_latest';
+parent_path = 'D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\Data_Give_to_Zhibo_20230223\simulations';
 sub1_path = dir(parent_path);
 for sub1Path_i = 3:length(sub1_path)
     current_deg = sub1_path(sub1Path_i).name; 
     newStr = strrep(current_deg,'o','.'); newStr = strrep(newStr,'m','-'); 
-    deg_num = str2double(newStr(6:end));
+    deg_num = str2double(newStr(8:end));
     sub2_path = dir(fullfile(parent_path, current_deg));
     for sub2Path_i = 3:length(sub2_path)
         current_L = sub2_path(sub2Path_i).name;
         newStr = strrep(current_L,'o','.');
-        L_num = str2double(newStr(13:end));
+        L_num = str2double(newStr(3:end));
         sub3_path = dir(fullfile(parent_path, current_deg, current_L));
         for sub3Path_i = 3:length(sub3_path)
             current_y0 = sub3_path(sub3Path_i).name;
@@ -269,7 +230,7 @@ for sub1Path_i = 3:length(sub1_path)
                 snapshot = readVTK(fullfile(fileinfo(ii).folder, fileinfo(ii).name));
                 XY = snapshot.points(:, 1:2);
 
-                if min(pdist2(XY,[windward_edge_x, windward_edge_y],'euclidean','Smallest',1)) < fiber_beads_size  * 1.25 % if it's direct contact.
+                if min(pdist2(XY,[windward_edge_x, windward_edge_y],'euclidean','Smallest',1)) < fiber_beads_size  * 1.1 % if it's direct contact.
 
                     L_current = sqrt((XY(1,1)-XY(end,1))^2 + (XY(1,2)-XY(end,2))^2);
                     com_XY = mean(XY, 1); % length and CoM of current fiber
@@ -325,7 +286,7 @@ for sub1Path_i = 3:length(sub1_path)
                 if abs(rotation_before_contact) > 180  % correct the real rotation angles
                     rotation_before_contact = -sign(rotation_before_contact)*(360-abs(rotation_before_contact));
                 end
-                tmp_index =  thetheta0==deg_num & theL==L_num & they0==y0_num;
+                tmp_index =  thetheta0==deg_num & theL==L_num & ismembertol(y0_num,they0,0.0125); 
                 Ind = find(tmp_index==1);
                 Loc = ['K', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
                 writematrix(ite_contact,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
@@ -334,7 +295,7 @@ for sub1Path_i = 3:length(sub1_path)
             end
 
             if exist('theta_c','var')
-                tmp_index =  thetheta0==deg_num & theL==L_num & they0==y0_num;
+                tmp_index =  thetheta0==deg_num & theL==L_num & ismembertol(y0_num,they0,0.0125);
                 Ind = find(tmp_index==1);
                 Loc = ['I', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
                 writematrix(y_c,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.

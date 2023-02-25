@@ -5,17 +5,17 @@
 clear; clc;
 commandwindow;
 
-parent_path = 'D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\simulations_latest';
+parent_path = 'D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\Data_Give_to_Zhibo_20230223\simulations';
 sub1_path = dir(parent_path);
-for sub1Path_i = 4:length(sub1_path)
+for sub1Path_i = 3:length(sub1_path)
     current_deg = sub1_path(sub1Path_i).name; 
     newStr = strrep(current_deg,'o','.'); newStr = strrep(newStr,'m','-'); 
-    deg_num = str2double(newStr(6:end));
+    deg_num = str2double(newStr(8:end));
     sub2_path = dir(fullfile(parent_path, current_deg));
     for sub2Path_i = 3:length(sub2_path)
         current_L = sub2_path(sub2Path_i).name;
         newStr = strrep(current_L,'o','.');
-        L_num = str2double(newStr(13:end));
+        L_num = str2double(newStr(3:end));
         sub3_path = dir(fullfile(parent_path, current_deg, current_L));
         for sub3Path_i = 3:length(sub3_path)
             current_y0 = sub3_path(sub3Path_i).name;
@@ -23,7 +23,6 @@ for sub1Path_i = 4:length(sub1_path)
             y0_num = str2double(newStr(4:end));
             fileinfo = dir(fullfile(parent_path, current_deg, current_L, current_y0, 'output_data\*.vtk'));
 
-            perturb_contact = 0; direct_contact = 0;
             ori_ee = nan(1, length(fileinfo));
             if deg_num >= 0
                 ori_ee(1) = deg_num;
@@ -55,7 +54,7 @@ for sub1Path_i = 4:length(sub1_path)
             [pks1, loc1] = findpeaks(diff(ori_ee), 'MinPeakHeight', 180);
             [pks2, loc2] = findpeaks(-diff(ori_ee), 'MinPeakHeight', 180);
 
-            if ~isempty(loc1) && ~isempty(loc2)
+            if ~isempty(loc1) || ~isempty(loc2)
                 loc = sort([loc1, loc2]);
                 if logical(sum(ismember(loc(1), loc1)))
                     for foo = 1:length(loc1)
@@ -86,10 +85,13 @@ for sub1Path_i = 4:length(sub1_path)
 
             f=gcf;
             exportgraphics(f,['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
-                '\simulations_latest_videos\', current_deg, '_', current_L, ...
+                '\Data_Give_to_Zhibo_20230223_videos\Orientations\', current_deg, '_', current_L, ...
                 '_', current_y0, '_animation.png'],'Resolution', 100)
             close all
 
+            save(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
+                '\Data_Give_to_Zhibo_20230223_videos\Orientations\', current_deg, '_', current_L, ...
+                '_', current_y0, '_orientations.mat'], 'ori_ee');
         end
     end
 end
