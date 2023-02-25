@@ -14,13 +14,9 @@ for sub1Path_i = 3:length(sub1_path)
     sub2_path = dir(fullfile(parent_path, current_deg));
     for sub2Path_i = 3:length(sub2_path)
         current_L = sub2_path(sub2Path_i).name;
-        newStr = strrep(current_L,'o','.');
-        L_num = str2double(newStr(3:end));
         sub3_path = dir(fullfile(parent_path, current_deg, current_L));
         for sub3Path_i = 3:length(sub3_path)
             current_y0 = sub3_path(sub3Path_i).name;
-            newStr = strrep(current_y0,'o','.');
-            y0_num = str2double(newStr(4:end));
             fileinfo = dir(fullfile(parent_path, current_deg, current_L, current_y0, 'output_data\*.vtk'));
 
             ori_ee = nan(1, length(fileinfo));
