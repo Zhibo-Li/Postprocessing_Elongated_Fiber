@@ -55,7 +55,7 @@ for sub1Path_i = 4:length(sub1_path)
             [pks1, loc1] = findpeaks(diff(ori_ee), 'MinPeakHeight', 180);
             [pks2, loc2] = findpeaks(-diff(ori_ee), 'MinPeakHeight', 180);
 
-            if ~isempty(loc1) && ~isempty(loc2)
+            if ~isempty(loc1) || ~isempty(loc2)
                 loc = sort([loc1, loc2]);
                 if logical(sum(ismember(loc(1), loc1)))
                     for foo = 1:length(loc1)
