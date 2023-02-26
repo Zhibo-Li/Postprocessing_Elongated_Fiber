@@ -17,6 +17,10 @@ load(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
 % initial condition' part.
 load(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'Data_Give_to_Zhibo_20230223\input_data\pert_cont (50%).mat'])
+pert_C1_50 = pert_C1; pert_C2_50 = pert_C2;
+load(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
+    'Data_Give_to_Zhibo_20230223\input_data\pert_cont (30%).mat'])
+pert_C1_30 = pert_C1; pert_C2_30 = pert_C2;
 l_obstacle = 86.6; % um
 time_step = 0.01; % s
 
@@ -36,49 +40,71 @@ for sub1Path_i = 3:length(sub1_path)
             current_y0 = sub3_path(sub3Path_i).name;
             newStr = strrep(current_y0,'o','.');
             y0_num = str2double(newStr(4:end));
+            if isnan(y0_num)
+                y0_num = str2double(newStr(4:end-10));
+            end
             fileinfo = dir(fullfile(parent_path, current_deg, current_L, current_y0, 'output_data\*.vtk'));
 
-            perturb_contact = 0; direct_contact = 0;
+            perturb_contact_50 = 0; perturb_contact_30 = 0; direct_contact = 0;
             for ii = 1:length(fileinfo)
                 snapshot = readVTK(fullfile(fileinfo(ii).folder, fileinfo(ii).name));
                 XY = snapshot.points(:, 1:2);
 
-                if_direct_contect = min(pdist2(XY,obs_2d,'euclidean','Smallest',1)) < fiber_beads_size * 1.1; % if it's direct contact.
-                if if_direct_contect
+                if_direct_contact = min(pdist2(XY,obs_2d,'euclidean','Smallest',1)) < fiber_beads_size * 1.1; % if it's direct contact.
+                if if_direct_contact
                     direct_contact = direct_contact + 1;
                 end
 
-%                 in_triangle = inpolygon(XY(:,1),XY(:,2),obs_2d(:,1),obs_2d(:,2)); % the points on the fiber which are inside the triangular obstacle
-%                 in_perturb_C1 = inpolygon(XY(:,1),XY(:,2),pert_C1(:,1),pert_C1(:,2)); % the points on the fiber which are inside the perturbed line 1
-%                 if_inbetween_twolines = and(~logical(in_triangle), logical(in_perturb_C1)); % the fiber is in between the two contours
-%                 if_inbetween_twolines = logical(sum(if_inbetween_twolines));
-% 
-%                 if min(pdist2(XY,pert_C1,'euclidean','Smallest',1)) < fiber_beads_size * 1.1 || ...
-%                     if_direct_contect || if_inbetween_twolines
-%                     perturb_contact = perturb_contact + 1;
-%                 end
+                %%%%%% 50%
+                in_triangle_50 = inpolygon(XY(:,1),XY(:,2),obs_2d(:,1),obs_2d(:,2)); % the points on the fiber which are inside the triangular obstacle
+                in_perturb_C1_50 = inpolygon(XY(:,1),XY(:,2),pert_C1_50(:,1),pert_C1_50(:,2)); % the points on the fiber which are inside the perturbed line 1
+                if_inbetween_twolines_50 = and(~logical(in_triangle_50), logical(in_perturb_C1_50)); % the fiber is in between the two contours
+                if_inbetween_twolines_50 = logical(sum(if_inbetween_twolines_50));
 
-                in_perturb_C2 = inpolygon(XY(:,1),XY(:,2),pert_C2(:,1),pert_C2(:,2)); % the points on the fiber which are inside the perturbed line 2
-                if_in_C2 = logical(sum(logical(in_perturb_C2)));
+                if min(pdist2(XY,pert_C1_50,'euclidean','Smallest',1)) < fiber_beads_size * 1.1 || ...
+                    if_direct_contact || if_inbetween_twolines_50
+                    perturb_contact_50 = perturb_contact_50 + 1;
+                end
 
-                if (min(pdist2(XY,pert_C2,'euclidean','Smallest',1)) < fiber_beads_size * 1.1 || if_in_C2) && ~if_direct_contect % counting number of perturbed contact
-                    perturb_contact = perturb_contact + 1;
+                in_perturb_C2_50 = inpolygon(XY(:,1),XY(:,2),pert_C2_50(:,1),pert_C2_50(:,2)); % the points on the fiber which are inside the perturbed line 2
+                if_in_C2_50 = logical(sum(logical(in_perturb_C2_50)));
+
+                if (min(pdist2(XY,pert_C2_50,'euclidean','Smallest',1)) < fiber_beads_size * 1.1 || if_in_C2_50) && ~if_direct_contact % counting number of perturbed contact
+                    perturb_contact_50 = perturb_contact_50 + 1;
+                end
+
+                %%%%%% 30%
+                in_triangle_30 = inpolygon(XY(:,1),XY(:,2),obs_2d(:,1),obs_2d(:,2)); % the points on the fiber which are inside the triangular obstacle
+                in_perturb_C1_30 = inpolygon(XY(:,1),XY(:,2),pert_C1_30(:,1),pert_C1_30(:,2)); % the points on the fiber which are inside the perturbed line 1
+                if_inbetween_twolines_30 = and(~logical(in_triangle_30), logical(in_perturb_C1_30)); % the fiber is in between the two contours
+                if_inbetween_twolines_30 = logical(sum(if_inbetween_twolines_30));
+
+                if min(pdist2(XY,pert_C1_30,'euclidean','Smallest',1)) < fiber_beads_size * 1.1 || ...
+                    if_direct_contact || if_inbetween_twolines_30
+                    perturb_contact_30 = perturb_contact_30 + 1;
+                end
+
+                in_perturb_C2_30 = inpolygon(XY(:,1),XY(:,2),pert_C2_30(:,1),pert_C2_30(:,2)); % the points on the fiber which are inside the perturbed line 2
+                if_in_C2_30 = logical(sum(logical(in_perturb_C2_30)));
+
+                if (min(pdist2(XY,pert_C2_30,'euclidean','Smallest',1)) < fiber_beads_size * 1.1 || if_in_C2_30) && ~if_direct_contact % counting number of perturbed contact
+                    perturb_contact_30 = perturb_contact_30 + 1;
                 end
 
             end
 
-            interaction1 = perturb_contact * time_step / (l_obstacle / U_max_phy);
-            interaction2 = direct_contact * time_step / (l_obstacle / U_max_phy);
-%             interaction3 = interaction1 + interaction2;
+            interaction1 = direct_contact * time_step / (l_obstacle / U_max_phy);
+            interaction2 = perturb_contact_50 * time_step / (l_obstacle / U_max_phy);
+            interaction3 = perturb_contact_30 * time_step / (l_obstacle / U_max_phy);
 
-            tmp_index =  thedeg==deg_num & theL==L_num & ismembertol(y0_num,they0,0.0125);
+            tmp_index =  thedeg==deg_num & theL==L_num & ismembertol(they0, y0_num,0.0125);
             Ind = find(tmp_index==1);
-            Loc = ['AD', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+            Loc = ['M', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
             writematrix(interaction1,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
-            Loc = ['AE', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+            Loc = ['N', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
             writematrix(interaction2,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
-%             Loc = ['X', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
-%             writematrix(interaction3,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
+            Loc = ['O', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+            writematrix(interaction3,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
             
         end
     end
@@ -223,9 +249,12 @@ for sub1Path_i = 3:length(sub1_path)
             current_y0 = sub3_path(sub3Path_i).name;
             newStr = strrep(current_y0,'o','.');
             y0_num = str2double(newStr(4:end));
+            if isnan(y0_num)
+                y0_num = str2double(newStr(4:end-10));
+            end
             fileinfo = dir(fullfile(parent_path, current_deg, current_L, current_y0, 'output_data\*.vtk'));
 
-            perturb_contact = 0; direct_contact = 0;
+            perturb_contact_50 = 0; direct_contact = 0;
             for ii = 1:length(fileinfo)
                 snapshot = readVTK(fullfile(fileinfo(ii).folder, fileinfo(ii).name));
                 XY = snapshot.points(:, 1:2);
@@ -256,51 +285,27 @@ for sub1Path_i = 3:length(sub1_path)
 
                     ite_contact = ii;  % the frame number of the contact case
 
-                    XY_1 = snapshot.points(1, 1:2);  % fiber head
-                    XY_2 = snapshot.points(end, 1:2);  % fiber tail
-
-                    if XY_2(1)-XY_1(1) > 0 && XY_2(2)-XY_1(2) >= 0  % the first quadrant
-                        ori_ee_contact = atand((XY_2(2)-XY_1(2)) / (XY_2(1)-XY_1(1)));  % ori_ee: [0, 360); X positive is 0°.
-                    elseif XY_2(1)-XY_1(1) <= 0 && XY_2(2)-XY_1(2) > 0  % the second quadrant
-                        ori_ee_contact = 180 + atand((XY_2(2)-XY_1(2)) / (XY_2(1)-XY_1(1)));
-                    elseif XY_2(1)-XY_1(1) < 0 && XY_2(2)-XY_1(2) <= 0  % the third quadrant
-                        ori_ee_contact = 180 + atand((XY_2(2)-XY_1(2)) / (XY_2(1)-XY_1(1)));
-                    elseif XY_2(1)-XY_1(1) >= 0 && XY_2(2)-XY_1(2) < 0  % the fourth quadrant
-                        ori_ee_contact = 360 + atand((XY_2(2)-XY_1(2)) / (XY_2(1)-XY_1(1)));
-                    end
-%                     % draw the fibers with the direction
-%                     d_XY = XY_2-XY_1;  % Difference
-%                     quiver(XY_1(1),XY_2(2),d_XY(1),d_XY(2),0); hold on
-
                     break
                 end
             end
 
-            if exist('ite_contact','var')
-                if deg_num >= 0
-                    ori_ini = deg_num;
-                else 
-                    ori_ini = 360 + deg_num;  % convert initial angle to range of [0 ,360)
-                end
-                rotation_before_contact = ori_ee_contact - ori_ini;  % the rotation angle before the contact
-                if abs(rotation_before_contact) > 180  % correct the real rotation angles
-                    rotation_before_contact = -sign(rotation_before_contact)*(360-abs(rotation_before_contact));
-                end
-                tmp_index =  thetheta0==deg_num & theL==L_num & ismembertol(y0_num,they0,0.0125); 
-                Ind = find(tmp_index==1);
-                Loc = ['K', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
-                writematrix(ite_contact,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
-                Loc = ['L', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
-                writematrix(rotation_before_contact,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
-            end
-
             if exist('theta_c','var')
-                tmp_index =  thetheta0==deg_num & theL==L_num & ismembertol(y0_num,they0,0.0125);
+                tmp_index =  thetheta0==deg_num & theL==L_num & ismembertol(they0, y0_num,0.0125);
                 Ind = find(tmp_index==1);
+
                 Loc = ['I', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
                 writematrix(y_c,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
                 Loc = ['J', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
                 writematrix(theta_c,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
+
+                Loc = ['K', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+                writematrix(ite_contact,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
+                % load orientation information which is calculated from: Vic_RigidFiberPostprocessing_Simulation_orientations.m
+                load(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
+                    '\Data_Give_to_Zhibo_20230223_videos\Orientations\', current_deg, '_', current_L, ...
+                    '_', current_y0, '_orientations.mat']);
+                Loc = ['L', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+                writematrix(ori_ee(ite_contact),[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
             end
 
             clearvars theta_c y_c ite_contact 
