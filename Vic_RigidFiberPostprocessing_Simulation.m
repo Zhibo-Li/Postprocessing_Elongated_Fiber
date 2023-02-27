@@ -308,7 +308,18 @@ for sub1Path_i = 3:length(sub1_path)
                 writematrix(ori_ee(ite_contact),[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
             end
 
-            clearvars theta_c y_c ite_contact 
+
+            load(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
+                '\Data_Give_to_Zhibo_20230223_videos\Orientations_2\', current_deg, '_', current_L, ...
+                '_', current_y0, '_orientations.mat']);
+            delta_theta_EndtoStart = ori_ee(end) - ori_ee(1);
+            tmp_index =  thetheta0==deg_num & theL==L_num & ismembertol(they0, y0_num,0.0125);
+            Ind = find(tmp_index==1);
+            Loc = ['F', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+            writematrix(delta_theta_EndtoStart,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
+
+
+            clearvars theta_c y_c ite_contact delta_theta_EndtoStart
 
         end
     end
