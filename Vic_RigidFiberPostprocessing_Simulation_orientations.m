@@ -86,7 +86,7 @@ for sub1Path_i = 3:length(sub1_path)
             plot(ori_ee, 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red');
 
             xlabel('$Frame$','FontSize', 18,'Interpreter', 'latex');
-            ylabel('$Orientation\ (^o)$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
 
             f=gcf;
             exportgraphics(f,['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
@@ -102,14 +102,14 @@ for sub1Path_i = 3:length(sub1_path)
 end
 
 
-%%  
+%% orientations vs x: given theta_0 and L to plot different y_0
 clear; close all; clc;
 
 Files = dir(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
     '\Data_Give_to_Zhibo_20230223_videos\Orientations\*.mat']);
 
-for choose_y0 = -10:2.5:10
-    for choose_L = 0.5:0.1:1  %1.2:0.2:1.4
+for choose_theta0 = -10:2.5:10
+    for choose_L = [0.5:0.1:1, 1.2:0.2:1.4]
 
         n = 1;
         for ii = 1: length(Files)
@@ -126,7 +126,7 @@ for choose_y0 = -10:2.5:10
                 current_y0{1} = current_y0_tmp(1:end-10);
             end
 
-            if str2double(current_deg) ~= choose_y0 || str2double(current_L) ~= choose_L
+            if str2double(current_deg) ~= choose_theta0 || str2double(current_L) ~= choose_L
                 % choose the y_0 and L to be plotted
                 continue
             else
@@ -140,7 +140,7 @@ for choose_y0 = -10:2.5:10
 
         end
 
-        figure('color', 'w'); set(gcf, 'Position', [100 100 1000 800]);
+        figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
         cmap = cmocean('thermal');  legend_txt = {};
         [~, sortID] = sort(cell2mat(To_Plot(:,3)));  % sort the plotting order
 
@@ -151,9 +151,9 @@ for choose_y0 = -10:2.5:10
                 'MarkerFaceColor', cmap(color_ind*30,:)); hold on
 
             xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
-            ylabel('$Orientation\ (^o)$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
 
-            title(strcat('$\theta_0=', title_deg, '\ and\ L=', title_L, '$'), ...
+            title(strcat('$\theta_0=', title_deg, '^{\circ}\ and\ L=', title_L, '$'), ...
                 'FontSize', 24, 'Interpreter', 'latex');
             legend_txt = [legend_txt, strcat('$y_0=', num2str(To_Plot{sortID(jj), 3}),'$')];
 
@@ -168,7 +168,155 @@ for choose_y0 = -10:2.5:10
 
         f=gcf;
         exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
-            'Figures\about orientations vs x\', savename{1}],'Resolution',100)
+            'Figures\about orientations vs x\Given theta0 and L\', savename{1}],'Resolution',100)
+
+        close
+    end
+end
+
+
+
+%% orientations vs x: given y_0 and L to plot different theta_0
+clear; close all; clc;
+
+Files = dir(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
+    '\Data_Give_to_Zhibo_20230223_videos\Orientations\*.mat']);
+
+for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
+    for choose_L = [0.5:0.1:1, 1.2:0.2:1.4]
+
+        n = 1;
+        for ii = 1: length(Files)
+
+            load(fullfile(Files(ii).folder, Files(ii).name));
+            current_deg =  extractBetween(Files(ii).name,'theta0_', '_L');
+            current_deg = strrep(current_deg,'o','.'); current_deg = strrep(current_deg,'m','-');
+            current_L =  extractBetween(Files(ii).name,'L_', '_y0');
+            current_L = strrep(current_L,'o','.');
+            current_y0 =  extractBetween(Files(ii).name,'y0_', '_ori');
+            current_y0 = strrep(current_y0,'o','.');
+            if isnan(str2double(current_y0{1}))
+                current_y0_tmp = current_y0{1};
+                current_y0{1} = current_y0_tmp(1:end-10);
+            end
+
+            if str2double(current_y0) ~= choose_y0 || str2double(current_L) ~= choose_L
+                % choose the y_0 and L to be plotted
+                continue
+            else
+                title_y0 = current_y0;
+                title_L = current_L;
+                To_Plot{n, 1} = ori_ee;
+                To_Plot{n, 2} = x;
+                To_Plot{n, 3} = str2double(current_deg); % to be sorted and plotted
+                n = n + 1;
+            end
+
+        end
+
+        figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
+        cmap = cmocean('thermal');  legend_txt = {};
+        [~, sortID] = sort(cell2mat(To_Plot(:,3)));  % sort the plotting order
+
+        color_ind = 1;
+        for jj = 1:size(To_Plot, 1)
+
+            plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 5,'MarkerEdgeColor','k', ...
+                'MarkerFaceColor', cmap(color_ind*28,:)); hold on
+
+            xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+
+            title(strcat('$y_0=', title_y0, '\ and\ L=', title_L, '$'), ...
+                'FontSize', 24, 'Interpreter', 'latex');
+            legend_txt = [legend_txt, strcat('$\theta_0=', num2str(To_Plot{sortID(jj), 3}),'^{\circ}$')];
+
+            color_ind = color_ind + 1;
+
+        end
+        xlim([-10 10])
+        ax = gca; ax.FontSize = 18;
+        legend(legend_txt, 'Location', 'northwest', 'FontSize', 18,  'Interpreter', 'latex');
+
+        savename = strcat('y_0=', title_y0, '_L=', title_L, '_orientation_vs_x.png');
+
+        f=gcf;
+        exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
+            'Figures\about orientations vs x\Given y0 and L\', savename{1}],'Resolution',100)
+
+        close
+    end
+end
+
+
+
+%% orientations vs x: given y_0 and theta_0 to plot different L
+clear; close all; clc;
+
+Files = dir(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
+    '\Data_Give_to_Zhibo_20230223_videos\Orientations\*.mat']);
+
+for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
+    for choose_theta0 = -10:2.5:10
+
+        n = 1;
+        for ii = 1: length(Files)
+
+            load(fullfile(Files(ii).folder, Files(ii).name));
+            current_deg =  extractBetween(Files(ii).name,'theta0_', '_L');
+            current_deg = strrep(current_deg,'o','.'); current_deg = strrep(current_deg,'m','-');
+            current_L =  extractBetween(Files(ii).name,'L_', '_y0');
+            current_L = strrep(current_L,'o','.');
+            current_y0 =  extractBetween(Files(ii).name,'y0_', '_ori');
+            current_y0 = strrep(current_y0,'o','.');
+            if isnan(str2double(current_y0{1}))
+                current_y0_tmp = current_y0{1};
+                current_y0{1} = current_y0_tmp(1:end-10);
+            end
+
+            if str2double(current_y0) ~= choose_y0 || str2double(current_deg) ~= choose_theta0
+                % choose the y_0 and L to be plotted
+                continue
+            else
+                title_y0 = current_y0;
+                title_deg = current_deg;
+                To_Plot{n, 1} = ori_ee;
+                To_Plot{n, 2} = x;
+                To_Plot{n, 3} = str2double(current_L); % to be sorted and plotted
+                n = n + 1;
+            end
+
+        end
+
+        figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
+        cmap = cmocean('thermal');  legend_txt = {};
+        [~, sortID] = sort(cell2mat(To_Plot(:,3)));  % sort the plotting order
+
+        color_ind = 1;
+        for jj = 1:size(To_Plot, 1)
+
+            plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 5,'MarkerEdgeColor','k', ...
+                'MarkerFaceColor', cmap(color_ind*30,:)); hold on
+
+            xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+
+            title(strcat('$y_0=', title_y0, '\ and\ \theta_0=', title_deg, '^{\circ}$'), ...
+                'FontSize', 24, 'Interpreter', 'latex');
+            legend_txt = [legend_txt, strcat('$L=', num2str(To_Plot{sortID(jj), 3}),'$')];
+
+            color_ind = color_ind + 1;
+
+        end
+        xlim([-10 10])
+        ax = gca; ax.FontSize = 18;
+        legend(legend_txt, 'Location', 'northwest', 'FontSize', 18,  'Interpreter', 'latex');
+
+        savename = strcat('y_0=', title_y0, '_theta_0=', title_deg, '_orientation_vs_x.png');
+
+        f=gcf;
+        exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
+            'Figures\about orientations vs x\Given y0 and theta0\', savename{1}],'Resolution',100)
 
         close
     end
