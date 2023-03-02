@@ -439,9 +439,81 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 
 
 
+%%%%%%%%%%%% plot theta_0, y_0, L and colorcoded (theta_c-theta_0) %%%%%%%%%%%%%%
+% (theta_c-theta_0): the rotation angle before the first contact
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 1000 600]);
+
+scatter3(together_plot(1, :), together_plot(3, :), together_plot(2, :), 100, ... 
+together_plot(8, :), 'Filled', 'o','MarkerEdgeColor','k'); hold on 
+
+% [XX, YY, ZZ] = meshgrid(unique(together_plot(1, :)), unique(together_plot(3, :)), unique(together_plot(2, :)));
+% VV = double(logical(XX));
+% hh1 = slice(XX, YY, ZZ, VV, [], 0.2, []);
+% hh2 = slice(XX, YY, ZZ, VV, [], 0.4, []);
+% 
+% set(hh1, 'EdgeColor','none','FaceColor','k','FaceAlpha', 0.2);
+% set(hh2, 'EdgeColor','none','FaceColor','k','FaceAlpha', 0.4);
+
+hcb=colorbar('Ticks', -40:20:40); caxis([-40 40]); cmocean('balance')
+ax = gca; ax.FontSize = 14;
+ylabel(hcb,'$Fiber\ rotation\ angle\ before\ contact\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex'); grid on
+xlabel('$\theta_0\ (^{\circ})$','FontSize', 22,'Interpreter', 'latex'); 
+ylabel('$y_0/h_{obs}$','FontSize', 22,'Interpreter', 'latex');
+zlabel('$L/l_{obs}$','FontSize', 22,'Interpreter', 'latex');
+
+view(-23,10)
+
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+%     '\Figures\about contact information vs initial condition\Simu data 2023-02-23\theta_0-y_0-L_vs_RotationAngle.png'],'Resolution',100)
 
 
 
+%%%%%%%%%%%% plot y_c_CoM vs y_0 (with color theta_0) %%%%%%%%%%%%%%
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 760 570]);
+
+together_plot_less_theta0 = together_plot;  
+
+L1_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.5); % classify contour length and indicate by symbols
+L2_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.6); 
+L3_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.7); 
+L4_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.8); 
+L5_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.9); 
+L6_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==1); 
+L7_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==1.2);
+L8_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==1.4);
+
+% for legend
+scatter(nan, nan, 1, nan, 'Filled', 'diamond','MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on  % for legend only
+scatter(nan, nan, 1, nan, 'Filled', 'o', 'MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on % for legend only
+scatter(nan, nan, 1, nan, 'Filled', 'square','MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on % for legend only
+scatter(nan, nan, 1, nan, 'Filled', '^','MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on % for legend only
+
+scatter(L1_together(3, :), L1_together(5, :)-0.5/2*sind(L1_together(6, :)), 100, L1_together(1, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
+scatter(L3_together(3, :), L3_together(5, :)-0.7/2*sind(L3_together(6, :)), 100, L3_together(1, :), 'Filled','o', 'MarkerEdgeColor','k'); hold on
+scatter(L5_together(3, :), L5_together(5, :)-0.9/2*sind(L5_together(6, :)), 100, L5_together(1, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
+scatter(L7_together(3, :), L7_together(5, :)-1.2/2*sind(L7_together(6, :)), 100, L7_together(1, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
+% scatter(L2_together(3, :), L2_together(5, :)-0.6/2*sind(L2_together(6, :)), 100, L2_together(1, :), 'diamond','LineWidth',2); hold on 
+% scatter(L4_together(3, :), L4_together(5, :)-0.8/2*sind(L4_together(6, :)), 100, L4_together(1, :), 'o', 'LineWidth',2); hold on
+% scatter(L6_together(3, :), L6_together(5, :)-1.0/2*sind(L6_together(6, :)), 100, L6_together(1, :), 'square','LineWidth',2); hold on
+% scatter(L8_together(3, :), L8_together(5, :)-1.4/2*sind(L8_together(6, :)), 100, L8_together(1, :), '^','LineWidth',2); hold on
+
+hcb=colorbar('Ticks', -10:2.5:10); caxis([-10 10]); colormap jet
+ax = gca; ax.FontSize = 16;
+title(hcb,'$\theta_0$','FontSize', 24,'Interpreter', 'latex'); grid on
+
+xlabel('$y_0/h_{obs}$','FontSize', 24,'Interpreter', 'latex'); 
+ylabel('${y_c}^{CoM}/h_{obs}$','FontSize', 24,'Interpreter', 'latex');
+% title_txt = ['$-10 < \theta_0 < 10$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+ylim([-0.1 1.1]);
+legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
+
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+%     '\Figures\about contact information vs initial condition\Simu data 2023-02-23\yc_COM-y0_color-theta_0.png'],'Resolution',100)
 
 
 
