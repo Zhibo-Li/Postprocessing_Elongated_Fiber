@@ -87,7 +87,8 @@ xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\'
     ,'NumHeaderLines',1);
 mask = cellfun(@ismissing, xlsfile); xlsfile(mask) = {nan};
 together_plot = [cell2mat(xlsfile(:, 1:3)), cell2mat(xlsfile(:, 5)), ...
-    cell2mat(xlsfile(:, 9:10)), cell2mat(xlsfile(:, 4)), cell2mat(xlsfile(:, 12))]; 
+    cell2mat(xlsfile(:, 9:10)), cell2mat(xlsfile(:, 4)), cell2mat(xlsfile(:, 12)), 
+    cell2mat(xlsfile(:, 16))]; 
 together_plot = together_plot';
 prompt = {'The lower bound of the initial angle:', 'The upper bound of the initial angle:', ...
     'The lower bound of the contour length:','The upper bound of the contour length:'...
@@ -111,6 +112,8 @@ together_plot(:, together_plot(2, :) > range_L_up) = [];
 % y_0
 together_plot(:, together_plot(3, :) < range_y0_low) = [];  
 together_plot(:, together_plot(3, :) > range_y0_up) = [];
+
+together_plot(:, isnan(together_plot(9, :))) = []; % choose the contact cases where the fiber ends touch the obstacle edge.
 
 bypass_edge_together = together_plot(:, together_plot(4, :)==0); 
 bypass_tip_together = together_plot(:, together_plot(4, :)==1);
@@ -410,10 +413,10 @@ scatter(nan, nan, 1, nan, 'Filled', 'o', 'MarkerEdgeColor','k', 'MarkerFaceColor
 scatter(nan, nan, 1, nan, 'Filled', 'square','MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on % for legend only
 scatter(nan, nan, 1, nan, 'Filled', '^','MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on % for legend only
 
-scatter(L1_together(3, :), L1_together(5, :), 100, L1_together(6, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
-scatter(L3_together(3, :), L3_together(5, :), 100, L3_together(6, :), 'Filled','o', 'MarkerEdgeColor','k'); hold on
-scatter(L5_together(3, :), L5_together(5, :), 100, L5_together(6, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
-scatter(L7_together(3, :), L7_together(5, :), 100, L7_together(6, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
+scatter(L1_together(3, :), L1_together(5, :), 100, L1_together(1, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
+scatter(L3_together(3, :), L3_together(5, :), 100, L3_together(1, :), 'Filled','o', 'MarkerEdgeColor','k'); hold on
+scatter(L5_together(3, :), L5_together(5, :), 100, L5_together(1, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
+scatter(L7_together(3, :), L7_together(5, :), 100, L7_together(1, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
 % scatter(L2_together(3, :), L2_together(5, :), 100, L2_together(1, :), 'diamond','LineWidth',2); hold on 
 % scatter(L4_together(3, :), L4_together(5, :), 100, L4_together(1, :), 'o', 'LineWidth',2); hold on
 % scatter(L6_together(3, :), L6_together(5, :), 100, L6_together(1, :), 'square','LineWidth',2); hold on
