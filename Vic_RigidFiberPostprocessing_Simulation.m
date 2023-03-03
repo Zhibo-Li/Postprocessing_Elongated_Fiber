@@ -447,7 +447,7 @@ figure('color', 'w'); set(gcf, 'Position', [100 100 1000 600]);
 [XX, YY, ZZ] = meshgrid(unique(together_plot(1, :)), unique(together_plot(3, :)), ...
     unique(together_plot(2, :)));
 scatter3(XX(:), YY(:), ZZ(:), 100, ones(size(ZZ(:), 1), 1), 'o', ...
-    'MarkerEdgeColor', [.6 .6 .6]); hold on 
+    'MarkerEdgeColor', [.8 .8 .8]); hold on 
 
 scatter3(together_plot(1, :), together_plot(3, :), together_plot(2, :), 100, ... 
 together_plot(8, :), 'Filled', 'o','MarkerEdgeColor','k');
@@ -475,15 +475,14 @@ view(-16,6)
 
 
 
-%%%%%%%%%%%% plot theta_0, y_0, L and colorcoded (theta_c-theta_0) %%%%%%%%%%%%%%
-% (theta_c-theta_0): the rotation angle before the first contact
+%%%%%%%%%%%% plot theta_0, y_0, L and colorcoded (y_c) %%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 1000 600]);
 
 [XX, YY, ZZ] = meshgrid(unique(together_plot(1, :)), unique(together_plot(3, :)), ...
     unique(together_plot(2, :)));
 scatter3(XX(:), YY(:), ZZ(:), 100, ones(size(ZZ(:), 1), 1), 'o', ...
-    'MarkerEdgeColor', [.6 .6 .6]); hold on 
+    'MarkerEdgeColor', [.8 .8 .8]); hold on 
 
 scatter3(together_plot(1, :), together_plot(3, :), together_plot(2, :), 100, ... 
 together_plot(5, :), 'Filled', 'o','MarkerEdgeColor','k'); 
@@ -507,7 +506,7 @@ view(-16,6)
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\Simu data 2023-02-23\theta_0-y_0-L_vs_RotationAngle.png'],'Resolution',100)
+%     '\Figures\about contact information vs initial condition\Simu data 2023-02-23\theta_0-y_0-L_vs_y_c.png'],'Resolution',100)
 
 
 
