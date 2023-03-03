@@ -444,8 +444,13 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 1000 600]);
 
+[XX, YY, ZZ] = meshgrid(unique(together_plot(1, :)), unique(together_plot(3, :)), ...
+    unique(together_plot(2, :)));
+scatter3(XX(:), YY(:), ZZ(:), 100, ones(size(ZZ(:), 1), 1), 'o', ...
+    'MarkerEdgeColor', [.6 .6 .6]); hold on 
+
 scatter3(together_plot(1, :), together_plot(3, :), together_plot(2, :), 100, ... 
-together_plot(8, :), 'Filled', 'o','MarkerEdgeColor','k'); hold on 
+together_plot(8, :), 'Filled', 'o','MarkerEdgeColor','k');
 
 % [XX, YY, ZZ] = meshgrid(unique(together_plot(1, :)), unique(together_plot(3, :)), unique(together_plot(2, :)));
 % VV = double(logical(XX));
@@ -459,10 +464,46 @@ hcb=colorbar('Ticks', -40:20:40); caxis([-40 40]); cmocean('balance')
 ax = gca; ax.FontSize = 14;
 ylabel(hcb,'$Fiber\ rotation\ angle\ before\ contact\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex'); grid on
 xlabel('$\theta_0\ (^{\circ})$','FontSize', 22,'Interpreter', 'latex'); 
-ylabel('$y_0/h_{obs}$','FontSize', 22,'Interpreter', 'latex');
+ylabel('$y_0/h_{obs}$','FontSize', 22,'Interpreter', 'latex'); yticks([0.2 0.4])
 zlabel('$L/l_{obs}$','FontSize', 22,'Interpreter', 'latex');
 
-view(-23,10)
+view(-16,6)
+
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+%     '\Figures\about contact information vs initial condition\Simu data 2023-02-23\theta_0-y_0-L_vs_RotationAngle.png'],'Resolution',100)
+
+
+
+%%%%%%%%%%%% plot theta_0, y_0, L and colorcoded (theta_c-theta_0) %%%%%%%%%%%%%%
+% (theta_c-theta_0): the rotation angle before the first contact
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 1000 600]);
+
+[XX, YY, ZZ] = meshgrid(unique(together_plot(1, :)), unique(together_plot(3, :)), ...
+    unique(together_plot(2, :)));
+scatter3(XX(:), YY(:), ZZ(:), 100, ones(size(ZZ(:), 1), 1), 'o', ...
+    'MarkerEdgeColor', [.6 .6 .6]); hold on 
+
+scatter3(together_plot(1, :), together_plot(3, :), together_plot(2, :), 100, ... 
+together_plot(5, :), 'Filled', 'o','MarkerEdgeColor','k'); 
+
+% [XX, YY, ZZ] = meshgrid(unique(together_plot(1, :)), unique(together_plot(3, :)), unique(together_plot(2, :)));
+% VV = double(logical(XX));
+% hh1 = slice(XX, YY, ZZ, VV, [], 0.2, []);
+% hh2 = slice(XX, YY, ZZ, VV, [], 0.4, []);
+% 
+% set(hh1, 'EdgeColor','none','FaceColor','k','FaceAlpha', 0.2);
+% set(hh2, 'EdgeColor','none','FaceColor','k','FaceAlpha', 0.4);
+
+hcb=colorbar('Ticks', 0:0.2:1); caxis([0 1]); cmocean('balance')
+ax = gca; ax.FontSize = 14;
+ylabel(hcb,'$y_c/h_{obs}$','FontSize', 18,'Interpreter', 'latex'); grid on
+xlabel('$\theta_0\ (^{\circ})$','FontSize', 22,'Interpreter', 'latex'); 
+ylabel('$y_0/h_{obs}$','FontSize', 22,'Interpreter', 'latex'); yticks([0.2 0.4])
+zlabel('$L/l_{obs}$','FontSize', 22,'Interpreter', 'latex');
+
+view(-16,6)
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
