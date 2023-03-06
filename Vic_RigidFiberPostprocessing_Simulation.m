@@ -1,5 +1,11 @@
+% Simulation data plotting.
+% Information is stored in the Excel file.
+
+
+
+%% # About interaction index 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%% plot about interaction index %%%%%%%%%%%%%%%%%%%%%%%%%%
+
 clear; close all; clc;
 xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'Data_Give_to_Zhibo_20230223\results_2023_02_23_Zhibo.xlsx'],'Sheet','Sheet1' ...
@@ -18,7 +24,7 @@ prompt = {'The lower bound of the initial angle:', 'The upper bound of the initi
 definput = {'-10', '10', 'nan', 'nan', 'nan', 'nan'};
 answer = inputdlg(prompt, 'Input (please input NaN if there is no bound)', [1 35] , definput);
 
-%%%%%%%%%%%%%%%%%%%%%%%%% assign the values %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% assign the values
 range_chi0_low = str2double(answer{1,1}); if isnan(range_chi0_low); range_chi0_low = -91; end
 range_chi0_up = str2double(answer{2,1}); if isnan(range_chi0_up); range_chi0_up = 91; end
 range_L_low = str2double(answer{3,1}); if isnan(range_L_low); range_L_low = 0; end
@@ -77,9 +83,8 @@ legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northeast','Fo
 
 
 
-%%
+%% # Contact infromation vs initial condition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%% plot contact infromation vs initial condition %%%%%%%%%%%%%%%
 
 clear; close all; clc;
 xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
@@ -96,7 +101,7 @@ prompt = {'The lower bound of the initial angle:', 'The upper bound of the initi
 definput = {'-10', '10', 'nan', 'nan', 'nan', 'nan'};
 answer = inputdlg(prompt, 'Input (please input NaN if there is no bound)', [1 35] , definput);
 
-%%%%%%%%%%%%%%%%%%%%%%%%% assign the values %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% assign the values 
 range_chi0_low = str2double(answer{1,1}); if isnan(range_chi0_low); range_chi0_low = -91; end
 range_chi0_up = str2double(answer{2,1}); if isnan(range_chi0_up); range_chi0_up = 91; end
 range_L_low = str2double(answer{3,1}); if isnan(range_L_low); range_L_low = 0; end
@@ -122,7 +127,9 @@ trapped_together = together_plot(:, together_plot(4, :)==3);
 
 
 
-%%%%%%%%%%%%%%% plot theta_c vs y_c (with dynamics) %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot theta_c vs y_c (with dynamics) 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 420 315]);
 % for legend
@@ -150,7 +157,9 @@ xticks([-45 -30 -15 0 15 30 45])
 
 
 
-%%%%%%%%%%%%%% plot theta_c vs y_c (without dynamics) ALL DATA %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot theta_c vs y_c (without dynamics) ALL DATA 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 520 390]);
 
@@ -166,7 +175,10 @@ xlim([-90 90]); ylim([-0.1 1.1])
 %     '\Figures\about contact information vs initial condition\Simu data 2023-02-23\thetaC-yC_simu_from_far_theta_0m10to10_alldata.png'],'Resolution',100)
 
 
-%%%%%%% plot theta_0 vs y_0 (without dynamics) which contact the obstacle %%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot theta_0 vs y_0 (without dynamics) which contact the obstacle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 520 390]);
 
@@ -188,7 +200,9 @@ xlim([-10 10]); ylim([-0.1 1.1])
 
 
 
-%%%%%%% plot theta_0 vs y_0 (with dynamics) which contact the obstacle %%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot theta_0 vs y_0 (with dynamics) which contact the obstacle 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 600 450]);
 % for legend
@@ -228,7 +242,9 @@ xlim([-90 90]); ylim([-0.1 1.1])
 
 
 
-%%%%%%%%%%%% plot theta_c vs theta_0 (with color y_0) %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot theta_c vs theta_0 (with color y_0)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 760 570]);
 
@@ -283,7 +299,9 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 
 
 
-%%%%%%%%%%%% plot theta_c vs theta_0 (with color y_c) %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot theta_c vs theta_0 (with color y_c) 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 760 570]);
 
@@ -329,8 +347,10 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 
 
 
-%%%%%%%%%%%% plot (theta_c-theta_0) vs theta_0 (with color y_0) %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot (theta_c-theta_0) vs theta_0 (with color y_0) 
 % (theta_c-theta_0): the rotation angle before the first contact
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 760 570]);
 
@@ -385,7 +405,9 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 
 
 
-%%%%%%%%%%%% plot y_c vs y_0 (with color theta_0) %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot y_c vs y_0 (with color theta_0) 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 760 570]);
 
@@ -439,8 +461,10 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 
 
 
-%%%%%%%%%%%% plot theta_0, y_0, L and colorcoded (theta_c-theta_0) %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot theta_0, y_0, L and colorcoded (theta_c-theta_0)
 % (theta_c-theta_0): the rotation angle before the first contact
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 1000 600]);
 
@@ -475,7 +499,9 @@ view(-16,6)
 
 
 
-%%%%%%%%%%%% plot theta_0, y_0, L and colorcoded (y_c) %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot theta_0, y_0, L and colorcoded (y_c)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 1000 600]);
 
@@ -510,7 +536,9 @@ view(-16,6)
 
 
 
-%%%%%%%%%%%% plot y_c_CoM vs y_0 (with color theta_0) %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot y_c_CoM vs y_0 (with color theta_0)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 760 570]);
 
@@ -554,6 +582,64 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 %     '\Figures\about contact information vs initial condition\Simu data 2023-02-23\yc_COM-y0_color-theta_0.png'],'Resolution',100)
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot y_c vs y_0_HEAD (with color theta_0) 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 760 570]);
+
+% together_plot_less_theta0 = together_plot(:, or(or(or(or(or(together_plot(1, :)==-60, together_plot(1, :)==-30), ...
+% together_plot(1, :)==0), together_plot(1, :)==30), together_plot(1, :)==60), together_plot(1, :)==90)); % choose theta_0
+
+% together_plot_less_theta0 = together_plot(:, or(or(or(or(or(or(or(or(together_plot(1, :)==-10, together_plot(1, :)==-7.5), ...
+% together_plot(1, :)==-5), together_plot(1, :)==-2.5), together_plot(1, :)==0), ...
+% together_plot(1, :)==2.5), together_plot(1, :)==5), together_plot(1, :)==7.5), together_plot(1, :)==10)); % choose theta_0
+
+together_plot_less_theta0 = together_plot;  
+
+L1_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.5); % classify contour length and indicate by symbols
+L2_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.6); 
+L3_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.7); 
+L4_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.8); 
+L5_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==0.9); 
+L6_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==1); 
+L7_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==1.2);
+L8_together = together_plot_less_theta0(:, together_plot_less_theta0(2, :)==1.4);
+
+% for legend
+scatter(nan, nan, 1, nan, 'Filled', 'diamond','MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on  % for legend only
+scatter(nan, nan, 1, nan, 'Filled', 'o', 'MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on % for legend only
+scatter(nan, nan, 1, nan, 'Filled', 'square','MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on % for legend only
+scatter(nan, nan, 1, nan, 'Filled', '^','MarkerEdgeColor','k', 'MarkerFaceColor',[.7 .7 .7]); hold on % for legend only
+
+scatter(L1_together(3, :)+0.5/2*sind(L1_together(1, :)), L1_together(5, :), 100, L1_together(1, :), 'Filled', 'diamond','MarkerEdgeColor','k'); hold on 
+scatter(L3_together(3, :)+0.7/2*sind(L3_together(1, :)), L3_together(5, :), 100, L3_together(1, :), 'Filled','o', 'MarkerEdgeColor','k'); hold on
+scatter(L5_together(3, :)+0.9/2*sind(L5_together(1, :)), L5_together(5, :), 100, L5_together(1, :), 'Filled', 'square','MarkerEdgeColor','k'); hold on
+scatter(L7_together(3, :)+1.2/2*sind(L7_together(1, :)), L7_together(5, :), 100, L7_together(1, :), 'Filled', '^','MarkerEdgeColor','k'); hold on
+% scatter(L2_together(3, :)+0.6/2*sind(L2_together(1, :)), L2_together(5, :), 100, L2_together(1, :), 'diamond','LineWidth',2); hold on 
+% scatter(L4_together(3, :)+0.8/2*sind(L4_together(1, :)), L4_together(5, :), 100, L4_together(1, :), 'o', 'LineWidth',2); hold on
+% scatter(L6_together(3, :)+1.0/2*sind(L6_together(1, :)), L6_together(5, :), 100, L6_together(1, :), 'square','LineWidth',2); hold on
+% scatter(L8_together(3, :)+1.4/2*sind(L8_together(1, :)), L8_together(5, :), 100, L8_together(1, :), '^','LineWidth',2); hold on
+
+hcb=colorbar('Ticks', -10:2.5:10); caxis([-10 10]); colormap jet
+ax = gca; ax.FontSize = 16;
+title(hcb,'$\theta_0$','FontSize', 24,'Interpreter', 'latex'); grid on
+
+xlabel('$y_0^{HEAD}/h_{obs}$','FontSize', 24,'Interpreter', 'latex'); 
+ylabel('$y_c/h_{obs}$','FontSize', 24,'Interpreter', 'latex');
+% title_txt = ['$-10 < \theta_0 < 10$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+ylim([-0.1 1.1]);
+legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
+
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+%     '\Figures\about contact information vs initial condition\Simu data 2023-02-23\yc-y0_HEAD_color-theta_0.png'],'Resolution',100)
+
+
 
 
 
