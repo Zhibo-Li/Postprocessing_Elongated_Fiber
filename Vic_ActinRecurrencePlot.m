@@ -1,5 +1,8 @@
-%%%% Poincaré plot or recurrence plot (RP).
+% Poincaré plot or recurrence plot (RP).
+% both experiment and simulation (tracers)
 
+
+%% Calculte and save (actin filament in porous media)
 clear; close all; clc;
 
 xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLines',1);
@@ -127,22 +130,24 @@ save(['F:\Processing & Results\Actin Filaments in Porous Media\Figures\' ...
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%%%%% draw Poincare Map for each flow angle
+%% draw Poincare Map for each flow angle (colorcode filament contour length)
 clear; close all; clc;
 
 load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data.mat');
+
+Obj_Mag = 0.1; % um/pixel
 
 thedate = Info.date;
 [C, ia, ic] = unique(thedate,'stable');
 ia = [ia; length(ic)+1];
 
+L_all = [];
 for ii = 1:length(ia)-1
 
-    Lattice_in_all = []; Lattice_out_all = [];
+    L_all = [L_all, Info.L(ia(ii):ia(ii+1)-1) * Obj_Mag];
+    Lattice_in_all = []; Lattice_out_all = []; L_toPlot_all = [];
 
     proc_date = C(ii);
-    L_all = Info.L(ia(ii):ia(ii+1)-1);
     for jj = ia(ii):ia(ii+1)-1
         Lattice_in = Info.map{1, jj};
         Lattice_out = [[Lattice_in(2:end, 1);nan], Lattice_in(:, 2:3)];
@@ -158,11 +163,15 @@ for ii = 1:length(ia)-1
 
         Lattice_in_all = [Lattice_in_all, Lattice_in];
         Lattice_out_all = [Lattice_out_all, Lattice_out];
+        L_toPlot_all = [L_toPlot_all, L_all(jj) * ones(1, numel(Lattice_in))];
 
     end
 
     figure('color', 'w'); set(gcf, 'Position', [100 100 500 500]);
-    plot(Lattice_in_all, Lattice_out_all, '.', 'LineStyle', 'none','MarkerSize', 13);
+    scatter(Lattice_in_all, Lattice_out_all, 20, L_toPlot_all, 'Filled', 'o','MarkerEdgeColor','none');
+    hcb=colorbar; caxis([0 50]) ;colormap jet
+    title(hcb,'$L(\mu{m})$','FontSize', 16,'Interpreter', 'latex'); 
+
     axis equal; grid on
     xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
     xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
@@ -181,14 +190,16 @@ for ii = 1:length(ia)-1
     title(title_txt,'FontSize', 22,'Interpreter', 'latex');
 
 %     f=gcf;
-%     exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\',title_txt(2:end-9),'_all.png'],'Resolution',100)
+%     exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\',title_txt(2:end-9),'_colorcodeL.png'],'Resolution',100)
 
 end
 
-%%%%% draw Poincare Map based on contour length at flow angle = 10
+%% draw Poincare Map based on contour length (shorter and longer) at different flow angles
 clear; close all; clc;
 
 load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data.mat');
+
+Obj_Mag = 0.1; % um/pixel
 
 thedate = Info.date;
 [C, ia, ic] = unique(thedate,'stable');
@@ -226,7 +237,7 @@ axis equal; grid on
 xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
 xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-title(['$\theta=',num2str(PAs_deg),'^{\circ}:\ L>', num2str(Contour_L_divide*0.1),'\mu{m}$'],'FontSize', 20,'Interpreter', 'latex');
+title(['$\theta=',num2str(PAs_deg),'^{\circ}:\ L>', num2str(Contour_L_divide * Obj_Mag),'\mu{m}$'],'FontSize', 20,'Interpreter', 'latex');
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=',num2str(PAs_deg),'_longer.png'],'Resolution',100)
 
@@ -251,7 +262,7 @@ axis equal; grid on
 xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
 xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
 ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-title(['$\theta=',num2str(PAs_deg),'^{\circ}:\ L<', num2str(Contour_L_divide*0.1),'\mu{m}$'],'FontSize', 20,'Interpreter', 'latex');
+title(['$\theta=',num2str(PAs_deg),'^{\circ}:\ L<', num2str(Contour_L_divide * Obj_Mag),'\mu{m}$'],'FontSize', 20,'Interpreter', 'latex');
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=',num2str(PAs_deg),'_shorter.png'],'Resolution',100)
 
