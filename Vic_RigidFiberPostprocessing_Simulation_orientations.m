@@ -222,7 +222,7 @@ for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
         for jj = 1:size(To_Plot, 1)
 
             plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 5,'MarkerEdgeColor','k', ...
-                'MarkerFaceColor', cmap(color_ind*28,:)); hold on
+                'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
 
             xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
             ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
@@ -296,7 +296,7 @@ for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
         for jj = 1:size(To_Plot, 1)
 
             plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 5,'MarkerEdgeColor','k', ...
-                'MarkerFaceColor', cmap(color_ind*30,:)); hold on
+                'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
 
             xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
             ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
@@ -321,3 +321,305 @@ for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
         close
     end
 end
+
+
+
+%% orientations vs x: plot until contact
+clear; close all; clc;
+
+xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
+    'Data_Give_to_Zhibo_20230223\results_2023_02_23_Zhibo.xlsx'], ...
+    'Sheet','Sheet1','NumHeaderLines',1);
+mask = cellfun(@ismissing, xlsfile); xlsfile(mask) = {nan};
+thedeg = cell2mat(xlsfile(:, 1)); 
+theL = round(cell2mat(xlsfile(:, 2)), 1); 
+they0 = round(cell2mat(xlsfile(:, 3)), 3); 
+
+ite_contact = cell2mat(xlsfile(:, 11)); 
+
+
+Files = dir(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
+    '\Data_Give_to_Zhibo_20230223_videos\Orientations\*.mat']);
+
+for ii = 1: length(Files)
+
+    load(fullfile(Files(ii).folder, Files(ii).name));
+
+    savename = strcat(Files(ii).name(1:end-4), '_untilContact.png');
+
+    current_deg =  extractBetween(Files(ii).name,'theta0_', '_L');
+    newStr = strrep(current_deg,'o','.'); newStr = strrep(newStr,'m','-');
+    deg_num = str2double(newStr);
+    current_L =  extractBetween(Files(ii).name,'L_', '_y0');
+    newStr = strrep(current_L,'o','.');
+    L_num = str2double(newStr);
+    current_y0 =  extractBetween(Files(ii).name,'y0_', '_ori');
+    newStr = strrep(current_y0,'o','.');
+    if isnan(str2double(newStr{1}))
+        current_y0_tmp = newStr{1};
+        newStr{1} = current_y0_tmp(1:end-10);
+        y0_num = str2double(newStr);
+    else
+        y0_num = str2double(newStr);
+    end
+
+    tmp_index =  thedeg==deg_num & theL==L_num & ismembertol(they0, y0_num,0.0125);
+    Ind = find(tmp_index==1);
+
+    if ~isnan(ite_contact(Ind))
+        figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
+        x_untilContact = x(36:ite_contact(Ind));
+        ori_ee_untilContact = ori_ee(36:ite_contact(Ind));
+        plot(x_untilContact, ori_ee_untilContact, 'o','MarkerSize', 10,'MarkerEdgeColor','k', ...
+            'MarkerFaceColor', 'm'); 
+
+        xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+        ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+        xlim([-5 2])
+        ax = gca; ax.FontSize = 18;
+
+        f=gcf;
+        exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+            '\Figures\about orientations vs x\until contact\', savename],'Resolution',100)
+
+        save(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
+            'Data_Give_to_Zhibo_20230223_videos\Orientations\until contact\theta0_', ...
+            current_deg{1}, '_L_', current_L{1},'_y0_', current_y0{1}, '_orientations_untilContact.mat'], ...
+            'ori_ee', 'x', 'x_untilContact', 'ori_ee_untilContact');
+
+    end
+
+    close
+end
+
+
+
+%% orientations vs x: given theta_0 and L to plot different y_0 (until contact)
+clear; close all; clc;
+
+Files = dir(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
+    '\Data_Give_to_Zhibo_20230223_videos\Orientations\until contact\*.mat']);
+
+for choose_theta0 = -10:2.5:10
+    for choose_L = [0.5:0.1:1, 1.2:0.2:1.4]
+
+        n = 1;
+        for ii = 1: length(Files)
+
+            load(fullfile(Files(ii).folder, Files(ii).name));
+            current_deg =  extractBetween(Files(ii).name,'theta0_', '_L');
+            current_deg = strrep(current_deg,'o','.'); current_deg = strrep(current_deg,'m','-');
+            current_L =  extractBetween(Files(ii).name,'L_', '_y0');
+            current_L = strrep(current_L,'o','.');
+            current_y0 =  extractBetween(Files(ii).name,'y0_', '_ori');
+            current_y0 = strrep(current_y0,'o','.');
+            if isnan(str2double(current_y0{1}))
+                current_y0_tmp = current_y0{1};
+                current_y0{1} = current_y0_tmp(1:end-10);
+            end
+
+            if str2double(current_deg) ~= choose_theta0 || str2double(current_L) ~= choose_L
+                % choose the y_0 and L to be plotted
+                continue
+            else
+                title_deg = current_deg;
+                title_L = current_L;
+                To_Plot{n, 1} = ori_ee_untilContact;
+                To_Plot{n, 2} = x_untilContact;
+                To_Plot{n, 3} = str2double(current_y0); % to be sorted and plotted
+                n = n + 1;
+            end
+
+        end
+
+        figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
+        cmap = cmocean('thermal');  legend_txt = {};
+        [~, sortID] = sort(cell2mat(To_Plot(:,3)));  % sort the plotting order
+
+        color_ind = 1;
+        for jj = 1:size(To_Plot, 1)
+
+            plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 5,'MarkerEdgeColor','k', ...
+                'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
+
+            xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+
+            title(strcat('$\theta_0=', title_deg, '^{\circ}\ and\ L=', title_L, '$'), ...
+                'FontSize', 24, 'Interpreter', 'latex');
+            legend_txt = [legend_txt, strcat('$y_0=', num2str(To_Plot{sortID(jj), 3}),'$')];
+
+            color_ind = color_ind + 1;
+
+        end
+        xlim([-5 0])
+        ax = gca; ax.FontSize = 18;
+        legend(legend_txt, 'Location', 'northwest', 'FontSize', 18,  'Interpreter', 'latex');
+
+        savename = strcat('theta_0=', title_deg, '_L=', title_L, '_orientation_vs_x.png');
+
+        f=gcf;
+        exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
+            'Figures\about orientations vs x\until contact\Given theta0 and L\', savename{1}],'Resolution',100)
+
+        close
+    end
+end
+
+
+
+%% orientations vs x: given y_0 and L to plot different theta_0 (until contact)
+clear; close all; clc;
+
+Files = dir(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
+    '\Data_Give_to_Zhibo_20230223_videos\Orientations\until contact\*.mat']);
+
+for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
+    for choose_L = [0.5:0.1:1, 1.2:0.2:1.4]
+
+        n = 1;
+        for ii = 1: length(Files)
+
+            if ~exist(fullfile(Files(ii).folder, Files(ii).name), 'file')
+                continue
+            else
+                load(fullfile(Files(ii).folder, Files(ii).name));
+                current_deg =  extractBetween(Files(ii).name,'theta0_', '_L');
+                current_deg = strrep(current_deg,'o','.'); current_deg = strrep(current_deg,'m','-');
+                current_L =  extractBetween(Files(ii).name,'L_', '_y0');
+                current_L = strrep(current_L,'o','.');
+                current_y0 =  extractBetween(Files(ii).name,'y0_', '_ori');
+                current_y0 = strrep(current_y0,'o','.');
+                if isnan(str2double(current_y0{1}))
+                    current_y0_tmp = current_y0{1};
+                    current_y0{1} = current_y0_tmp(1:end-10);
+                end
+
+                if str2double(current_y0) ~= choose_y0 || str2double(current_L) ~= choose_L
+                    % choose the y_0 and L to be plotted
+                    continue
+                else
+                    title_y0 = current_y0;
+                    title_L = current_L;
+                    To_Plot{n, 1} = ori_ee_untilContact;
+                    To_Plot{n, 2} = x_untilContact;
+                    To_Plot{n, 3} = str2double(current_deg); % to be sorted and plotted
+                    n = n + 1;
+                end
+
+            end
+
+            figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
+            cmap = cmocean('thermal');  legend_txt = {};
+            [~, sortID] = sort(cell2mat(To_Plot(:,3)));  % sort the plotting order
+
+            color_ind = 1;
+            for jj = 1:size(To_Plot, 1)
+
+                plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 5,'MarkerEdgeColor','k', ...
+                    'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
+
+                xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+                ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+
+                title(strcat('$y_0=', title_y0, '\ and\ L=', title_L, '$'), ...
+                    'FontSize', 24, 'Interpreter', 'latex');
+                legend_txt = [legend_txt, strcat('$\theta_0=', num2str(To_Plot{sortID(jj), 3}),'^{\circ}$')];
+
+                color_ind = color_ind + 1;
+
+            end
+            xlim([-5 0])
+            ax = gca; ax.FontSize = 18;
+            legend(legend_txt, 'Location', 'northwest', 'FontSize', 18,  'Interpreter', 'latex');
+
+            savename = strcat('y_0=', title_y0, '_L=', title_L, '_orientation_vs_x.png');
+
+            f=gcf;
+            exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
+                'Figures\about orientations vs x\until contact\Given y0 and L\', savename{1}],'Resolution',100)
+
+            close
+        end
+    end
+end
+
+
+
+%% orientations vs x: given y_0 and theta_0 to plot different L (until contact)
+clear; close all; clc;
+
+Files = dir(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
+    '\Data_Give_to_Zhibo_20230223_videos\Orientations\until contact\*.mat']);
+
+for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
+    for choose_theta0 = -10:2.5:10
+
+        n = 1;
+        for ii = 1: length(Files)
+
+            if ~exist(fullfile(Files(ii).folder, Files(ii).name), 'file')
+                continue
+            else
+                load(fullfile(Files(ii).folder, Files(ii).name));
+                current_deg =  extractBetween(Files(ii).name,'theta0_', '_L');
+                current_deg = strrep(current_deg,'o','.'); current_deg = strrep(current_deg,'m','-');
+                current_L =  extractBetween(Files(ii).name,'L_', '_y0');
+                current_L = strrep(current_L,'o','.');
+                current_y0 =  extractBetween(Files(ii).name,'y0_', '_ori');
+                current_y0 = strrep(current_y0,'o','.');
+                if isnan(str2double(current_y0{1}))
+                    current_y0_tmp = current_y0{1};
+                    current_y0{1} = current_y0_tmp(1:end-10);
+                end
+
+                if str2double(current_y0) ~= choose_y0 || str2double(current_deg) ~= choose_theta0
+                    % choose the y_0 and L to be plotted
+                    continue
+                else
+                    title_y0 = current_y0;
+                    title_deg = current_deg;
+                    To_Plot{n, 1} = ori_ee_untilContact;
+                    To_Plot{n, 2} = x_untilContact;
+                    To_Plot{n, 3} = str2double(current_L); % to be sorted and plotted
+                    n = n + 1;
+                end
+
+            end
+
+            figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
+            cmap = cmocean('thermal');  legend_txt = {};
+            [~, sortID] = sort(cell2mat(To_Plot(:,3)));  % sort the plotting order
+
+            color_ind = 1;
+            for jj = 1:size(To_Plot, 1)
+
+                plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 5,'MarkerEdgeColor','k', ...
+                    'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
+
+                xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+                ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+
+                title(strcat('$y_0=', title_y0, '\ and\ \theta_0=', title_deg, '^{\circ}$'), ...
+                    'FontSize', 24, 'Interpreter', 'latex');
+                legend_txt = [legend_txt, strcat('$L=', num2str(To_Plot{sortID(jj), 3}),'$')];
+
+                color_ind = color_ind + 1;
+
+            end
+            xlim([-5 0])
+            ax = gca; ax.FontSize = 18;
+            legend(legend_txt, 'Location', 'northwest', 'FontSize', 18,  'Interpreter', 'latex');
+
+            savename = strcat('y_0=', title_y0, '_theta_0=', title_deg, '_orientation_vs_x.png');
+
+            f=gcf;
+            exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
+                'Figures\about orientations vs x\until contact\Given y0 and theta0\', savename{1}],'Resolution',100)
+
+            close
+        end
+    end
+end
+
+
