@@ -118,7 +118,8 @@ together_plot(:, together_plot(2, :) > range_L_up) = [];
 together_plot(:, together_plot(3, :) < range_y0_low) = [];  
 together_plot(:, together_plot(3, :) > range_y0_up) = [];
 
-together_plot(:, isnan(together_plot(9, :))) = []; % choose the contact cases where the fiber ends touch the obstacle edge.
+together_plot(5:6, isnan(together_plot(9, :))) = nan; 
+% choose the contact cases where the fiber ends touch the obstacle edge and set others to be NaN.
 
 bypass_edge_together = together_plot(:, together_plot(4, :)==0); 
 bypass_tip_together = together_plot(:, together_plot(4, :)==1);
@@ -766,8 +767,9 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 % %     '\Figures\about contact information vs initial condition\theta_0m10to10_theta_c-y_c_delta.png'],'Resolution',100)
 % 
 % 
-% 
-% %%%%%%%%%%%%%%% plot (theta_0, y_0) vs (theta_c, y_c) in vector field %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% plot (theta_0, y_0) vs (theta_c, y_c) in vector field (outdated version)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 % % let the data 'align' for reshape
 % together_plot(:, together_plot(3, :) == 0.1875) = [];
@@ -810,3 +812,101 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 % % f=gcf;
 % % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 % %     '\Figures\about contact information vs initial condition\contourL_', num2str(choose_L) ,'.png'],'Resolution',100)
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plot (theta_0, y_0) vs (theta_c, y_c) in vector field
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+the_y0s = sort([0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]);
+
+toPlot_theta_0 = reshape(together_plot(1, :), 19, 8, 9);
+toPlot_L_0 = reshape(together_plot(2, :), 19, 8, 9);
+toPlot_y_0 = reshape(together_plot(3, :), 19, 8, 9);
+toPlot_y_c = reshape(together_plot(5, :), 19, 8, 9);
+toPlot_theta_c = reshape(together_plot(6, :), 19, 8, 9);
+
+for foo = 1:numel(toPlot_y_0)
+    tmp_dif = abs(toPlot_y_0(foo)-the_y0s);
+    toPlot_y_0(foo) = the_y0s(tmp_dif==min(tmp_dif));
+end
+
+%%% choose one contour length to plot
+% choose_L = 1; % the layer number.
+% the_L_0 = unique(squeeze(toPlot_L_0(:,choose_L,:)));
+% 
+% toPlot_y_0_X = squeeze(toPlot_y_0(:,choose_L,:));
+% toPlot_theta_0_Y = squeeze(toPlot_theta_0(:,choose_L,:));
+% 
+% toPlot_y_c_X = squeeze(toPlot_y_c(:,choose_L,:)) + 1; % +1: to be better shown
+% toPlot_theta_c_Y = squeeze(toPlot_theta_c(:,choose_L,:));
+% toPlot_contact_Y = toPlot_y_c_X .* sind(toPlot_theta_c_Y);
+% toPlot_contact_X = toPlot_y_c_X .* cosd(toPlot_theta_c_Y);
+% 
+% 
+% figure('color', 'w'); set(gcf, 'Position', [100 100 1200 800]);
+% quiver(toPlot_y_0_X, toPlot_theta_0_Y/180*pi, toPlot_contact_X/50, toPlot_contact_Y/50, 0, ...
+%     'm','LineWidth', 2,'ShowArrowHead','on'); 
+% hold on
+% axis equal;  grid on
+% xlim([0.1 0.7]); ylim([-0.2 0.2]);
+% ylabel('$Initial\ angle\ (\theta_0\ rad)$','FontSize', 18,'Interpreter', 'latex'); 
+% xlabel('$Initial\ position\ (y_0/h_{obs} + 1)$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$Length\ L/l_{obs} = ',num2str(the_L_0), '$'];
+% title(title_txt,'FontSize', 18,'Interpreter', 'latex');
+% 
+% ref_X = nan(size(toPlot_y_0_X, 1), size(toPlot_y_0_X, 2));
+% ref_Y = ref_X;
+% ref_X(16, 9) = 0.04; ref_Y(16, 9) = 0; 
+% quiver(toPlot_y_0_X, toPlot_theta_0_Y/180*pi, ref_X, ref_Y, 0, 'k',...
+%         'LineWidth', 2,'ShowArrowHead','off'); 
+% text(0.58,0.16, 'Reference line','Color','k','FontSize',16)
+% 
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+%     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
+%     '\vector map\contourL_', num2str(the_L_0) ,'.png'],'Resolution',100)
+
+
+%%% plot different lengths on one figure
+legend_txt = {}; cmap = cmocean('thermal');  color_ind = 1; 
+figure('color', 'w'); set(gcf, 'Position', [100 100 1200 800]);
+for ii = 8:-1:1
+
+    the_L_0 = unique(squeeze(toPlot_L_0(:,ii,:)));
+
+    toPlot_y_0_X = squeeze(toPlot_y_0(:,ii,:));
+    toPlot_theta_0_Y = squeeze(toPlot_theta_0(:,ii,:));
+
+    toPlot_y_c_X = squeeze(toPlot_y_c(:,ii,:)) + 1; % +1: to be better shown
+    toPlot_theta_c_Y = squeeze(toPlot_theta_c(:,ii,:));
+    toPlot_contact_Y = toPlot_y_c_X .* sind(toPlot_theta_c_Y);
+    toPlot_contact_X = toPlot_y_c_X .* cosd(toPlot_theta_c_Y);
+
+    quiver(toPlot_y_0_X, toPlot_theta_0_Y/180*pi, toPlot_contact_X/50, toPlot_contact_Y/50, 0, 'color',...
+        cmap(color_ind*20,:),'LineWidth', 2,'ShowArrowHead','on'); 
+    hold on
+    color_ind = color_ind + 1;
+    legend_txt = [legend_txt, strcat('$L/l_{obs} = ',num2str(the_L_0), '$')];
+
+end
+
+ref_X = nan(size(toPlot_y_0_X, 1), size(toPlot_y_0_X, 2));
+ref_Y = ref_X;
+ref_X(16, 9) = 0.04; ref_Y(16, 9) = 0; 
+quiver(toPlot_y_0_X, toPlot_theta_0_Y/180*pi, ref_X, ref_Y, 0, 'k',...
+        'LineWidth', 2,'ShowArrowHead','off'); 
+hold on;
+legend_txt = [legend_txt, ''];
+axis equal;  grid on
+xlim([0.1 0.7]); ylim([-0.2 0.2]);
+ylabel('$Initial\ angle\ (\theta_0\ rad)$','FontSize', 18,'Interpreter', 'latex'); 
+xlabel('$Initial\ position\ (y_0/h_{obs} + 1)$','FontSize', 18,'Interpreter', 'latex');
+legend(legend_txt, 'Location', 'southwest','FontSize', 16,'Interpreter', 'latex')
+text(0.58,0.16, 'Reference line','Color','k','FontSize',16)
+
+% % f=gcf;
+% % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+%     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
+%     '\vector map\contourL_all.png'],'Resolution',100)
