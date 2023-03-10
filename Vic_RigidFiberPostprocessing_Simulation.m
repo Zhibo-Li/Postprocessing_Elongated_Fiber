@@ -884,8 +884,9 @@ for ii = 8:-1:1
     toPlot_contact_Y = toPlot_y_c_X .* sind(toPlot_theta_c_Y);
     toPlot_contact_X = toPlot_y_c_X .* cosd(toPlot_theta_c_Y);
 
-    quiver(toPlot_y_0_X, toPlot_theta_0_Y/180*pi, toPlot_contact_X/50, toPlot_contact_Y/50, 0, 'color',...
-        cmap(color_ind*20,:),'LineWidth', 2,'ShowArrowHead','on'); 
+    q = quiver(toPlot_y_0_X, toPlot_theta_0_Y/180*pi, toPlot_contact_X/50, toPlot_contact_Y/50, 0, 'color',...
+        cmap(color_ind*20,:),'LineWidth', 1,'ShowArrowHead','on'); 
+    q.MaxHeadSize = 0.03;
     hold on
     color_ind = color_ind + 1;
     legend_txt = [legend_txt, strcat('$L/l_{obs} = ',num2str(the_L_0), '$')];
