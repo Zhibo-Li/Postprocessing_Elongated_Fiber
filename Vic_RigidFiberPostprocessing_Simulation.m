@@ -851,8 +851,8 @@ end
 % hold on
 % axis equal;  grid on
 % xlim([0.1 0.7]); ylim([-0.2 0.2]);
-% ylabel('$Initial\ angle\ (\theta_0\ rad)$','FontSize', 18,'Interpreter', 'latex'); 
-% xlabel('$Initial\ position\ (y_0/h_{obs} + 1)$','FontSize', 18,'Interpreter', 'latex');
+% ylabel('$Initial\ angle\ \theta_0\ (rad)$','FontSize', 18,'Interpreter', 'latex'); 
+% xlabel('$Initial\ position\ y_0/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
 % title_txt = ['$Length\ L/l_{obs} = ',num2str(the_L_0), '$'];
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 % 
@@ -863,10 +863,10 @@ end
 %         'LineWidth', 2,'ShowArrowHead','off'); 
 % text(0.58,0.16, 'Reference line','Color','k','FontSize',16)
 % 
-% f=gcf;
-% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
-%     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
-%     '\vector map\contourL_', num2str(the_L_0) ,'.png'],'Resolution',100)
+% % f=gcf;
+% % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+% %     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
+% %     '\vector map\contourL_', num2str(the_L_0) ,'.png'],'Resolution',100)
 
 
 %%% plot different lengths on one figure
@@ -902,12 +902,12 @@ hold on;
 legend_txt = [legend_txt, ''];
 axis equal;  grid on
 xlim([0.1 0.7]); ylim([-0.2 0.2]);
-ylabel('$Initial\ angle\ (\theta_0\ rad)$','FontSize', 18,'Interpreter', 'latex'); 
-xlabel('$Initial\ position\ (y_0/h_{obs} + 1)$','FontSize', 18,'Interpreter', 'latex');
+ylabel('$Initial\ angle\ \theta_0\ (rad)$','FontSize', 18,'Interpreter', 'latex'); 
+xlabel('$Initial\ position\ y_0/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
 legend(legend_txt, 'Location', 'southwest','FontSize', 16,'Interpreter', 'latex')
 text(0.58,0.16, 'Reference line','Color','k','FontSize',16)
 
-% % f=gcf;
-% % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 %     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
 %     '\vector map\contourL_all.png'],'Resolution',100)
