@@ -63,14 +63,14 @@ scatter(pole_vaulting_together(6, :), pole_vaulting_together(4, :), 220, pole_va
 
 % cmap(size(together_plot,2)); 
 hcb=colorbar; caxis([0 1])
-title(hcb,'$Initial\ position\ (y_0/h_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
+title(hcb,'$Initial\ position\ (y_0/h_{\rm obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
 set(gca,'FontSize',16);
 % xlabel('$max\left|U_0-U(t)\right|/U_0$','FontSize', 22,'Interpreter', 'latex');
 % xlabel('$Contact\ probability\ (disturbed\ layer = 40\mu{m}) $','FontSize', 22,'Interpreter', 'latex');  % for interaction3
 % xlabel('$Normalized\ direct\ contact\ duration$','FontSize', 22,'Interpreter', 'latex');  
 xlabel('$Normalized\ perturbed\ duration$','FontSize', 22,'Interpreter', 'latex'); 
 % xlabel('$Interaction\ index$','FontSize', 22,'Interpreter', 'latex'); 
-ylabel('$Deviation\ (\delta/h_{obs})$','FontSize', 22,'Interpreter', 'latex');
+ylabel('$Deviation\ (\delta/h_{\rm obs})$','FontSize', 22,'Interpreter', 'latex');
 legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northeast','FontSize', 14,'Interpreter', 'latex')
 % title('$0.5<L<1$','FontSize', 22,'Interpreter', 'latex')
 % xlim([0 12]); %ylim([-0.4 0.8])
@@ -145,8 +145,8 @@ plot(bypass_edge_together(6, :), bypass_edge_together(5, :), 'o','MarkerSize', 1
 plot(bypass_tip_together(6, :), bypass_tip_together(5, :),  'square','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); hold on
 plot(pole_vaulting_together(6, :), pole_vaulting_together(5, :),  '^','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
 
-xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
-ylabel('$y_c/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+xlabel('$\theta_{\rm c}$','FontSize', 18,'Interpreter', 'latex'); 
+ylabel('$y_{\rm c}/h_{\rm obs}$','FontSize', 18,'Interpreter', 'latex');
 % title_txt = ['$-90 < \theta_0 < 90$'];
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 xlim([-50 50]); ylim([0 1]);
@@ -168,8 +168,8 @@ figure('color', 'w'); set(gcf, 'Position', [100 100 520 390]);
 % for plot
 plot(together_plot(6, :), together_plot(5, :), 'o','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','m'); hold on 
 
-xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
-ylabel('$y_c/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+xlabel('$\theta_{\rm c}$','FontSize', 18,'Interpreter', 'latex'); 
+ylabel('$y_{\rm c}/h_{\rm obs}$','FontSize', 18,'Interpreter', 'latex');
 xlim([-90 90]); ylim([-0.1 1.1])
 
 % f=gcf;
@@ -193,7 +193,7 @@ plot(together_plot_contact(1, :), together_plot_contact(3, :), ...
     'o','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','m'); hold on 
 
 xlabel('$\theta_0$','FontSize', 18,'Interpreter', 'latex'); 
-ylabel('$y_0/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+ylabel('$y_0/h_{\rm obs}$','FontSize', 18,'Interpreter', 'latex');
 xlim([-10 10]); ylim([-0.1 1.1])
 
 % f=gcf;
@@ -231,7 +231,7 @@ plot(pole_vaulting_together_contact(1, :), pole_vaulting_together_contact(3, :),
     '^','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
 
 xlabel('$\theta_0$','FontSize', 18,'Interpreter', 'latex'); 
-ylabel('$y_0/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+ylabel('$y_0/h_{\rm obs}$','FontSize', 18,'Interpreter', 'latex');
 % title_txt = ['$-90 < \theta_0 < 90$'];
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 xlim([-90 90]); ylim([-0.1 1.1])
@@ -286,14 +286,14 @@ scatter(L7_together(1, :), L7_together(6, :), 100, L7_together(3, :), 'Filled', 
 % cmap(size(together_plot,2)); 
 hcb=colorbar('Ticks', 0.1:0.1:0.6); caxis([0.1 0.6]); colormap jet
 ax = gca; ax.FontSize = 16;
-title(hcb,'$y_0/h_{obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
+title(hcb,'$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
 xlabel('$\theta_0$','FontSize', 24,'Interpreter', 'latex'); 
-ylabel('$\theta_c$','FontSize', 24,'Interpreter', 'latex');
+ylabel('$\theta_{\rm c}$','FontSize', 24,'Interpreter', 'latex');
 
 % title_txt = ['$-10 < \theta_0 < 10$'];
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 % xlim([-90 90]); ylim([-0.1 1.1]);
-legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
+legend({'$L/l_{\rm obs}=0.5$','$L/l_{\rm obs}=0.7$','$L/l_{\rm obs}=0.9$','$L/l_{\rm obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
@@ -334,14 +334,14 @@ scatter(L7_together(1, :), L7_together(6, :), 100, L7_together(5, :), 'Filled', 
 % cmap(size(together_plot,2)); 
 hcb=colorbar('Ticks', -0.1:0.2:1.1); caxis([-0.1 1.1]); colormap jet
 ax = gca; ax.FontSize = 16;
-title(hcb,'$y_c/h_{obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
+title(hcb,'$y_{\rm c}/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
 xlabel('$\theta_0$','FontSize', 24,'Interpreter', 'latex'); 
-ylabel('$\theta_c$','FontSize', 24,'Interpreter', 'latex');
+ylabel('$\theta_{\rm c}$','FontSize', 24,'Interpreter', 'latex');
 
 % title_txt = ['$-10 < \theta_0 < 10$'];
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 % xlim([-90 90]); ylim([-0.1 1.1]);
-legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
+legend({'$L/l_{\rm obs}=0.5$','$L/l_{\rm obs}=0.7$','$L/l_{\rm obs}=0.9$','$L/l_{\rm obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
@@ -392,14 +392,14 @@ scatter(L7_together(1, :), L7_together(8, :), 100, L7_together(3, :), 'Filled', 
 % cmap(size(together_plot,2)); 
 hcb=colorbar('Ticks', 0.1:0.1:0.6); caxis([0.1 0.6]); colormap jet
 ax = gca; ax.FontSize = 16;
-title(hcb,'$y_0/h_{obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
+title(hcb,'$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
 xlabel('$\theta_0$','FontSize', 24,'Interpreter', 'latex'); 
-ylabel('$\theta_c-\theta_0$','FontSize', 24,'Interpreter', 'latex');
+ylabel('$\theta_{\rm c}-\theta_0$','FontSize', 24,'Interpreter', 'latex');
 
 % title_txt = ['$-10 < \theta_0 < 10$'];
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 % xlim([-90 90]); ylim([-0.1 1.1]);
-legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
+legend({'$L/l_{\rm obs}=0.5$','$L/l_{\rm obs}=0.7$','$L/l_{\rm obs}=0.9$','$L/l_{\rm obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
@@ -450,12 +450,12 @@ hcb=colorbar('Ticks', -10:2.5:10); caxis([-10 10]); colormap jet
 ax = gca; ax.FontSize = 16;
 title(hcb,'$\theta_0$','FontSize', 24,'Interpreter', 'latex'); grid on
 
-xlabel('$y_0/h_{obs}$','FontSize', 24,'Interpreter', 'latex'); 
-ylabel('$y_c/h_{obs}$','FontSize', 24,'Interpreter', 'latex');
+xlabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); 
+ylabel('$y_{\rm c}/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 % title_txt = ['$-10 < \theta_0 < 10$'];
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 ylim([-0.1 1.1]);
-legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
+legend({'$L/l_{\rm obs}=0.5$','$L/l_{\rm obs}=0.7$','$L/l_{\rm obs}=0.9$','$L/l_{\rm obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
@@ -488,12 +488,13 @@ together_plot(8, :), 'Filled', 'o','MarkerEdgeColor','k');
 
 hcb=colorbar('Ticks', -40:20:40); caxis([-40 40]); cmocean('balance')
 ax = gca; ax.FontSize = 14;
-ylabel(hcb,'$Fiber\ rotation\ angle\ before\ contact\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex'); grid on
-xlabel('$\theta_0\ (^{\circ})$','FontSize', 22,'Interpreter', 'latex'); 
-ylabel('$y_0/h_{obs}$','FontSize', 22,'Interpreter', 'latex'); yticks([0.2 0.4])
-zlabel('$L/l_{obs}$','FontSize', 22,'Interpreter', 'latex');
+ylabel(hcb,'$Fiber\ rotation\ angle\ before\ contact$','FontSize', 18,'Interpreter', 'latex'); grid on
+xlabel('$\theta_0$','FontSize', 22,'Interpreter', 'latex'); 
+ylabel('$y_0/h_{\rm obs}$','FontSize', 22,'Interpreter', 'latex'); yticks([0.2 0.4])
+zlabel('$L/l_{\rm obs}$','FontSize', 22,'Interpreter', 'latex');
+set(gca,'TickLabelInterpreter','latex');
 
-view(-16,6)
+view(-12,5)
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
@@ -525,12 +526,13 @@ together_plot(5, :), 'Filled', 'o','MarkerEdgeColor','k');
 
 hcb=colorbar('Ticks', 0:0.2:1); caxis([0 1]); cmocean('balance')
 ax = gca; ax.FontSize = 14;
-ylabel(hcb,'$y_c/h_{obs}$','FontSize', 18,'Interpreter', 'latex'); grid on
-xlabel('$\theta_0\ (^{\circ})$','FontSize', 22,'Interpreter', 'latex'); 
-ylabel('$y_0/h_{obs}$','FontSize', 22,'Interpreter', 'latex'); yticks([0.2 0.4])
-zlabel('$L/l_{obs}$','FontSize', 22,'Interpreter', 'latex');
+ylabel(hcb,'$y_{\rm c}/h_{\rm obs}$','FontSize', 18,'Interpreter', 'latex'); grid on
+xlabel('$\theta_0$','FontSize', 22,'Interpreter', 'latex'); 
+ylabel('$y_0/h_{\rm obs}$','FontSize', 22,'Interpreter', 'latex'); yticks([0.2 0.4])
+zlabel('$L/l_{\rm obs}$','FontSize', 22,'Interpreter', 'latex');
+set(gca,'TickLabelInterpreter','latex');
 
-view(-16,6)
+view(-12,5)
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
@@ -574,12 +576,12 @@ hcb=colorbar('Ticks', -10:2.5:10); caxis([-10 10]); colormap jet
 ax = gca; ax.FontSize = 16;
 title(hcb,'$\theta_0$','FontSize', 24,'Interpreter', 'latex'); grid on
 
-xlabel('$y_0/h_{obs}$','FontSize', 24,'Interpreter', 'latex'); 
-ylabel('${y_c}^{CoM}/h_{obs}$','FontSize', 24,'Interpreter', 'latex');
+xlabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); 
+ylabel('${y_{\rm c}}^{CoM}/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 % title_txt = ['$-10 < \theta_0 < 10$'];
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 ylim([-0.1 1.1]);
-legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
+legend({'$L/l_{\rm obs}=0.5$','$L/l_{\rm obs}=0.7$','$L/l_{\rm obs}=0.9$','$L/l_{\rm obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
@@ -588,7 +590,7 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% plot y_c vs y_0_HEAD (with color theta_0) 
+%% plot y_{\rm c} vs y_0_HEAD (with color theta_0) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 760 570]);
@@ -630,12 +632,12 @@ hcb=colorbar('Ticks', -10:2.5:10); caxis([-10 10]); colormap jet
 ax = gca; ax.FontSize = 16;
 title(hcb,'$\theta_0$','FontSize', 24,'Interpreter', 'latex'); grid on
 
-xlabel('$y_0^{HEAD}/h_{obs}$','FontSize', 24,'Interpreter', 'latex'); 
-ylabel('$y_c/h_{obs}$','FontSize', 24,'Interpreter', 'latex');
+xlabel('$y_0^{HEAD}/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); 
+ylabel('$y_{\rm c}/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 % title_txt = ['$-10 < \theta_0 < 10$'];
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 ylim([-0.1 1.1]);
-legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
+legend({'$L/l_{\rm obs}=0.5$','$L/l_{\rm obs}=0.7$','$L/l_{\rm obs}=0.9$','$L/l_{\rm obs}=1.2$'}, 'Location', 'northwest','FontSize', 16,'Interpreter', 'latex')
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
@@ -661,7 +663,7 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 % 
 % % cmap(size(together_plot,2)); 
 % hcb=colorbar; caxis([0 1]); colormap jet
-% title(hcb,'$Initial\ position\ (y_0/h_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
+% title(hcb,'$Initial\ position\ (y_0/h_{\rm obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
 % 
 % xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
 % ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
@@ -723,7 +725,7 @@ legend({'$L/l_{obs}=0.5$','$L/l_{obs}=0.7$','$L/l_{obs}=0.9$','$L/l_{obs}=1.2$'}
 % 
 % % cmap(size(together_plot,2)); 
 % hcb=colorbar; caxis([0.5 1.5]); colormap jet
-% title(hcb,'$Contour\ length\ (L/l_{obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
+% title(hcb,'$Contour\ length\ (L/l_{\rm obs})$','FontSize', 16,'Interpreter', 'latex'); grid on
 % 
 % xlabel('$\theta_c$','FontSize', 18,'Interpreter', 'latex'); 
 % ylabel('$y_c$','FontSize', 18,'Interpreter', 'latex');
@@ -852,9 +854,9 @@ end
 % hold on
 % axis equal;  grid on
 % xlim([0.1 0.7]); ylim([-0.2 0.2]);
-% ylabel('$Initial\ angle\ \theta_0\ (rad)$','FontSize', 18,'Interpreter', 'latex'); 
-% xlabel('$Initial\ position\ y_0/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
-% title_txt = ['$Length\ L/l_{obs} = ',num2str(the_L_0), '$'];
+% ylabel('$Initial\ angle\ \theta_0\ (^\circ)$','FontSize', 18,'Interpreter', 'latex'); 
+% xlabel('$Initial\ position\ y_0/h_{\rm obs}$','FontSize', 18,'Interpreter', 'latex');
+% title_txt = ['$Length\ L/l_{\rm obs} = ',num2str(the_L_0), '$'];
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 % 
 % ref_X = nan(size(toPlot_y_0_X, 1), size(toPlot_y_0_X, 2));
@@ -862,6 +864,8 @@ end
 % ref_X(16, 9) = 0.04; ref_Y(16, 9) = 0; 
 % quiver(toPlot_y_0_X, toPlot_theta_0_Y/180*pi, ref_X, ref_Y, 0, 'k',...
 %         'LineWidth', 2,'ShowArrowHead','off'); 
+% set(gca,'TickLabelInterpreter','latex','Fontsize',14,'YTick', ...
+%     -10/180*pi:2.5/180*pi:10/180*pi,'YTickLabel',-10:2.5:10);
 % text(0.58,0.16, 'Reference line','Color','k','FontSize',16)
 % 
 % % f=gcf;
@@ -890,7 +894,7 @@ end
 %     q.MaxHeadSize = 0.03;
 %     hold on
 %     color_ind = color_ind + 1;
-%     legend_txt = [legend_txt, strcat('$L/l_{obs} = ',num2str(the_L_0), '$')];
+%     legend_txt = [legend_txt, strcat('$L/l_{\rm obs} = ',num2str(the_L_0), '$')];
 % 
 % end
 % 
@@ -903,9 +907,11 @@ end
 % legend_txt = [legend_txt, ''];
 % axis equal;  grid on
 % xlim([0.1 0.7]); ylim([-0.2 0.2]);
-% ylabel('$Initial\ angle\ \theta_0\ (rad)$','FontSize', 18,'Interpreter', 'latex'); 
-% xlabel('$Initial\ position\ y_0/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+% ylabel('$Initial\ angle\ \theta_0\ (^\circ)$','FontSize', 18,'Interpreter', 'latex'); 
+% xlabel('$Initial\ position\ y_0/h_{\rm obs}$','FontSize', 18,'Interpreter', 'latex');
 % legend(legend_txt, 'Location', 'southwest','FontSize', 16,'Interpreter', 'latex')
+% set(gca,'TickLabelInterpreter','latex','Fontsize',14,'YTick', ...
+%     -10/180*pi:2.5/180*pi:10/180*pi,'YTickLabel',-10:2.5:10);
 % text(0.58,0.16, 'Reference line','Color','k','FontSize',16)
 % 
 % % f=gcf;
@@ -940,17 +946,17 @@ for ii = 8:-1:1
     ref_X = ref_X ./ sqrt(toPlot_contact_X.^2 + toPlot_contact_Y.^2);
     ref_Y = ref_Y ./ sqrt(toPlot_contact_X.^2 + toPlot_contact_Y.^2);
     qq = quiver(toPlot_y_0_X, toPlot_theta_0_Y/180*pi, ref_X/50, ref_Y/50, 0, 'color',...
-        'k','LineWidth', 1, 'ShowArrowHead','on');
+        'k','LineWidth', 0.5, 'ShowArrowHead','on');
     qq.MaxHeadSize = 0.02;
 
-    legend_txt = [legend_txt, strcat('$L/l_{obs} = ',num2str(the_L_0), '$')];
+    legend_txt = [legend_txt, strcat('$L/l_{\rm obs} = ',num2str(the_L_0), '$')];
    
 end
 
 axis equal;  grid on
 xlim([0.1 0.7]); ylim([-0.2 0.2]);
-ylabel('$Initial\ angle\ \theta_0\ (rad)$','FontSize', 18,'Interpreter', 'latex'); 
-xlabel('$Initial\ position\ y_0/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+ylabel('$Initial\ angle\ \theta_0\ (^\circ)$','FontSize', 18,'Interpreter', 'latex'); 
+xlabel('$Initial\ position\ y_0/h_{\rm obs}$','FontSize', 18,'Interpreter', 'latex');
 legend_txt_tmp = legend_txt; 
 legend_txt = cell(1, numel(legend_txt)*2);
 for foo = 1:numel(legend_txt)
@@ -961,6 +967,8 @@ for foo = 1:numel(legend_txt)
     end
 end
 legend(legend_txt, 'Location', 'southwest','FontSize', 16,'Interpreter', 'latex')
+set(gca,'TickLabelInterpreter','latex','Fontsize',16,'YTick', ...
+    -10/180*pi:2.5/180*pi:10/180*pi,'YTickLabel',-10:2.5:10);
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
