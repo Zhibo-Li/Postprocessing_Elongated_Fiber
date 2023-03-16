@@ -88,7 +88,7 @@ legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northeast','Fo
 
 clear; close all; clc;
 xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
-    'Data_Give_to_Zhibo_20230223\results_2023_02_23_Zhibo.xlsx'],'Sheet','Sheet1' ...
+    'Data_Give_to_Zhibo_20230223\results_2023_02_23_Zhibo_NewContactThreshold.xlsx'],'Sheet','Sheet1' ...
     ,'NumHeaderLines',1);
 mask = cellfun(@ismissing, xlsfile); xlsfile(mask) = {nan};
 together_plot = [cell2mat(xlsfile(:, 1:3)), cell2mat(xlsfile(:, 5)), ...
@@ -118,8 +118,8 @@ together_plot(:, together_plot(2, :) > range_L_up) = [];
 together_plot(:, together_plot(3, :) < range_y0_low) = [];  
 together_plot(:, together_plot(3, :) > range_y0_up) = [];
 
-% together_plot(5:6, isnan(together_plot(9, :))) = nan;  % use this for vector map plotting.
-together_plot(:, isnan(together_plot(9, :))) = []; % use this for the other plottings.
+% together_plot(5:6, or(isnan(together_plot(9, :)), together_plot(9, :) == 0)) = nan;  % use this for vector map plotting.
+% together_plot(:, or(isnan(together_plot(9, :)), together_plot(9, :) == 0)) = []; % use this for the other plottings.
 % choose the contact cases where the fiber ends touch the obstacle edge and set others to be NaN.
 
 bypass_edge_together = together_plot(:, together_plot(4, :)==0); 
@@ -135,12 +135,12 @@ trapped_together = together_plot(:, together_plot(4, :)==3);
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 420 315]);
 % for legend
-plot(nan, nan, 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); 
+plot(nan, nan, 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor',[0.92, 0.70, 0.22]); 
 plot(nan, nan, 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red');
 plot(nan, nan,  'square','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); 
 plot(nan, nan,  '^','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','blue');  
 % for plot
-plot(trapped_together(6, :), trapped_together(5, :), 'diamond','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); hold on 
+plot(trapped_together(6, :), trapped_together(5, :), 'diamond','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor',[0.92, 0.70, 0.22]); hold on 
 plot(bypass_edge_together(6, :), bypass_edge_together(5, :), 'o','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
 plot(bypass_tip_together(6, :), bypass_tip_together(5, :),  'square','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); hold on
 plot(pole_vaulting_together(6, :), pole_vaulting_together(5, :),  '^','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
@@ -151,6 +151,8 @@ ylabel('$y_{\rm c}/h_{\rm obs}$','FontSize', 18,'Interpreter', 'latex');
 % title(title_txt,'FontSize', 18,'Interpreter', 'latex');
 xlim([-50 50]); ylim([0 1]);
 xticks([-45 -30 -15 0 15 30 45])
+set(gca,'TickLabelInterpreter','latex','Fontsize',16);
+grid on
 % legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northwest','FontSize', 14,'Interpreter', 'latex')
 
 % f=gcf;
@@ -208,7 +210,7 @@ xlim([-10 10]); ylim([-0.1 1.1])
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 600 450]);
 % for legend
-plot(nan, nan, 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); 
+plot(nan, nan, 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor',[0.92, 0.70, 0.22]); 
 plot(nan, nan, 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red');
 plot(nan, nan,  'square','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); 
 plot(nan, nan,  '^','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','blue'); 
@@ -222,7 +224,7 @@ trapped_together_contact = together_plot_contact(:, together_plot_contact(4, :)=
 
 % for plot
 plot(trapped_together_contact(1, :), trapped_together_contact(3, :), ...
-    'diamond','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','yellow'); hold on 
+    'diamond','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor',[0.92, 0.70, 0.22]); hold on 
 plot(bypass_edge_together_contact(1, :), bypass_edge_together_contact(3, :), ...
     'o','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
 plot(bypass_tip_together_contact(1, :), bypass_tip_together_contact(3, :), ...
