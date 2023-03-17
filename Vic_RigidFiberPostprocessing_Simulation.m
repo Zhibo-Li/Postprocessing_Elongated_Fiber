@@ -134,16 +134,16 @@ trapped_together = together_plot(:, together_plot(4, :)==3);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 420 315]);
-% for legend
-plot(nan, nan, 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor',[0.92, 0.70, 0.22]); 
+% for legend 
 plot(nan, nan, 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red');
 plot(nan, nan,  'square','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); 
 plot(nan, nan,  '^','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','blue');  
+plot(nan, nan, 'diamond','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor',[0.92, 0.70, 0.22]);
 % for plot
-plot(trapped_together(6, :), trapped_together(5, :), 'diamond','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor',[0.92, 0.70, 0.22]); hold on 
-plot(bypass_edge_together(6, :), bypass_edge_together(5, :), 'o','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
-plot(bypass_tip_together(6, :), bypass_tip_together(5, :),  'square','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); hold on
-plot(pole_vaulting_together(6, :), pole_vaulting_together(5, :),  '^','MarkerSize', 10,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
+plot(bypass_edge_together(6, :), bypass_edge_together(5, :), 'o','MarkerSize', 18,'MarkerEdgeColor','k','MarkerFaceColor','red'); hold on
+plot(bypass_tip_together(6, :), bypass_tip_together(5, :),  'square','MarkerSize', 20,'MarkerEdgeColor','k','MarkerFaceColor', [0 .5 0]); hold on
+plot(pole_vaulting_together(6, :), pole_vaulting_together(5, :),  '^','MarkerSize', 18,'MarkerEdgeColor','k','MarkerFaceColor','blue'); hold on
+plot(trapped_together(6, :), trapped_together(5, :), 'diamond','MarkerSize', 18,'MarkerEdgeColor','k','MarkerFaceColor',[0.92, 0.70, 0.22]); hold on 
 
 xlabel('$\theta_{\rm c}$','FontSize', 14,'Interpreter', 'latex'); 
 ylabel('$y_{\rm c}/h_{\rm obs}$','FontSize', 14,'Interpreter', 'latex');
@@ -1052,18 +1052,19 @@ ylabel('$\theta_0$','FontSize', 24,'Interpreter', 'latex');
 xlabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 
 set(gca,'TickLabelInterpreter','latex','Fontsize',24,'YTick', ...
-    -10/180*pi:2.5/180*pi:10/180*pi,'YTickLabel',-10:2.5:10);
+    -10/180*pi:5/180*pi:10/180*pi,'YTickLabel',-10:5:10);
 
 % annotation
-plot([0.25 0.31], [10/180*pi 10/180*pi], 'k:', 'LineWidth', 3);
-annotation('textarrow',[0.47 0.37], [0.78 0.85],'String','$\Delta\theta$', ...
+plot([0.25 0.31], [10/180*pi 10/180*pi], 'k:', 'LineWidth', 2);
+annotation('textarrow',[0.47 0.37], [0.74 0.81],'String','$\Delta\theta$', ...
     'FontSize', 24, 'Interpreter', 'latex')
 
+set_plot(gcf, gca)
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 %     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
-%     '\vector map\vectorMap_delta-theta_yc-y0_L1.png'],'Resolution',100)
+%     '\vector map\vectorMap_delta-theta_yc-y0_L1.eps'])
 
 
 
@@ -1116,15 +1117,17 @@ ylabel('$\theta_0$','FontSize', 24,'Interpreter', 'latex');
 xlabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 
 % annotation
-plot([0.25 0.31], [10/180*pi 10/180*pi], 'k:', 'LineWidth', 3);
-annotation('textarrow',[0.5 0.37], [0.8 0.85],'String','$\theta_{\rm c}$', ...
+plot([0.3 0.34], [7.5/180*pi 7.5/180*pi], 'k:', 'LineWidth', 2);
+annotation('textarrow',[0.54 0.44], [0.71 0.76],'String','$\theta_{\rm c}$', ...
     'FontSize', 24, 'Interpreter', 'latex')
 
-legend([legend_txt, {''}], 'Location', 'southwest','FontSize', 24,'Interpreter', 'latex')
+legend([legend_txt, {''}], 'Location', 'northeast','FontSize', 24,'Interpreter', 'latex')
 set(gca,'TickLabelInterpreter','latex','Fontsize',24,'YTick', ...
-    -10/180*pi:2.5/180*pi:10/180*pi,'YTickLabel',-10:2.5:10);
+    -10/180*pi:5/180*pi:10/180*pi,'YTickLabel',-10:5:10);
+
+set_plot(gcf, gca)
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 %     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
-%     '\vector map\vectorMap_thetac_L.png'],'Resolution',100)
+%     '\vector map\vectorMap_thetac_L.eps'])
