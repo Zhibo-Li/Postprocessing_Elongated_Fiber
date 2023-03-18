@@ -1006,7 +1006,7 @@ end
 
 
 figure('color', 'w'); set(gcf, 'Position', [100 100 1200 800]);
-cmap = cmocean('phase');  
+cmap = cmocean('balance');  
 
 choose_L = 6; % the layer number (L = 1).
 the_L_0 = unique(squeeze(toPlot_L_0(:,choose_L,:)));
@@ -1042,7 +1042,7 @@ end
 % set(hcb, 'FontSize', 24, 'TickLabelInterpreter', 'latex')
 % title(hcb,'$y_{\rm c}/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
 
-hcb=colorbar('Ticks', -0.4:0.2:0.4); caxis([-0.4 0.4]); cmocean('phase'); % for plot y_c-y_0
+hcb=colorbar('Ticks', -0.4:0.2:0.4); caxis([-0.4 0.4]); cmocean('balance'); % for plot y_c-y_0
 set(hcb, 'FontSize', 24, 'TickLabelInterpreter', 'latex')
 title(hcb,'$(y_{\rm c}-y_0)/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
 
