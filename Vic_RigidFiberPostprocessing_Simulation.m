@@ -118,7 +118,7 @@ together_plot(:, together_plot(2, :) > range_L_up) = [];
 together_plot(:, together_plot(3, :) < range_y0_low) = [];  
 together_plot(:, together_plot(3, :) > range_y0_up) = [];
 
-together_plot(5:6, or(isnan(together_plot(9, :)), together_plot(9, :) == 0)) = nan;  % use this for vector map plotting.
+together_plot([5:6, 8], or(isnan(together_plot(9, :)), together_plot(9, :) == 0)) = nan;  % use this for vector map plotting.
 % together_plot(:, or(isnan(together_plot(9, :)), together_plot(9, :) == 0)) = []; % use this for the other plottings.
 % choose the contact cases where the fiber ends touch the obstacle edge and set others to be NaN.
 
