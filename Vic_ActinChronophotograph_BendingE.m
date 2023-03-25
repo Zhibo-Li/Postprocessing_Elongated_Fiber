@@ -1,5 +1,5 @@
 %%%% Plot the chronophotograoh and bending energy of actin filaments.
-%%%% data from Vic_AddInformationSave.m
+%%%% data from Vic_ActinAddInformationSave.m
 %%%% data name format: PAsInfoAdded_trajectory_M63_..._batch1.mat
 
 clear; close all; clc;

@@ -1,5 +1,5 @@
 %%%% Plot the chronophotograoh, bending energy and Lee of actin filaments.
-%%%% data from Vic_ActinChronophotograph_BendingE and Vic_ActinChronophotograph_Lee
+%%%% data from VicPlot_ActinChronophotograph_BendingE_Lee.m (the second section)
 %%%% data name format: trajectory_..._batch1_Info.mat
 
 clear; close all; clc;
@@ -21,7 +21,7 @@ NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
 ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 
-for no_Group = [7 8 13 14 15 16 17 18 19 20]
+for no_Group = [7 8 13:25]
 
     the_exp_date = yyyymmdd(ExpDate{no_Group, 1});
     thefiles = dir(fullfile(storePath{no_Group},'*.mat'));
@@ -89,7 +89,7 @@ end
 
 %%
 %%%% Calculate the bending energy and Lee of actin filaments.
-%%%% data from Vic_AddInformationSave.m
+%%%% data from Vic_ActinAddInformationSave.m
 %%%% saving name format: trajectory_..._batch1_Info.mat
 
 clear; close all; clc;
@@ -103,7 +103,7 @@ NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
 ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 
-for no_Group = 19:20
+for no_Group = 23:25
 
     the_exp_date = yyyymmdd(ExpDate{no_Group, 1});
     thefiles = dir(fullfile(storePath{no_Group},'*.mat'));
