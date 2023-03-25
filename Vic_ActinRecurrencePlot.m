@@ -15,9 +15,8 @@ PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 Array_angles = xlsfile(:, 14);  % The flow angles.
 
 n = 1;
-for no_Group = [7 8 13 14 15 16 17 18 19 20 21 22]
-    % Square-based array 0°, 10°, and 20°
-    % No.13 needed to be recalculated (20230125)
+for no_Group = [7 8 13:25]
+    % Square-based array 0°, 10°, 20°, 15°, 35°, 30° and 45°
 
     Array_angle = Array_angles{no_Group};
 
@@ -115,6 +114,7 @@ for no_Group = [7 8 13 14 15 16 17 18 19 20 21 22]
             Info.map{n} = For_Poincare;
             Info.date(n) = the_exp_date;
             Info.name{n} = filename(14:end-4);
+            Info.FlowAngle(n) = Array_angle;
             n = n + 1;
 
             % f=gcf;
@@ -137,8 +137,8 @@ load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare p
 
 Obj_Mag = 0.1; % um/pixel
 
-thedate = Info.date;
-[C, ia, ic] = unique(thedate,'stable');
+theFlAng = Info.FlowAngle;
+[C, ia, ic] = unique(theFlAng,'stable');
 ia = [ia; length(ic)+1];
 
 L_all = [];
@@ -167,30 +167,22 @@ for ii = 1:length(ia)-1
 
     end
 
-    figure('color', 'w'); set(gcf, 'Position', [100 100 500 500]);
+    figure('color', 'w'); set(gcf, 'Position', [100 100 600 600]);
     scatter(Lattice_in_all, Lattice_out_all, 20, L_toPlot_all, 'Filled', 'o','MarkerEdgeColor','none');
-    hcb=colorbar; caxis([0 50]) ;colormap jet
-    title(hcb,'$L(\mu{m})$','FontSize', 16,'Interpreter', 'latex'); 
+    hcb=colorbar; caxis([0 50]); colormap jet
+    set(hcb,'TickLabelInterpreter','latex','Fontsize',16);
+    title(hcb,'$L(\mu{m})$','FontSize', 20,'Interpreter', 'latex');
 
-    axis equal; grid on
-    xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
-    xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
-    ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-    if ii == 1
-        title_txt = '$\theta=0^{\circ}$';
-    elseif ii == 2
-        title_txt = '$\theta=10^{\circ}$';
-    elseif ii == 3
-        title_txt = '$\theta=20^{\circ}$';
-    elseif ii == 4
-        title_txt = '$\theta=15^{\circ}$';
-    else
-        title_txt = '$\theta=35^{\circ}$';
-    end
-    title(title_txt,'FontSize', 22,'Interpreter', 'latex');
-
+    axis equal; grid on; box on
+    xlim([0 1]); ylim([0 1]); 
+    set(gca,'TickLabelInterpreter','latex','Fontsize',16);
+    xlabel('$\eta_{i}$','FontSize', 24,'Interpreter', 'latex');
+    ylabel('$\eta_{i+1}$','FontSize', 24,'Interpreter', 'latex');
+    title_txt = strcat('$\theta=', num2str(C(ii)), '^{\circ}$');
+    title(title_txt,'FontSize', 20,'Interpreter', 'latex');
+    
 %     f=gcf;
-%     exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\',title_txt(2:end-9),'_colorcodeL.png'],'Resolution',100)
+%     exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\',title_txt(2:end-9),'_colorcode-L.png'],'Resolution',100)
 
 end
 
@@ -201,8 +193,8 @@ load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare p
 
 Obj_Mag = 0.1; % um/pixel
 
-thedate = Info.date;
-[C, ia, ic] = unique(thedate,'stable');
+theFlAng = Info.FlowAngle;
+[C, ia, ic] = unique(theFlAng,'stable');
 ia = [ia; length(ic)+1];
 
 ii = 2; % choose theta = 10 
