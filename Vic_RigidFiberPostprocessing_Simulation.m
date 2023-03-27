@@ -116,8 +116,8 @@ end
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%% plot contact infromation vs initial condition %%%%%%%%%%%%%%%
-%%% based on simulation data (in 'simulations_latest' folder)
+%%%%%%%%%%%%%%%%%% calculate contact infromation %%%%%%%%%%%%%%%%%%%%%%%%%
+
 clear; close all; clc;
 
 [excelname, excelpathname] = uigetfile(['D:\Dropbox\Collaboration - LadHyX\' ...
@@ -141,7 +141,7 @@ obs_2d = sortrows([obs_2d, theta], 3); obs_2d = obs_2d(:, 1:2);
 
 ver_ind = find(obs_2d(:,2) == max(obs_2d(:,2))); % index of the vertex
 obs_2d = [obs_2d(ver_ind:end, :); obs_2d(1:ver_ind-1, :)]; % re-order the coordinates (highest apex first).
-windward_edge_x = obs_2d(1:round(size(obs_2d, 1)/3)+3,1); % 1/3 of all the points; +2 is to extend the edge a bit more.
+windward_edge_x = obs_2d(1:round(size(obs_2d, 1)/3)+3,1); % 1/3 of all the points; +3 is to extend the edge a bit more.
 windward_edge_y = obs_2d(1:round(size(obs_2d, 1)/3)+3,2);
 % the highest and lowest of the obstacle for y_c calculation.
 obs_top = max(obs_2d(:,2));
