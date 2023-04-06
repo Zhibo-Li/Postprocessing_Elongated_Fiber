@@ -169,34 +169,43 @@ for sub1Path_i = 3:length(sub1_path)
             fileinfo = dir(fullfile(parent_path, current_deg, current_L, current_y0, 'output_data\*.vtk'));
 
             for ii = 1:length(fileinfo)
-                snapshot = readVTK(fullfile(fileinfo(ii).folder, fileinfo(ii).name));
-                XY = snapshot.points(:, 1:2);
 
-                the_dist = pdist2(XY,[windward_edge_x, windward_edge_y],'euclidean');
+                currentVTK_name = fileinfo(ii).name;
+                steric_fib_obs = strcat('fiber_beads_f_steric_fib_obs_', currentVTK_name(end-9: end-4), '.dat');
 
-                if min(min(the_dist)) < 0.593 * (obs_beads_size+fiber_beads_size)  % if it's direct contact.
+                if str2double(currentVTK_name(end-9: end-4)) ~= 0
 
-                    com_XY = mean(XY, 1); % CoM of current fiber
-                    Gyr = 1/size(XY,1) * [sum((XY(:, 1)-com_XY(1)).^2),  sum((XY(:, 1)-com_XY(1)) .* (XY(:, 2)-com_XY(2)));
-                        sum((XY(:, 2)-com_XY(2)) .* (XY(:, 1)-com_XY(1))), sum((XY(:, 2)-com_XY(2)).^2)];
-                    [eigenV,eigenD] = eig(Gyr);
-                    [d,ind] = sort(diag(eigenD));
-                    Ds = eigenD(ind,ind);
-                    Vs = eigenV(:,ind);
-                    theta_c = atan(Vs(2,2)/Vs(1,2))/pi*180; % calculate theta_c
+                    ster_forces = readmatrix(fullfile(fileinfo(ii).folder, steric_fib_obs));
+                    abs_ster_forces = sum(abs(ster_forces), 2);
 
-                    [minDist_ind_fiber, minDist_indy_obs] = find(the_dist == min(min(the_dist))); 
-                    y_c = (windward_edge_y(minDist_indy_obs)-obs_bottom) / (obs_top-obs_bottom); % calculate y_c
+                    if sum(abs_ster_forces) ~= 0
 
-                    if minDist_ind_fiber == 1 || minDist_ind_fiber == size(XY, 1)
-                        if_fiberENDs_contact = 1; % check if the fiber ends contact the obstacle
-                    else
-                        if_fiberENDs_contact = 0;
+                        snapshot = readVTK(fullfile(fileinfo(ii).folder, fileinfo(ii).name));
+                        XY = snapshot.points(:, 1:2);
+
+                        the_dist = pdist2(XY,[windward_edge_x, windward_edge_y],'euclidean');
+
+                        com_XY = mean(XY, 1); % CoM of current fiber
+                        Gyr = 1/size(XY,1) * [sum((XY(:, 1)-com_XY(1)).^2),  sum((XY(:, 1)-com_XY(1)) .* (XY(:, 2)-com_XY(2)));
+                            sum((XY(:, 2)-com_XY(2)) .* (XY(:, 1)-com_XY(1))), sum((XY(:, 2)-com_XY(2)).^2)];
+                        [eigenV,eigenD] = eig(Gyr);
+                        [d,ind] = sort(diag(eigenD));
+                        Ds = eigenD(ind,ind);
+                        Vs = eigenV(:,ind);
+                        theta_c = atan(Vs(2,2)/Vs(1,2))/pi*180; % calculate theta_c
+
+                        [minDist_ind_fiber, minDist_indy_obs] = find(the_dist == min(min(the_dist)));
+                        y_c = (windward_edge_y(minDist_indy_obs)-obs_bottom) / (obs_top-obs_bottom); % calculate y_c
+
+                        if minDist_ind_fiber == 1 || minDist_ind_fiber == size(XY, 1)
+                            if_fiberENDs_contact = 1; % check if the fiber ends contact the obstacle
+                        else
+                            if_fiberENDs_contact = 0;
+                        end
+
+                        ite_contact = ii - 1;  % the frame number of the contact case (the number which is contained in the filename)
+                        break
                     end
-
-                    ite_contact = ii - 1;  % the frame number of the contact case
-
-                    break
                 end
             end
 
@@ -216,7 +225,8 @@ for sub1Path_i = 3:length(sub1_path)
                     '\Data_Give_to_Zhibo_20230223_videos\Orientations\', current_deg, '_', current_L, ...
                     '_', current_y0, '_orientations.mat']);
                 Loc = ['L', num2str(Ind+1)]; 
-                writematrix(ori_ee(ite_contact),[excelpathname, excelname],'Sheet','Sheet1','Range', Loc); 
+                writematrix(ori_ee(ite_contact+1),[excelpathname, excelname],'Sheet','Sheet1','Range', Loc); 
+                % ite_contact+1: because the number is in the file name
 
                 Loc = ['P', num2str(Ind+1)]; 
                 writematrix(if_fiberENDs_contact,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  
