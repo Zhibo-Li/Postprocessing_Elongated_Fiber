@@ -176,14 +176,12 @@ for sub1Path_i = 3:length(sub1_path)
                 if str2double(currentVTK_name(end-9: end-4)) ~= 0
 
                     ster_forces = readmatrix(fullfile(fileinfo(ii).folder, steric_fib_obs));
-                    abs_ster_forces = sum(abs(ster_forces), 2);
+                    abs_ster_forces = sqrt(sum(ster_forces.^2, 2));
 
                     if sum(abs_ster_forces) ~= 0
 
                         snapshot = readVTK(fullfile(fileinfo(ii).folder, fileinfo(ii).name));
                         XY = snapshot.points(:, 1:2);
-
-                        the_dist = pdist2(XY,[windward_edge_x, windward_edge_y],'euclidean');
 
                         com_XY = mean(XY, 1); % CoM of current fiber
                         Gyr = 1/size(XY,1) * [sum((XY(:, 1)-com_XY(1)).^2),  sum((XY(:, 1)-com_XY(1)) .* (XY(:, 2)-com_XY(2)));
@@ -194,10 +192,10 @@ for sub1Path_i = 3:length(sub1_path)
                         Vs = eigenV(:,ind);
                         theta_c = atan(Vs(2,2)/Vs(1,2))/pi*180; % calculate theta_c
 
-                        [minDist_ind_fiber, minDist_indy_obs] = find(the_dist == min(min(the_dist)));
-                        y_c = (windward_edge_y(minDist_indy_obs)-obs_bottom) / (obs_top-obs_bottom); % calculate y_c
+                        bead_cont_ind = find(abs_ster_forces == max(abs_ster_forces));
+                        y_c = (XY(bead_cont_ind, 2)-obs_bottom) / (obs_top-obs_bottom); % calculate y_c
 
-                        if minDist_ind_fiber == 1 || minDist_ind_fiber == size(XY, 1)
+                        if bead_cont_ind == 1 || bead_cont_ind == size(XY, 1)
                             if_fiberENDs_contact = 1; % check if the fiber ends contact the obstacle
                         else
                             if_fiberENDs_contact = 0;
