@@ -194,7 +194,7 @@ for sub1Path_i = 3:length(sub1_path)
                         if_fiberENDs_contact = 0;
                     end
 
-                    ite_contact = ii;  % the frame number of the contact case
+                    ite_contact = ii - 1;  % the frame number of the contact case
 
                     break
                 end
