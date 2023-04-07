@@ -86,9 +86,9 @@ legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'northeast','Fo
 %% # Contact infromation vs initial condition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% clear; close all; clc;
+clear; close all; clc;
 xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
-    'Data_Give_to_Zhibo_20230223\results_2023_02_23_Zhibo_NewContactThreshold.xlsx'],'Sheet','Sheet1' ...
+    'Data_Give_to_Zhibo_20230223\results_2023_02_23_Zhibo_DetectContactbyForce.xlsx'],'Sheet','Sheet1' ...
     ,'NumHeaderLines',1);
 mask = cellfun(@ismissing, xlsfile); xlsfile(mask) = {nan};
 together_plot = [cell2mat(xlsfile(:, 1:3)), cell2mat(xlsfile(:, 5)), ...
@@ -1033,7 +1033,7 @@ arrow_scale = 0.06;
 for ii = 1:size(p1, 1)
     if ~isnan(toPlot_y_c_colorInd(ii))
     set(gca,'ColorOrder', cmap(toPlot_y_c_colorInd(ii), :))
-    arrow3(p1(ii,:),p1(ii,:)+arrow_scale*p2(ii,:), '2o', 10)
+    arrow3(p1(ii,:),p1(ii,:)+arrow_scale*p2(ii,:), '3o', 0)
     hold on
     end
 end
@@ -1102,7 +1102,7 @@ for ii = 8:-2:1
         size(toPlot_theta_c_ii, 2)) .* cosd(toPlot_theta_c_ii); % arrow direction
 
     q = quiver(toPlot_y_0_X, toPlot_theta_0_Y/180*pi, toPlot_contact_X/30, toPlot_contact_Y/30, 0, 'color',...
-        cmap(color_ind*60,:),'LineWidth', 2, 'ShowArrowHead','on'); 
+        cmap(color_ind*60,:),'LineWidth', 2, 'ShowArrowHead','off'); 
     q.MaxHeadSize = 0.05;
     hold on
     color_ind = color_ind + 1;
