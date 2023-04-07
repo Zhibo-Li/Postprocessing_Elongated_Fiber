@@ -86,8 +86,9 @@ for sub1Path_i = 3:length(sub1_path)
             plot(ori_ee, 'o','MarkerSize', 8,'MarkerEdgeColor','k','MarkerFaceColor','red');
 
             xlabel('$Frame$','FontSize', 18,'Interpreter', 'latex');
-            ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$\Delta\theta$','FontSize', 18,'Interpreter', 'latex');
 
+            set_plot(gcf, gca)
             f=gcf;
             exportgraphics(f,['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
                 '\Data_Give_to_Zhibo_20230223_videos\Orientations\', current_deg, '_', current_L, ...
@@ -151,7 +152,7 @@ for choose_theta0 = -10:2.5:10
                 'MarkerFaceColor', cmap(color_ind*30,:)); hold on
 
             xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
-            ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$\Delta\theta$','FontSize', 18,'Interpreter', 'latex');
 
             title(strcat('$\theta_0=', title_deg, '^{\circ}\ and\ L=', title_L, '$'), ...
                 'FontSize', 24, 'Interpreter', 'latex');
@@ -166,6 +167,7 @@ for choose_theta0 = -10:2.5:10
 
         savename = strcat('theta_0=', title_deg, '_L=', title_L, '_orientation_vs_x.png');
 
+        set_plot(gcf, gca)
         f=gcf;
         exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
             'Figures\about orientations vs x\Given theta0 and L\', savename{1}],'Resolution',100)
@@ -225,7 +227,7 @@ for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
                 'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
 
             xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
-            ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$\Delta\theta$','FontSize', 18,'Interpreter', 'latex');
 
             title(strcat('$y_0=', title_y0, '\ and\ L=', title_L, '$'), ...
                 'FontSize', 24, 'Interpreter', 'latex');
@@ -240,6 +242,7 @@ for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
 
         savename = strcat('y_0=', title_y0, '_L=', title_L, '_orientation_vs_x.png');
 
+        set_plot(gcf, gca)
         f=gcf;
         exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
             'Figures\about orientations vs x\Given y0 and L\', savename{1}],'Resolution',100)
@@ -299,7 +302,7 @@ for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
                 'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
 
             xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
-            ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$\Delta\theta$','FontSize', 18,'Interpreter', 'latex');
 
             title(strcat('$y_0=', title_y0, '\ and\ \theta_0=', title_deg, '^{\circ}$'), ...
                 'FontSize', 24, 'Interpreter', 'latex');
@@ -314,6 +317,7 @@ for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
 
         savename = strcat('y_0=', title_y0, '_theta_0=', title_deg, '_orientation_vs_x.png');
 
+        set_plot(gcf, gca)
         f=gcf;
         exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
             'Figures\about orientations vs x\Given y0 and theta0\', savename{1}],'Resolution',100)
@@ -374,10 +378,11 @@ for ii = 1: length(Files)
             'MarkerFaceColor', 'm'); 
 
         xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
-        ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+        ylabel('$\Delta\theta$','FontSize', 18,'Interpreter', 'latex');
         xlim([-5 2])
         ax = gca; ax.FontSize = 18;
 
+        set_plot(gcf, gca)
         f=gcf;
         exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
             '\Figures\about orientations vs x\until contact\', savename],'Resolution',100)
@@ -443,7 +448,7 @@ for choose_theta0 = -10:2.5:10
                 'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
 
             xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
-            ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$\Delta\theta$','FontSize', 18,'Interpreter', 'latex');
 
             title(strcat('$\theta_0=', title_deg, '^{\circ}\ and\ L=', title_L, '$'), ...
                 'FontSize', 24, 'Interpreter', 'latex');
@@ -458,6 +463,7 @@ for choose_theta0 = -10:2.5:10
 
         savename = strcat('theta_0=', title_deg, '_L=', title_L, '_orientation_vs_x.png');
 
+        set_plot(gcf, gca)
         f=gcf;
         exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
             'Figures\about orientations vs x\until contact\Given theta0 and L\', savename{1}],'Resolution',100)
@@ -508,39 +514,40 @@ for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
                 end
 
             end
-
-            figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
-            cmap = cmocean('thermal');  legend_txt = {};
-            [~, sortID] = sort(cell2mat(To_Plot(:,3)));  % sort the plotting order
-
-            color_ind = 1;
-            for jj = 1:size(To_Plot, 1)
-
-                plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 5,'MarkerEdgeColor','k', ...
-                    'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
-
-                xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
-                ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
-
-                title(strcat('$y_0=', title_y0, '\ and\ L=', title_L, '$'), ...
-                    'FontSize', 24, 'Interpreter', 'latex');
-                legend_txt = [legend_txt, strcat('$\theta_0=', num2str(To_Plot{sortID(jj), 3}),'^{\circ}$')];
-
-                color_ind = color_ind + 1;
-
-            end
-            xlim([-5 0])
-            ax = gca; ax.FontSize = 18;
-            legend(legend_txt, 'Location', 'northwest', 'FontSize', 18,  'Interpreter', 'latex');
-
-            savename = strcat('y_0=', title_y0, '_L=', title_L, '_orientation_vs_x.png');
-
-            f=gcf;
-            exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
-                'Figures\about orientations vs x\until contact\Given y0 and L\', savename{1}],'Resolution',100)
-
-            close
         end
+        
+        figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
+        cmap = cmocean('thermal');  legend_txt = {};
+        [~, sortID] = sort(cell2mat(To_Plot(:,3)));  % sort the plotting order
+
+        color_ind = 1;
+        for jj = 1:size(To_Plot, 1)
+
+            plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 5,'MarkerEdgeColor','k', ...
+                'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
+
+            xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$\Delta\theta$','FontSize', 18,'Interpreter', 'latex');
+
+            title(strcat('$y_0=', title_y0, '\ and\ L=', title_L, '$'), ...
+                'FontSize', 24, 'Interpreter', 'latex');
+            legend_txt = [legend_txt, strcat('$\theta_0=', num2str(To_Plot{sortID(jj), 3}),'^{\circ}$')];
+
+            color_ind = color_ind + 1;
+
+        end
+        xlim([-5 0])
+        ax = gca; ax.FontSize = 18;
+        legend(legend_txt, 'Location', 'northwest', 'FontSize', 18,  'Interpreter', 'latex');
+
+        savename = strcat('y_0=', title_y0, '_L=', title_L, '_orientation_vs_x.png');
+
+        set_plot(gcf, gca)
+        f=gcf;
+        exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
+            'Figures\about orientations vs x\until contact\Given y0 and L\', savename{1}],'Resolution',100)
+
+        close
     end
 end
 
@@ -586,39 +593,41 @@ for choose_y0 = [0.1:0.1:0.9, 0.15:0.1:0.55, 0.325:0.05:0.525]
                 end
 
             end
-
-            figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
-            cmap = cmocean('thermal');  legend_txt = {};
-            [~, sortID] = sort(cell2mat(To_Plot(:,3)));  % sort the plotting order
-
-            color_ind = 1;
-            for jj = 1:size(To_Plot, 1)
-
-                plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 5,'MarkerEdgeColor','k', ...
-                    'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
-
-                xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
-                ylabel('$Orientation\ (^{\circ})$','FontSize', 18,'Interpreter', 'latex');
-
-                title(strcat('$y_0=', title_y0, '\ and\ \theta_0=', title_deg, '^{\circ}$'), ...
-                    'FontSize', 24, 'Interpreter', 'latex');
-                legend_txt = [legend_txt, strcat('$L=', num2str(To_Plot{sortID(jj), 3}),'$')];
-
-                color_ind = color_ind + 1;
-
-            end
-            xlim([-5 0])
-            ax = gca; ax.FontSize = 18;
-            legend(legend_txt, 'Location', 'northwest', 'FontSize', 18,  'Interpreter', 'latex');
-
-            savename = strcat('y_0=', title_y0, '_theta_0=', title_deg, '_orientation_vs_x.png');
-
-            f=gcf;
-            exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
-                'Figures\about orientations vs x\until contact\Given y0 and theta0\', savename{1}],'Resolution',100)
-
-            close
         end
+
+        figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
+        cmap = cmocean('thermal');  legend_txt = {};
+        To_Plot([1,3,5,7], :) = []; % only plot L=0.6, 0.8, 1 and 1.4.
+        [~, sortID] = sort(cell2mat(To_Plot(:,3)));  % sort the plotting order
+
+        color_ind = 1;
+        for jj = 1:size(To_Plot, 1)
+
+            plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 8,'MarkerEdgeColor','k', ...
+                'MarkerFaceColor', cmap(color_ind*floor(255/size(To_Plot, 1)),:)); hold on
+
+            xlabel('$x/h_{obs}$','FontSize', 18,'Interpreter', 'latex');
+            ylabel('$\Delta\theta$','FontSize', 18,'Interpreter', 'latex');
+
+            title(strcat('$y_0=', title_y0, '\ and\ \theta_0=', title_deg, '^{\circ}$'), ...
+                'FontSize', 24, 'Interpreter', 'latex');
+            legend_txt = [legend_txt, strcat('$L=', num2str(To_Plot{sortID(jj), 3}),'$')];
+
+            color_ind = color_ind + 1;
+
+        end
+        xlim([-5 0])
+        ax = gca; ax.FontSize = 18;
+        legend(legend_txt, 'Location', 'northwest', 'FontSize', 18,  'Interpreter', 'latex');
+
+        savename = strcat('y_0=', title_y0, '_theta_0=', title_deg, '_orientation_vs_x.png');
+
+        set_plot(gcf, gca) 
+        f=gcf;
+        exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
+            'Figures\about orientations vs x\until contact\Given y0 and theta0\', savename{1}],'Resolution',100)
+
+        close
     end
 end
 
