@@ -61,6 +61,11 @@ fiber_XY = snapshot.points(:, 1:2);
 hold on
 plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', [.7 .7 .7], 'LineWidth', 3)
 snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
+    'Data_Give_to_Zhibo_20230223\simulations\theta0_2o5\L_1\y0_0o35\output_data\fibers_000070.vtk']);
+fiber_XY = snapshot.points(:, 1:2);
+hold on
+plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', [.7 .7 .7], 'LineWidth', 3)
+snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'Data_Give_to_Zhibo_20230223\simulations\theta0_2o5\L_1\y0_0o35\output_data\fibers_000086.vtk']);
 fiber_XY = snapshot.points(:, 1:2);
 hold on
@@ -72,6 +77,11 @@ fiber_XY = snapshot.points(:, 1:2);
 hold on
 plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', [.3 .3 .3], 'LineWidth', 3)
 snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
+    'Data_Give_to_Zhibo_20230223\simulations\theta0_m5\L_1\y0_0o35\output_data\fibers_000070.vtk']);
+fiber_XY = snapshot.points(:, 1:2);
+hold on
+plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', [.3 .3 .3], 'LineWidth', 3)
+snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'Data_Give_to_Zhibo_20230223\simulations\theta0_m5\L_1\y0_0o35\output_data\fibers_000083.vtk']);
 fiber_XY = snapshot.points(:, 1:2);
 hold on
@@ -79,6 +89,11 @@ plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', [.3 .3 .3], 'LineWidth', 3)
 % theta0: -5   y0: 0.5
 snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'Data_Give_to_Zhibo_20230223\simulations\theta0_m5\L_1\y0_0o5\output_data\fibers_000045.vtk']);
+fiber_XY = snapshot.points(:, 1:2);
+hold on
+plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', 'k', 'LineWidth', 3)
+snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
+    'Data_Give_to_Zhibo_20230223\simulations\theta0_m5\L_1\y0_0o5\output_data\fibers_000070.vtk']);
 fiber_XY = snapshot.points(:, 1:2);
 hold on
 plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', 'k', 'LineWidth', 3)
