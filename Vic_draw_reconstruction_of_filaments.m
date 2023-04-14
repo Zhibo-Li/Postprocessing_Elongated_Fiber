@@ -2,7 +2,8 @@
 %  Good_case: stored the absolute slice numbers of the calculated *.tif
 %             files. Get directly after running the 'Filament-detecting'
 %             (update parameters version). 
-%             * call in loop j: xy(1).frame(j)
+%             * Good_case_frm = find(ismember(xy(1).frame, Good_case));
+%             * call in loop j: xy(1).frame(Good_case_frm(j))
 %
 %  Good_case_frm: stored the index of the 'Good_case' variable. Get from
 %                 the 'draw reconstruction and selection' process.
