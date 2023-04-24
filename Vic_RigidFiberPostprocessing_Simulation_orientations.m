@@ -686,7 +686,7 @@ for choose_y0 = 0.425
             plot(To_Plot{sortID(jj), 2}, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 8,'MarkerEdgeColor','k', ...
                 'MarkerFaceColor', cmap(color_ind*60,:)); hold on
 
-            xlabel('$x/h_{obs}$','FontSize', 24,'Interpreter', 'latex');
+            xlabel('$x/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
             ylabel('$\Delta\theta$','FontSize', 24,'Interpreter', 'latex');
 
             color_ind = color_ind - 1; % coincidence with the vector plot
@@ -722,7 +722,7 @@ for choose_y0 = 0.425
         set_plot(gcf, gca) 
 %         f=gcf;
 %         exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
-%             'Figures\about orientations vs x\until contact\Given y0 and theta0\', savename{1}]
+%             'Figures\about orientations vs x\until contact\Given y0 and theta0\', savename{1}]);
 
 %         close
     end
