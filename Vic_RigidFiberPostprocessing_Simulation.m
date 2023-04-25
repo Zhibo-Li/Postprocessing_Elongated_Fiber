@@ -1014,7 +1014,7 @@ the_L_0 = unique(squeeze(toPlot_L_0(:,choose_L,:)));
 toPlot_y_0_X = squeeze(toPlot_y_0(:,choose_L,:));
 toPlot_theta_0_Y = squeeze(toPlot_theta_0(:,choose_L,:)); % x, y coordinates
 toPlot_theta_0_Y = toPlot_theta_0_Y/180*pi;
-p1 = [toPlot_y_0_X(:), toPlot_theta_0_Y(:)]; % for arrow3 plotting
+p1 = [ toPlot_theta_0_Y(:), toPlot_y_0_X(:)]; % for arrow3 plotting
 
 toPlot_delta_theta = squeeze(toPlot_delta_theta(:,choose_L,:));
 toPlot_contact_Y = ones(size(toPlot_delta_theta, 1), ...
@@ -1044,19 +1044,19 @@ end
 
 hcb=colorbar('Ticks', -0.4:0.2:0.4); caxis([-0.4 0.4]); cmocean('balance'); % for plot y_c-y_0
 set(hcb, 'FontSize', 24, 'TickLabelInterpreter', 'latex')
-title(hcb,'$(y_{\rm c}-y_0)/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
+title(hcb,'$\Delta{y}_{\rm c}/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
 
 axis equal;  grid on; box on
-xlim([0.1 0.7]); ylim([-0.2 0.2]);
-ylabel('$\theta_0$','FontSize', 24,'Interpreter', 'latex'); 
-xlabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
+ylim([0.18 0.62]); xlim([-0.25 0.3]);
+xlabel('$\theta_0$','FontSize', 24,'Interpreter', 'latex'); 
+ylabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 
-set(gca,'TickLabelInterpreter','latex','Fontsize',24,'YTick', ...
-    -10/180*pi:5/180*pi:10/180*pi,'YTickLabel',-10:5:10);
+set(gca,'TickLabelInterpreter','latex','Fontsize',24,'XTick', ...
+    -10/180*pi:5/180*pi:15/180*pi,'XTickLabel',-10:5:15);
 
 % annotation
-plot([0.25 0.31], [10/180*pi 10/180*pi], 'k:', 'LineWidth', 2);
-annotation('textarrow',[0.47 0.37], [0.74 0.81],'String','$\Delta\theta_{\rm c}$', ...
+plot([-2.5/180*pi 1/180*pi], [0.475 0.475], 'k:', 'LineWidth', 2);
+annotation('textarrow',[0.575,0.469], [0.743,0.683],'String','$\Delta\theta_{\rm c}$', ...
     'FontSize', 24, 'Interpreter', 'latex')
 
 set_plot(gcf, gca)
@@ -1064,7 +1064,7 @@ set_plot(gcf, gca)
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 %     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
-%     '\vector map\vectorMap_delta-theta_yc-y0_L1.eps'])
+%     '\vector map\vectorMap_delta-theta_yc-y0_L1_switchXY.eps'])
 
 
 
@@ -1078,7 +1078,8 @@ toPlot_theta_0 = reshape(together_plot(1, :), 19, 8, 9);
 toPlot_L_0 = reshape(together_plot(2, :), 19, 8, 9);
 toPlot_y_0 = reshape(together_plot(3, :), 19, 8, 9);
 toPlot_y_c = reshape(together_plot(5, :), 19, 8, 9);
-toPlot_theta_c = reshape(together_plot(6, :), 19, 8, 9);
+% toPlot_theta_c = reshape(together_plot(6, :), 19, 8, 9);
+toPlot_delta_theta = reshape(together_plot(8, :), 19, 8, 9);
 
 for foo = 1:numel(toPlot_y_0)
     tmp_dif = abs(toPlot_y_0(foo)-the_y0s);
@@ -1095,13 +1096,13 @@ for ii = 8:-2:1
     toPlot_y_0_X = squeeze(toPlot_y_0(:,ii,:));
     toPlot_theta_0_Y = squeeze(toPlot_theta_0(:,ii,:));
 
-    toPlot_theta_c_ii = squeeze(toPlot_theta_c(:,ii,:));
+    toPlot_theta_c_ii = squeeze(toPlot_delta_theta(:,ii,:));
     toPlot_contact_Y = ones(size(toPlot_theta_c_ii, 1), ...
         size(toPlot_theta_c_ii, 2)) .* sind(toPlot_theta_c_ii);
     toPlot_contact_X = ones(size(toPlot_theta_c_ii, 1), ...
         size(toPlot_theta_c_ii, 2)) .* cosd(toPlot_theta_c_ii); % arrow direction
 
-    q = quiver(toPlot_y_0_X, toPlot_theta_0_Y/180*pi, toPlot_contact_X/30, toPlot_contact_Y/30, 0, 'color',...
+    q = quiver(toPlot_theta_0_Y/180*pi, toPlot_y_0_X, toPlot_contact_X/30, toPlot_contact_Y/30, 0, 'color',...
         cmap(color_ind*60,:),'LineWidth', 2, 'ShowArrowHead','off'); 
     q.MaxHeadSize = 0.05;
     hold on
@@ -1111,23 +1112,23 @@ for ii = 8:-2:1
    
 end
 
-axis equal;  grid on; box on
-xlim([0.1 0.7]); ylim([-0.2 0.2]);
-ylabel('$\theta_0$','FontSize', 24,'Interpreter', 'latex'); 
-xlabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
+% axis equal;  grid on; box on
+ylim([0.08 0.62]); xlim([-0.25 0.3]);
+xlabel('$\theta_0$','FontSize', 24,'Interpreter', 'latex'); 
+ylabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 
 % annotation
-plot([0.3 0.34], [7.5/180*pi 7.5/180*pi], 'k:', 'LineWidth', 2);
-annotation('textarrow',[0.54 0.44], [0.71 0.76],'String','$\theta_{\rm c}$', ...
+plot([0 2/180*pi], [0.475 0.475], 'k:', 'LineWidth', 2);
+annotation('textarrow',[0.639,0.527], [0.773,0.727],'String','$\Delta\theta_{\rm c}$', ...
     'FontSize', 24, 'Interpreter', 'latex')
 
-legend([legend_txt, {''}], 'Location', 'northeast','FontSize', 24,'Interpreter', 'latex')
-set(gca,'TickLabelInterpreter','latex','Fontsize',24,'YTick', ...
-    -10/180*pi:5/180*pi:10/180*pi,'YTickLabel',-10:5:10);
+legend([legend_txt, {''}], 'Location', 'southwest','FontSize', 24,'Interpreter', 'latex')
+set(gca,'TickLabelInterpreter','latex','Fontsize',24,'XTick', ...
+    -10/180*pi:5/180*pi:15/180*pi,'XTickLabel',-10:5:15);
 
 set_plot(gcf, gca)
 
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 %     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
-%     '\vector map\vectorMap_thetac_L.eps'])
+%     '\vector map\vectorMap_deltathetac_L_switchXY.eps'])
