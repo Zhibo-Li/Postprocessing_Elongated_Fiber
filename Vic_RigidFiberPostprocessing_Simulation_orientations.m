@@ -830,34 +830,35 @@ obs_2d = [obs_2d; obs_2d(1, :)];
 figure('color', 'w'); 
 plot(obs_2d(:,1), obs_2d(:,2), 'k', 'LineWidth', 2); 
     
+cmap = cmocean('matter');
 % load fiber and plot it
 % theta0: -7.5          y0: 0.425           L: 0.6 and 1.4
 snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'Data_Give_to_Zhibo_20230223\simulations\theta0_m7o5\L_1o4\y0_0o425\output_data\fibers_000081.vtk']);
 fiber_XY = snapshot.points(:, 1:2);
 hold on
-plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', 'r', 'LineWidth', 3)
+plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', cmap(60,:), 'LineWidth', 3)
 snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'Data_Give_to_Zhibo_20230223\simulations\theta0_m7o5\L_1o4\y0_0o425\output_data\fibers_000065.vtk']);
 fiber_XY = snapshot.points(:, 1:2);
 hold on
-plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', 'r', 'LineWidth', 3)
+plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', cmap(60,:), 'LineWidth', 3)
 
 snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'Data_Give_to_Zhibo_20230223\simulations\theta0_m7o5\L_0o6\y0_0o425\output_data\fibers_000082.vtk']);
 fiber_XY = snapshot.points(:, 1:2);
 hold on
-plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', 'b', 'LineWidth', 3)
+plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', cmap(240,:), 'LineWidth', 3)
 snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'Data_Give_to_Zhibo_20230223\simulations\theta0_m7o5\L_0o6\y0_0o425\output_data\fibers_000093.vtk']);
 fiber_XY = snapshot.points(:, 1:2);
 hold on
-plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', 'b', 'LineWidth', 3)
+plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', cmap(240,:), 'LineWidth', 3)
 snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
     'Data_Give_to_Zhibo_20230223\simulations\theta0_m7o5\L_0o6\y0_0o425\output_data\fibers_000065.vtk']);
 fiber_XY = snapshot.points(:, 1:2);
 hold on
-plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', 'b', 'LineWidth', 3)
+plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', cmap(240,:), 'LineWidth', 3)
 
 axis equal; axis off
 
