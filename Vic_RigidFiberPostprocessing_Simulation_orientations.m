@@ -780,10 +780,10 @@ for choose_y0 = 0.425
         color_ind = size(To_Plot, 1);
         for jj = 1:size(To_Plot, 1)
 
-            plot(To_Plot{sortID(jj), 2}*sqrt(3)/2, To_Plot{sortID(jj), 1}, 'o','MarkerSize', 8,'MarkerEdgeColor','k', ...
+            plot(To_Plot{sortID(jj), 2}(1:end-1)*sqrt(3)/2, To_Plot{sortID(jj), 1}(1:end-1), 'o','MarkerSize', 8,'MarkerEdgeColor','k', ...
                 'MarkerFaceColor', cmap(color_ind*60,:)); hold on
 
-            plot(To_Plot{sortID(jj), 2}(end)*sqrt(3)/2, To_Plot{sortID(jj), 1}(end), '^','MarkerSize', 12,'MarkerEdgeColor','k', ...
+            plot(To_Plot{sortID(jj), 2}(end)*sqrt(3)/2, To_Plot{sortID(jj), 1}(end), '^','MarkerSize', 9,'MarkerEdgeColor','k', ...
                 'MarkerFaceColor', cmap(color_ind*60,:)); hold on
 
             xlabel('$x/l_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
@@ -812,7 +812,7 @@ for choose_y0 = 0.425
 %         close
     end
 end
-
+%%
 % The position of the obstacle
 obs = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
     '\Data_Give_to_Zhibo_20230223\input_data\obstacle_beads.vtk']);
