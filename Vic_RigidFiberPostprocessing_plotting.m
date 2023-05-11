@@ -280,6 +280,43 @@ trapped_together(:, trapped_together(5, :) < range_y0_low) = [];
 trapped_names(trapped_together(5, :) > range_y0_up) = [];
 trapped_together(:, trapped_together(5, :) > range_y0_up) = [];
 
+%% Save data to AllinONE (with further data cleaning) !!!!!!!!!!!!!!!!!!!!!!!:  
+
+together_plot_filtered = together_plot;
+names_plot_filtered = names_plot;
+% together_plot_filtered(:, together_plot_filtered(10, :) > 800) = []; % remove the cases that are too fast
+% together_plot_filtered(:, together_plot_filtered(10, :) < 400) = []; % remove the cases that are too slow
+abs_delta_U = abs(together_plot_filtered(21, :) - together_plot_filtered(20, :)); % |U_f - u_0|
+abs_delta_chi = abs(together_plot_filtered(16, :) - together_plot_filtered(3, :)); % |chi_f - chi_0|
+
+together_plot_filtered(:, and(abs_delta_U > 100, abs_delta_chi < 10)) = []; % remove the cases that have large U-differences but very small chi-differences.
+names_plot_filtered(:, and(abs_delta_U > 100, abs_delta_chi < 10)) = [];
+
+% % %% save the data
+% % Trappping = [trapped_together(3, :)', trapped_together(5, :)', trapped_together(1, :)', trapped_together(2, :)'];
+% % Below = [bypass_edge_together(3, :)', bypass_edge_together(5, :)', bypass_edge_together(1, :)', bypass_edge_together(2, :)'];
+% % Above = [bypass_tip_together(3, :)', bypass_tip_together(5, :)', bypass_tip_together(1, :)', bypass_tip_together(2, :)'];
+% % Pole_vaulting = [pole_vaulting_together(3, :)', pole_vaulting_together(5, :)', pole_vaulting_together(1, :)', pole_vaulting_together(2, :)'];
+% % readme = '1st column: theta_0;   2nd col: y_0;   3rd col: delta;   4th col: L.';
+% % save('D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\Data & Figures\delta_vs_theta0-y0_alldata_20230110.mat','Trappping','Below','Above','Pole_vaulting', 'readme');
+
+% % %% save the data (All in one)
+AllinONE.name = [names_plot_filtered, trapped_names];
+AllinONE.delta = [together_plot_filtered(1, :), trapped_together(1, :)]; % normalized delta by h_obs
+AllinONE.L = [together_plot_filtered(2, :), trapped_together(2, :)]; % normalized L by l_obs
+AllinONE.theta_0 = [together_plot_filtered(3, :), trapped_together(3, :)]; % theta_0
+AllinONE.x_0 = [together_plot_filtered(4, :), trapped_together(4, :)]; % normalized x_0 by h_obs (initial position)
+AllinONE.y_0 = [together_plot_filtered(5, :), trapped_together(5, :)]; % normalized y_0 by h_obs
+AllinONE.x_f = [together_plot_filtered(6, :), trapped_together(6, :)]; % normalized x_f by h_obs (final position)
+AllinONE.y_f = [together_plot_filtered(7, :), trapped_together(7, :)]; % normalized y_f by h_obs
+AllinONE.if_above = [together_plot_filtered(8, :), trapped_together(8, :)]; % if 'Above'
+AllinONE.if_PoleVaulting = [together_plot_filtered(12, :), trapped_together(12, :)]; % if 'PoleVaulting'
+AllinONE.if_Trapping = [together_plot_filtered(15, :), trapped_together(15, :)]; % if 'Trapping'
+AllinONE.if_Contacting = [together_plot_filtered(22, :), trapped_together(22, :)]; % if 'Contacting'
+
+readme = 'See struct AllinONE, field name gives the data meaning!';
+save('D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\FSI - Rigid Fiber &  Individual Obstacle\Rigid_Fiber_expdata.mat','AllinONE', 'readme');
+
 
 %% plotting
 %%%%%%%%%%%%%%%%%%%%%%%%% scatter plots %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -345,8 +382,42 @@ if range_y0_low ~= -10; ylim([range_y0_low range_y0_up]); end
 % f=gcf;
 % exportgraphics(f,'delta_vs_L-y0_classification_alldata_20230105.png','Resolution',100)
 
+
+%% plot chi_0 & y_0 with classification and further data cleaning (optional)):  
+figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
+% cmap = cmocean('thermal');
+
+together_plot_filtered = together_plot;
+
+% together_plot_filtered(:, together_plot_filtered(10, :) > 800) = []; % remove the cases that are too fast
+% together_plot_filtered(:, together_plot_filtered(10, :) < 400) = []; % remove the cases that are too slow
+abs_delta_U = abs(together_plot_filtered(21, :) - together_plot_filtered(20, :)); % |U_f - u_0|
+abs_delta_chi = abs(together_plot_filtered(16, :) - together_plot_filtered(3, :)); % |chi_f - chi_0|
+
+together_plot_filtered(:, and(abs_delta_U > 100, abs_delta_chi < 10)) = []; % remove the cases that have large U-differences but very small chi-differences.
+
+onlypass_ind = ~(logical(together_plot_filtered(12, :))); 
+% the case index without pole-vaulting, apex-vaulting and sliding.
+bypass_edge_together = together_plot_filtered(:, and(~logical(together_plot_filtered(8, :)), onlypass_ind));
+bypass_tip_together = together_plot_filtered(:, and(logical(together_plot_filtered(8, :)), onlypass_ind));
+pole_vaulting_together = together_plot_filtered(:, logical(together_plot_filtered(12, :))); 
+
+plot(bypass_edge_together(3, :), bypass_edge_together(5, :), 'o','MarkerSize', 18,'MarkerEdgeColor','red','LineWidth',2); hold on
+plot(bypass_tip_together(3, :), bypass_tip_together(5, :),  'square','MarkerSize', 20,'MarkerEdgeColor',[0 .5 0],'LineWidth',2); hold on
+plot(pole_vaulting_together(3, :), pole_vaulting_together(5, :),  '^','MarkerSize', 18,'MarkerEdgeColor','blue','LineWidth',2); hold on
+plot(trapped_together(3, :), trapped_together(5, :), 'diamond','MarkerSize', 18,'MarkerEdgeColor',[0.92, 0.70, 0.22],'LineWidth',2); hold on 
+
+xlabel('$\theta_0$','FontSize', 18,'Interpreter', 'latex'); 
+ylabel('$y_0/h_{\rm obs}$','FontSize', 18,'Interpreter', 'latex');
+
+xlim([-10 10]); ylim([0 1]); 
+set_plot(gcf, gca)
+
+f=gcf;
+savefig(f,'D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\FSI - Rigid Fiber &  Individual Obstacle\delta_vs_theta0-y0_L0.5-1.5_20230110.fig')
+
+
 %% plot the deviation vs chi_0 & y_0 (with classification and further data cleaning (optional)):  
-% Also save data to AllinONE !!!!!!!!!!!!!!!!!!!!!!!
 figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
 % cmap = cmocean('thermal');
 cmap = colormap("jet");
@@ -358,7 +429,6 @@ abs_delta_U = abs(together_plot_filtered(21, :) - together_plot_filtered(20, :))
 abs_delta_chi = abs(together_plot_filtered(16, :) - together_plot_filtered(3, :)); % |chi_f - chi_0|
 
 together_plot_filtered(:, and(abs_delta_U > 100, abs_delta_chi < 10)) = []; % remove the cases that have large U-differences but very small chi-differences.
-names_plot_filtered(:, and(abs_delta_U > 100, abs_delta_chi < 10)) = [];
 
 onlypass_ind = ~(logical(together_plot_filtered(12, :))); 
 % the case index without pole-vaulting, apex-vaulting and sliding.
@@ -391,30 +461,7 @@ legend({'Trapping','Below','Above','Pole-vaulting'}, 'Location', 'southeast','Fo
 % f=gcf;
 % exportgraphics(f,'delta_vs_theta0-y0_L0.5-1.5_20230110.png','Resolution',100)
 
-% % %% save the data
-% % Trappping = [trapped_together(3, :)', trapped_together(5, :)', trapped_together(1, :)', trapped_together(2, :)'];
-% % Below = [bypass_edge_together(3, :)', bypass_edge_together(5, :)', bypass_edge_together(1, :)', bypass_edge_together(2, :)'];
-% % Above = [bypass_tip_together(3, :)', bypass_tip_together(5, :)', bypass_tip_together(1, :)', bypass_tip_together(2, :)'];
-% % Pole_vaulting = [pole_vaulting_together(3, :)', pole_vaulting_together(5, :)', pole_vaulting_together(1, :)', pole_vaulting_together(2, :)'];
-% % readme = '1st column: theta_0;   2nd col: y_0;   3rd col: delta;   4th col: L.';
-% % save('D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\Data & Figures\delta_vs_theta0-y0_alldata_20230110.mat','Trappping','Below','Above','Pole_vaulting', 'readme');
 
-% % %% save the data (All in one)
-% AllinONE.name = names_plot_filtered;
-% AllinONE.delta = together_plot_filtered(1, :); % normalized delta by h_obs
-% AllinONE.L = together_plot_filtered(2, :); % normalized L by l_obs
-% AllinONE.theta_0 = together_plot_filtered(3, :); % theta_0
-% AllinONE.x_0 = together_plot_filtered(4, :); % normalized x_0 by h_obs (initial position)
-% AllinONE.y_0 = together_plot_filtered(5, :); % normalized y_0 by h_obs
-% AllinONE.x_f = together_plot_filtered(6, :); % normalized x_f by h_obs (final position)
-% AllinONE.y_f = together_plot_filtered(7, :); % normalized y_f by h_obs
-% AllinONE.if_above = together_plot_filtered(8, :); % if 'Above'
-% AllinONE.if_PoleVaulting = together_plot_filtered(12, :); % if 'PoleVaulting'
-% AllinONE.if_Trapping = together_plot_filtered(15, :); % if 'Trapping'
-% AllinONE.if_Contacting = together_plot_filtered(22, :); % if 'Contacting'
-% 
-% readme = 'See struct AllinONE, field name gives the data meaning!';
-% save('D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\FSI - Rigid Fiber &  Individual Obstacle\Rigid_Fiber_expdata.mat','AllinONE', 'readme');
 
 %% plot the y_0 vs L & deviation (with classification and further data cleaning (optional)):
 figure('color', 'w'); set(gcf, 'Position', [100 100 1000 500]);
