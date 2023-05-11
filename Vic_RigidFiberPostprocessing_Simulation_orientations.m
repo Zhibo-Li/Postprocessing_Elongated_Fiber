@@ -783,8 +783,11 @@ for choose_y0 = 0.425
             plot(To_Plot{sortID(jj), 2}(1:end-1)*sqrt(3)/2, To_Plot{sortID(jj), 1}(1:end-1), 'o','MarkerSize', 8,'MarkerEdgeColor','k', ...
                 'MarkerFaceColor', cmap(color_ind*60,:)); hold on
 
-            plot(To_Plot{sortID(jj), 2}(end)*sqrt(3)/2, To_Plot{sortID(jj), 1}(end), '^','MarkerSize', 9,'MarkerEdgeColor','k', ...
+            plot(To_Plot{sortID(jj), 2}(end)*sqrt(3)/2, To_Plot{sortID(jj), 1}(end), '^','MarkerSize', 11,'MarkerEdgeColor','k', ...
                 'MarkerFaceColor', cmap(color_ind*60,:)); hold on
+
+            plot([To_Plot{sortID(jj), 2}(end)*sqrt(3)/2 To_Plot{sortID(jj), 2}(end)*sqrt(3)/2], [-40 0], '-.','linewidth', 1.5, ...
+                'Color', cmap(color_ind*60,:)); hold on
 
             xlabel('$x/l_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
             ylabel('$\Delta\theta$','FontSize', 24,'Interpreter', 'latex');
@@ -813,6 +816,28 @@ for choose_y0 = 0.425
     end
 end
 %%
+% load flow field simulation data
+load(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\Data_Give_to' ...
+    '_Zhibo_20230223\input_data\Mid_plane_data.mat'])
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 600 320]);
+
+startX = 800*1E-6 * ones(1, 75);
+startY = linspace(200*1E-6, 600*1E-6,75);
+lineobj = streamline(XX*scale,YY*scale, UX_midplane/U_max,UY_midplane/U_max, startX, startY);
+% quiver(XX*scale,YY*scale, UX_midplane/U_max,UY_midplane/U_max)
+for foo = 1:length(lineobj)
+    lineobj(foo).LineWidth = 0.1;
+    lineobj(foo).Color = [.6, .6, .6];
+end
+axis off
+
+% % Plot separatrix
+hold on 
+lineobj_sep = streamline(XX*scale,YY*scale, UX_midplane/U_max,UY_midplane/U_max, 800*1E-6, 399.4*1E-6);
+lineobj_sep.Color = 'red';
+lineobj_sep.LineWidth = 1.5;
+
 % The position of the obstacle
 obs = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared' ...
     '\Data_Give_to_Zhibo_20230223\input_data\obstacle_beads.vtk']);
@@ -827,7 +852,7 @@ obs_2d(:, 1) = (obs_2d(:, 1) - obs_2d_center(1)) * ...
 obs_2d(:, 2) = (obs_2d(:, 2) - obs_2d_center(2)) * ...
     (2.5e-5 + obs_beads_size) / 2.5e-5 + obs_2d_center(2);  % 2.5e-5 is the 1/3 the height of the equilateral triangle
 obs_2d = [obs_2d; obs_2d(1, :)];
-figure('color', 'w'); 
+hold on;
 plot(obs_2d(:,1), obs_2d(:,2), 'k', 'LineWidth', 2); 
     
 cmap = cmocean('matter');
@@ -845,7 +870,7 @@ hold on
 plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', cmap(60,:), 'LineWidth', 3)
 
 snapshot = readVTK(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
-    'Data_Give_to_Zhibo_20230223\simulations\theta0_m7o5\L_0o6\y0_0o425\output_data\fibers_000082.vtk']);
+    'Data_Give_to_Zhibo_20230223\simulations\theta0_m7o5\L_0o6\y0_0o425\output_data\fibers_000081.vtk']);
 fiber_XY = snapshot.points(:, 1:2);
 hold on
 plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', cmap(240,:), 'LineWidth', 3)
@@ -862,6 +887,26 @@ plot(fiber_XY(:,1), fiber_XY(:,2), 'Color', cmap(240,:), 'LineWidth', 3)
 
 axis equal; axis off
 
-f=gcf;
-exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle\' ...
-    'Figures\about orientations vs x\until contact\Given y0 and theta0\the_sketch.eps']);
+xlim([950 1250]*1E-6)
+ylim([320 480]*1E-6)
+
+hold on;
+rectangle('Position',[950 320 300 160]*1E-6, 'LineStyle','--')
+
+text(1025*1E-6, 424*1E-6,'$t_1$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
+text(1065*1E-6, 440*1E-6,'$t_1+0.16s$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
+text(1140*1E-6, 456*1E-6,'$t_1+0.28s$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
+
+text(min(obs_2d(:,1))-20*1E-6, min(obs_2d(:,2))-15*1E-6,'$-0.5$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
+text(mean(obs_2d(:,1))-3*1E-6,  min(obs_2d(:,2))-15*1E-6,'$0$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
+text(max(obs_2d(:,1))-12*1E-6,  min(obs_2d(:,2))-15*1E-6,'$0.5$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
+
+plot([mean(obs_2d(:,1)) mean(obs_2d(:,1))], [min(obs_2d(:,2))-5*1E-6 max(obs_2d(:,2))],':k','linewidth',1.5)
+
+text(mean(obs_2d(:,1))-20*1E-6,  min(obs_2d(:,2))-35*1E-6,'$x/l_{\rm obs}$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
+
+% f=gcf;
+% set(f,'renderer','Painters');
+% print('-depsc2','-tiff','-r300','-painters',['F:\Processing & Results\FSI - ' ...
+%     'Rigid Fiber &  Individual Obstacle\Figures\about orientations vs x\' ...
+%     'until contact\Given y0 and theta0\the_sketch.eps'])
