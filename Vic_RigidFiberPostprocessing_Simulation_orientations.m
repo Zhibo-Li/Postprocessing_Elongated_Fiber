@@ -893,9 +893,9 @@ ylim([320 480]*1E-6)
 hold on;
 rectangle('Position',[950 320 300 160]*1E-6, 'LineStyle','--')
 
-text(1025*1E-6, 424*1E-6,'$t_1$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
-text(1065*1E-6, 440*1E-6,'$t_1+0.16s$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
-text(1140*1E-6, 456*1E-6,'$t_1+0.28s$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
+text(1005*1E-6, 424*1E-6,'$t_1$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
+text(1045*1E-6, 440*1E-6,'$t_1+0.16$ s','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
+text(1120*1E-6, 456*1E-6,'$t_1+0.28$ s','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
 
 text(min(obs_2d(:,1))-20*1E-6, min(obs_2d(:,2))-15*1E-6,'$-0.5$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
 text(mean(obs_2d(:,1))-3*1E-6,  min(obs_2d(:,2))-15*1E-6,'$0$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
@@ -905,8 +905,8 @@ plot([mean(obs_2d(:,1)) mean(obs_2d(:,1))], [min(obs_2d(:,2))-5*1E-6 max(obs_2d(
 
 text(mean(obs_2d(:,1))-20*1E-6,  min(obs_2d(:,2))-35*1E-6,'$x/l_{\rm obs}$','FontSize',18,'interpreter','latex','BackgroundColor', 'w')
 
-% f=gcf;
-% set(f,'renderer','Painters');
-% print('-depsc2','-tiff','-r300','-painters',['F:\Processing & Results\FSI - ' ...
-%     'Rigid Fiber &  Individual Obstacle\Figures\about orientations vs x\' ...
-%     'until contact\Given y0 and theta0\the_sketch.eps'])
+f=gcf;
+set(f,'renderer','Painters');
+print('-depsc2','-tiff','-r300','-painters',['F:\Processing & Results\FSI - ' ...
+    'Rigid Fiber &  Individual Obstacle\Figures\about orientations vs x\' ...
+    'until contact\Given y0 and theta0\the_sketch.eps'])
