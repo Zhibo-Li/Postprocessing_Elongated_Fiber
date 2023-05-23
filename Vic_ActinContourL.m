@@ -44,26 +44,7 @@ for no_Group = [7 8 13:25]
 
             excel_pos = find(cellfun(@(x) contains(filename, x), all_names));
 
-            ContourL_all = xy.arclen_spl(Good_case_frm);
-
-            Longest_10percent_num = ceil(length(ContourL_all)/10); % the number of 10% longest shapshots
-            if Longest_10percent_num > 3
-
-                Sorted_L = sort(ContourL_all, 'descend');
-                Longest_10percent = Sorted_L(1:Longest_10percent_num); % 10% longest L
-
-                L_mean = mean(Longest_10percent);
-                L_std = std(Longest_10percent);
-               
-                Longest_10percent(abs(Longest_10percent - L_mean) > 2*L_std) = []; % 2-sigma
-
-                ContourL = mean(Longest_10percent);
-
-            else
-
-                ContourL = mean(ContourL_all);
-
-            end
+            ContourL = VicFc_Get_ContourLength(ContourL_all);
 
             Loc = ['B', num2str(excel_pos+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
             writematrix(ContourL,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
