@@ -21,7 +21,7 @@ excelpathname = ['F:\Processing & Results\Actin Filaments in Porous Media' ...
     '\Dynamics manually classification\'];
 % The path contains the Excels be be written in.
 
-for no_Group = [7 8 13:25]
+for no_Group = [7 8 13:28]
 
     the_exp_date = yyyymmdd(ExpDate{no_Group, 1});
     thefiles = dir(fullfile(storePath{no_Group},'*.mat'));
@@ -44,7 +44,8 @@ for no_Group = [7 8 13:25]
 
             excel_pos = find(cellfun(@(x) contains(filename, x), all_names));
 
-            ContourL = VicFc_Get_ContourLength(ContourL_all);
+            ContourL_all = xy.arclen_spl(Good_case_frm);
+            ContourL = VicFc_Get_ContourLength(ContourL_all) * mag; % unit: um
 
             Loc = ['B', num2str(excel_pos+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
             writematrix(ContourL,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
