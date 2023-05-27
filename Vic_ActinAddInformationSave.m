@@ -17,8 +17,8 @@ for no_Group = 1: NumGroup
     % list of the .mat files which contain the reconstruction information
     % (came from 'Filaments detection' code) in one group.
 
-    if no_Group <= 12 || no_Group == 16
-        % experiments before 2022.01.04 and experiments on 2022.02.17 Group1
+    if no_Group <= 6 || (no_Group <= 12 && no_Group >= 9)
+        % experiments before 2022.01.04 except for the one in 2022.09.14
 
         for no_Case = 1:length(filelist)
 
@@ -47,8 +47,7 @@ for no_Group = 1: NumGroup
         end
 
     else
-        % experiments on 2022.02.16 Group1, Group2 & Group3 and experiments on 2022.02.17 Group2 & Group3
-        % and all the other data except 'experiments before 2022.01.04 and experiments on 2022.02.17 Group1'
+        % all the other data
 
         for no_Case = 1:length(filelist)
 
