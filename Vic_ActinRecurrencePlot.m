@@ -15,7 +15,7 @@ PAsPath = xlsfile(:, 3);  % Path of the pillar array information.
 Array_angles = xlsfile(:, 14);  % The flow angles.
 
 n = 1;
-for no_Group = [7 8 13:25]
+for no_Group = [7 8 13:28]
     % Square-based array 0°, 10°, 20°, 15°, 35°, 30° and 45°
 
     Array_angle = Array_angles{no_Group};
@@ -75,7 +75,7 @@ for no_Group = [7 8 13:25]
 
             % get the filament length
             spl_Ls = xy.arclen_spl(Good_case_frm);
-            L_0 = Vic_Get_ave_cutExtreme(spl_Ls, 0.2);
+            L_0 = VicFc_Get_ContourLength(spl_Ls);
 
             % get the filament CoMs at different time
             fiber_center = reshape(cell2mat(xy.centroid), 2, length(cell2mat(xy.centroid))/2)';
@@ -125,7 +125,7 @@ for no_Group = [7 8 13:25]
 end
 
 save(['F:\Processing & Results\Actin Filaments in Porous Media\Figures\' ...
-    'Poincare plots\Poincare_Map_data.mat'], 'Info')
+    'Poincare plots\Poincare_Map_data_202305.mat'], 'Info')
 
 
 
@@ -133,23 +133,26 @@ save(['F:\Processing & Results\Actin Filaments in Porous Media\Figures\' ...
 %% draw Poincare Map for each flow angle (colorcode filament contour length)
 clear; close all; clc;
 
-load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data.mat');
+load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data_202305.mat');
 
 Obj_Mag = 0.1; % um/pixel
 
 theFlAng = Info.FlowAngle;
 [C, ia, ic] = unique(theFlAng,'stable');
-ia = [ia; length(ic)+1];
 
-L_all = [];
-for ii = 1:length(ia)-1
+for ii = 1: length(C)
 
-    L_all = [L_all, Info.L(ia(ii):ia(ii+1)-1) * Obj_Mag];
     Lattice_in_all = []; Lattice_out_all = []; L_toPlot_all = [];
+    current_deg = C(ii);
+    
+    % the contour lengths
+    L_all = Info.L  * Obj_Mag;
 
-    proc_date = C(ii);
-    for jj = ia(ii):ia(ii+1)-1
-        Lattice_in = Info.map{1, jj};
+    % in & out position in a unit cell
+    current_deg_index = find(theFlAng == current_deg);
+    for jj = 1:length(current_deg_index)
+        Lattice_in = Info.map{1, current_deg_index(jj)};
+
         Lattice_out = [[Lattice_in(2:end, 1);nan], Lattice_in(:, 2:3)];
         out_in_diff = Lattice_out(:, 2) - Lattice_in(:, 2);
 
@@ -163,7 +166,7 @@ for ii = 1:length(ia)-1
 
         Lattice_in_all = [Lattice_in_all, Lattice_in];
         Lattice_out_all = [Lattice_out_all, Lattice_out];
-        L_toPlot_all = [L_toPlot_all, L_all(jj) * ones(1, numel(Lattice_in))];
+        L_toPlot_all = [L_toPlot_all, L_all(current_deg_index(jj)) * ones(1, numel(Lattice_in))];
 
     end
 
@@ -185,78 +188,6 @@ for ii = 1:length(ia)-1
 %     exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\',title_txt(2:end-9),'_colorcode-L.png'],'Resolution',100)
 
 end
-
-%% draw Poincare Map based on contour length (shorter and longer) at different flow angles
-clear; close all; clc;
-
-load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data.mat');
-
-Obj_Mag = 0.1; % um/pixel
-
-theFlAng = Info.FlowAngle;
-[C, ia, ic] = unique(theFlAng,'stable');
-ia = [ia; length(ic)+1];
-
-ii = 2; % choose theta = 10 
-PAs_deg = 10;
-
-proc_date = C(ii);
-L_all = Info.L(ia(ii):ia(ii+1)-1);
-Contour_L_divide = 150;
-longer_ind = find(L_all >= Contour_L_divide);
-shorter_ind = find(L_all < Contour_L_divide);
-
-map_data = Info.map(1, ia(ii):ia(ii+1)-1);
-
-%%%%% draw longer fiber 
-Lattice_in_all = []; Lattice_out_all = [];
-for jj = 1:length(longer_ind)
-
-    Lattice_in = map_data{longer_ind(jj)};
-    Lattice_out = [[Lattice_in(2:end, 1);nan], Lattice_in(:, 2:3)];
-    out_in_diff = Lattice_out(:, 2) - Lattice_in(:, 2);
-
-    Lattice_in = Lattice_in(out_in_diff==0)';
-    Lattice_out = Lattice_out(out_in_diff==0)';
-
-    Lattice_in_all = [Lattice_in_all, Lattice_in];
-    Lattice_out_all = [Lattice_out_all, Lattice_out];
-end
-
-figure('color', 'w'); set(gcf, 'Position', [100 100 500 500]);
-plot(Lattice_in_all, Lattice_out_all, '.', 'LineStyle', 'none','MarkerSize', 13);
-axis equal; grid on
-xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
-xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
-ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-title(['$\theta=',num2str(PAs_deg),'^{\circ}:\ L>', num2str(Contour_L_divide * Obj_Mag),'\mu{m}$'],'FontSize', 20,'Interpreter', 'latex');
-% f=gcf;
-% exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=',num2str(PAs_deg),'_longer.png'],'Resolution',100)
-
-%%%%% draw shorter fiber 
-Lattice_in_all = []; Lattice_out_all = [];
-for jj = 1:length(shorter_ind)
-
-    Lattice_in = map_data{shorter_ind(jj)};
-    Lattice_out = [[Lattice_in(2:end, 1);nan], Lattice_in(:, 2:3)];
-    out_in_diff = Lattice_out(:, 2) - Lattice_in(:, 2);
-
-    Lattice_in = Lattice_in(out_in_diff==0)';
-    Lattice_out = Lattice_out(out_in_diff==0)';
-
-    Lattice_in_all = [Lattice_in_all, Lattice_in];
-    Lattice_out_all = [Lattice_out_all, Lattice_out];
-end
-
-figure('color', 'w'); set(gcf, 'Position', [100 100 500 500]);
-plot(Lattice_in_all, Lattice_out_all, '.', 'LineStyle', 'none','MarkerSize', 13);
-axis equal; grid on
-xlim([0 1]); ylim([0 1]); ax=gca; ax.FontSize = 15;
-xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
-ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-title(['$\theta=',num2str(PAs_deg),'^{\circ}:\ L<', num2str(Contour_L_divide * Obj_Mag),'\mu{m}$'],'FontSize', 20,'Interpreter', 'latex');
-% f=gcf;
-% exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\theta=',num2str(PAs_deg),'_shorter.png'],'Resolution',100)
 
 
 
