@@ -31,7 +31,7 @@ obs_bottom = min(obs_2d(:,2));
 
 parent_path = 'D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\Data_Give_to_Zhibo_20230223\simulations';
 sub1_path = dir(parent_path);
-for sub1Path_i = 8:length(sub1_path)
+for sub1Path_i = 7
     current_deg = sub1_path(sub1Path_i).name; 
     newStr = strrep(current_deg,'o','.'); newStr = strrep(newStr,'m','-'); 
     deg_num = str2double(newStr(8:end));
@@ -66,7 +66,7 @@ for sub1Path_i = 8:length(sub1_path)
 
             if sum(ster_forces_y) ~= 0
                 ster_forces_y(ster_forces_y == 0) = [];
-                impulse_time_integral = mean(ster_forces_y)*numel(ster_forces_y)^2;
+                impulse_time_integral = mean(ster_forces_y)*numel(ster_forces_y);
                 mean_force = mean(ster_forces_y);
             else
                 impulse_time_integral = 0;
@@ -76,11 +76,11 @@ for sub1Path_i = 8:length(sub1_path)
             tmp_index =  thetheta0==deg_num & theL==L_num & ismembertol(they0, y0_num,0.0125);
             Ind = find(tmp_index==1);
 
-            Loc = ['I', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+            Loc = ['L', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
             writematrix(impulse_time_integral,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value into the excel.
 
-            Loc = ['K', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
-            writematrix(mean_force,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value into the excel.
+%             Loc = ['K', num2str(Ind+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+%             writematrix(mean_force,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value into the excel.
 
             clearvars impulse_time_integral  
 
@@ -99,17 +99,19 @@ xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\' ...
 thedyn = cell2mat(xlsfile(:, 5));
 
 theL = cell2mat(xlsfile(:, 2)); %theL(thedyn==3) = [];
-thedelta = cell2mat(xlsfile(:, 4)); %thedelta(thedyn==3) = [];
+thedelta = cell2mat(xlsfile(:, 4)); thedelta(thedyn==3) = [];
 theimpulse = cell2mat(xlsfile(:, 9)); %theimpulse(thedyn==3) = [];
 theforce = cell2mat(xlsfile(:, 11)); %theforce(thedyn==3) = [];
+theforce_times_t = cell2mat(xlsfile(:, 12)); theforce_times_t(thedyn==3) = [];
 
 
-figure; plot(theforce, 'ro')
-figure; plot(thedelta, 'b*')
-figure; plot(theforce./theL, thedelta, 'm^')
+% figure; plot(theforce, 'ro')
+% figure; plot(thedelta, 'b*')
+figure; plot(theforce_times_t, thedelta, 'm^')
 % xlim([-0.5e-4 0.5e-4])
 
-xlabel('$Steric\ force\ (f_x)$','FontSize', 22,'Interpreter', 'latex'); 
+% xlabel('$Steric\ force\ (f_y)$','FontSize', 22,'Interpreter', 'latex'); 
+xlabel('$\int f_y t$','FontSize', 22,'Interpreter', 'latex'); 
 % xlabel('$Interaction\ index$','FontSize', 22,'Interpreter', 'latex'); 
 ylabel('$Deviation\ (\delta/h_{\rm obs})$','FontSize', 22,'Interpreter', 'latex');
 set_plot(gcf, gca)
