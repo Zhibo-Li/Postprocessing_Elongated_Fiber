@@ -144,7 +144,7 @@ for ii = 1: length(C)
 
     Lattice_in_all = []; Lattice_out_all = []; L_toPlot_all = [];
     current_deg = C(ii);
-    
+
     % the contour lengths
     L_all = Info.L  * Obj_Mag;
 
@@ -170,31 +170,50 @@ for ii = 1: length(C)
 
     end
 
-    figure('color', 'w'); set(gcf, 'Position', [100 100 600 600]);
+    f = figuresetting('centimeters',10,10,'times new roman',20,'off',2,'off','off');
+    f.figure('');
     scatter(Lattice_in_all, Lattice_out_all, 20, L_toPlot_all, 'Filled', 'o','MarkerEdgeColor','none');
-    hcb=colorbar; caxis([0 50]); colormap jet
-    set(hcb,'TickLabelInterpreter','latex','Fontsize',16);
-    title(hcb,'$L(\mu{m})$','FontSize', 20,'Interpreter', 'latex');
+    cmocean('amp'); caxis([0 50]);
+%     hcb=colorbar; 
+%     set(hcb,'TickLabelInterpreter','latex','Fontsize',20);
+%     title(hcb,'$L(\mu{m})$','FontSize', 20,'Interpreter', 'latex');
+    title_txt = strcat('$\alpha=', num2str(C(ii)), '^{\circ}$');
 
-    axis equal; grid on; box on
-    xlim([0 1]); ylim([0 1]); 
-    set(gca,'TickLabelInterpreter','latex','Fontsize',16);
-    xlabel('$\eta_{i}$','FontSize', 24,'Interpreter', 'latex');
-    ylabel('$\eta_{i+1}$','FontSize', 24,'Interpreter', 'latex');
-    title_txt = strcat('$\theta=', num2str(C(ii)), '^{\circ}$');
-    title(title_txt,'FontSize', 20,'Interpreter', 'latex');
-    
-%     f=gcf;
-%     exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\',title_txt(2:end-9),'_colorcode-L.png'],'Resolution',100)
+    f.interp_font('latex')
+    f.axes('linear',[0 1],'linear',[0 1],'$\eta_{i}$','$\eta_{i+1}$',20);
+    f.axes_ticks([0:0.2:1], [0:0.2:1]);
+    grid on
+    text(0.05, 0.9, title_txt,'FontSize', 20, ...
+        'Interpreter', 'latex','BackgroundColor',[.7 .7 .7])
+
+    set(gcf,'renderer','Painters');
+    print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
+        'Actin Filaments in Porous Media\Figures\Poincare plots\', ...
+        title_txt(2:end-9),'_colorcode-L.eps']);
 
 end
 
+%% Plot only the colorbar for the above figures.
+figure('color', 'w'); set(gcf, 'Position', [100 100 200 380]);
 
+cmocean('amp');
+caxis([0 50])
+c = colorbar;
+c.Label.String = '$L\ (\mathrm{\mu m})$';
+c.Label.Interpreter = 'LaTeX';
+c.TickLabelInterpreter = 'LaTeX';
+c.FontSize = 20;
+c.Location = 'west';
+axis off
+
+set(gcf,'renderer','Painters');
+print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\Actin Filaments in Porous Media\' ...
+        'Figures\Poincare plots\The_colorbar_L.eps']);
 
 %% Draw Poincare for tracer from simulation
 clear; close all; clc;
 
-Simu_deg = 40;  % Change this to choose the PAs angle (flow angle)
+Simu_deg = 45;  % Change this to choose the PAs angle (flow angle)
 Simu_data = readmatrix(['F:\Simulation\202208_differentFlowangles_relatedto_' ...
     '0811exp_45deg\',num2str(Simu_deg),'deg\Data\Streamline_forPoincare_moreLines.csv']);
 XXYY_Simu = Simu_data(1:end, 13:14);  % (x, y) of the streamline
@@ -210,8 +229,10 @@ XXYY_Simu = (RotMatrix * XXYY_Simu')';  % after rotation
 PAs_X = (-30:3:30)*1e-4; PAs_Y = (-30:3:30)*1e-4;  % pillar positions
 ave_y_gap = 3e-4;
 
-figure('color', 'w'); set(gcf, 'Position', [100 100 500 500]);
-for streamline_i = 250:length(locs)-249  % choose streamlines not too close to the sidewalls (sometimes needs change)
+f = figuresetting('centimeters',10,10,'times new roman',22,'off',2,'off','off');
+f.figure('');
+for streamline_i = round((length(locs)-150)/2):length(locs)-round((length(locs)-150)/2)  
+    % choose streamlines not too close to the sidewalls (sometimes needs change)
 
     XXYY_Simu_i = XXYY_Simu(locs(streamline_i):locs(streamline_i+1)-1, :);
 %     plot(XXYY_Simu_i(:, 1), XXYY_Simu_i(:, 2))
@@ -250,16 +271,19 @@ for streamline_i = 250:length(locs)-249  % choose streamlines not too close to t
     Lattice_in = Lattice_in(out_in_diff==0)';
     Lattice_out = Lattice_out(out_in_diff==0)';
 
-    plot(Lattice_in, Lattice_out, 'b.', 'LineStyle', 'none','MarkerSize', 13); hold on
+    plot(Lattice_in, Lattice_out, 'k.', 'LineStyle', 'none','MarkerSize', 8); hold on
 
 end
-ax=gca; ax.FontSize = 15; axis equal; grid on 
-xlim([0 1]); ylim([0 1]); 
-xlabel('$\eta_{i}$','FontSize', 22,'Interpreter', 'latex');
-ylabel('$\eta_{i+1}$','FontSize', 22,'Interpreter', 'latex');
-title(['$Simulation:\ \theta=',num2str(Simu_deg),'^{\circ}$'],'FontSize', 20,'Interpreter', 'latex');
+
+f.interp_font('latex')
+f.axes('linear',[0 1],'linear',[0 1],'$\eta_{i}$','$\eta_{i+1}$',22);
+f.axes_ticks([0:0.2:1], [0:0.2:1]);
+grid on
+text(0.05, 0.9, ['$\alpha =',num2str(Simu_deg),'^{\circ}$'],'FontSize', 22, ...
+    'Interpreter', 'latex','BackgroundColor',[.7 .7 .7])
 
 f=gcf;
-exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Simu_theta=',num2str(Simu_deg),'_tracer.png'],'Resolution',100)
+exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Figures\Poincare plots\Simu_theta=',num2str(Simu_deg),'_tracer.eps'])
 
 
