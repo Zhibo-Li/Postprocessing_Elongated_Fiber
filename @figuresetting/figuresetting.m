@@ -139,6 +139,10 @@ classdef figuresetting
             box on
         end
 
+        function obj = axes_ticks(obj,set_xticks,set_yticks)
+            xticks(set_xticks); 
+            yticks(set_yticks);
+        end
 
         function obj = interp_font(obj,interp)
             ax = gca;
