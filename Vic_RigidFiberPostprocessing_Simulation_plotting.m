@@ -1132,3 +1132,115 @@ set_plot(gcf, gca)
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 %     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
 %     '\vector map\vectorMap_deltathetac_L_switchXY.eps'])
+
+
+
+%% Plot the PDF of deviation for non-contact and contact cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clear; close all; clc;
+xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
+    'Data_Give_to_Zhibo_20230223\results_2023_02_23_Zhibo_DetectContactbyForce.xlsx'],'Sheet','Sheet1' ...
+    ,'NumHeaderLines',1);
+mask = cellfun(@ismissing, xlsfile); xlsfile(mask) = {nan};
+together_plot = [cell2mat(xlsfile(:, 1:3)), cell2mat(xlsfile(:, 5)), ...
+    cell2mat(xlsfile(:, 9:10)), cell2mat(xlsfile(:, 4)), cell2mat(xlsfile(:, 12)), ...
+    cell2mat(xlsfile(:, 16))]; 
+together_plot = together_plot';
+prompt = {'The lower bound of the initial angle:', 'The upper bound of the initial angle:', ...
+    'The lower bound of the contour length:','The upper bound of the contour length:'...
+    'The lower bound of the initial position:','The upper bound of the initial position:'};
+definput = {'-10', '10', 'nan', 'nan', 'nan', 'nan'};
+answer = inputdlg(prompt, 'Input (please input NaN if there is no bound)', [1 35] , definput);
+
+%%% assign the values 
+range_chi0_low = str2double(answer{1,1}); if isnan(range_chi0_low); range_chi0_low = -91; end
+range_chi0_up = str2double(answer{2,1}); if isnan(range_chi0_up); range_chi0_up = 91; end
+range_L_low = str2double(answer{3,1}); if isnan(range_L_low); range_L_low = 0; end
+range_L_up = str2double(answer{4,1}); if isnan(range_L_up); range_L_up = 10; end
+range_y0_low = str2double(answer{5,1}); if isnan(range_y0_low); range_y0_low = -10; end
+range_y0_up = str2double(answer{6,1}); if isnan(range_y0_up); range_y0_up = 10; end
+% chi_0
+together_plot(:, together_plot(1, :) < range_chi0_low) = []; 
+together_plot(:, together_plot(1, :) > range_chi0_up) = [];
+% L
+together_plot(:, together_plot(2, :) < range_L_low) = [];
+together_plot(:, together_plot(2, :) > range_L_up) = [];
+% y_0
+together_plot(:, together_plot(3, :) < range_y0_low) = [];  
+together_plot(:, together_plot(3, :) > range_y0_up) = [];
+
+together_contact_edge = together_plot(:, together_plot(9, :) == 1);
+together_contact_apex = together_plot(:, together_plot(9, :) == 0);
+together_NOcontact = together_plot(:, isnan(together_plot(9, :)));
+together_contact = together_plot(:, or(together_plot(9, :) == 1, together_plot(9, :) == 0)); % use this for the other plottings.
+
+delta_contact_edge = together_contact_edge(7, :);
+delta_contact_apex = together_contact_apex(7, :);
+delta_NOcontact = together_NOcontact(7, :);
+delta_contact = together_contact(7, :);
+
+% load the experimental data
+load(['D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\FSI - Rigid Fiber ' ...
+    '&  Individual Obstacle\Rigid_Fiber_expdata.mat'])
+
+
+exp_contact = AllinONE.if_Contacting;
+exp_delta = AllinONE.delta;
+L = AllinONE.L;
+y_0 = AllinONE.y_0;
+theta_0 = AllinONE.theta_0;
+
+
+exp_contact(L<0.5) = []; exp_delta(L<0.5) = []; y_0(L<0.5) = []; theta_0(L<0.5) = [];
+L(L<0.5) = []; 
+exp_contact(L>1.5) = []; exp_delta(L>1.5) = []; y_0(L>1.5) = []; theta_0(L>1.5) = [];
+exp_contact(y_0>1) = []; exp_delta(y_0>1) = []; theta_0(y_0>1) = []; 
+y_0(y_0>1) = []; 
+exp_contact(y_0<0) = []; exp_delta(y_0<0) = []; theta_0(y_0<0) = []; 
+exp_contact(theta_0>10) = []; exp_delta(theta_0>10) = [];
+theta_0(theta_0>10) = []; 
+exp_contact(theta_0<-10) = []; exp_delta(theta_0<-10) = [];
+
+exp_delta_contact = exp_delta(logical(exp_contact));
+exp_delta_NOcontact = exp_delta(~logical(exp_contact));
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 800 600],'DefaultTextInterpreter', 'latex');
+histogram(delta_NOcontact, 'BinWidth',0.02, 'Normalization', 'probability'); hold on
+histogram(delta_contact, 'BinWidth',0.02, 'Normalization', 'probability');
+set(gca, 'Box', 'On', 'XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, ...
+    'FontSize', 24, 'FontName', 'Times new roman')
+legend('Non contact', 'Contact', 'location','northwest', 'FontSize', 22, 'FontName', 'Times new roman')
+text(0.33, 0.76, 'Experiment', 'FontSize', 22, 'FontName', 'Times new roman')
+
+% Convert y-axis values to percentage values by multiplication
+a = cellstr(num2str(get(gca,'ytick')'*100));
+% Create a vector of '%' signs
+pct = char(ones(size(a,1),1)*'%');
+% Append the '%' signs after the percentage values
+new_yticks = [char(a),pct];
+for i=1:size(new_yticks,1); the_yticks{i} = new_yticks(i, :); end
+% 'Reflect the changes on the plot
+set(gca,'yticklabel',the_yticks)
+xlabel('$\delta$','FontSize', 24,'Interpreter', 'latex');
+ylabel('Probability','FontSize', 24, 'FontName', 'Times new roman');
+
+
+axes('Position',[.58 .50 .30 .35])
+histogram(exp_delta_NOcontact, 'BinWidth',0.02, 'Normalization', 'probability'); hold on
+histogram(exp_delta_contact, 'BinWidth',0.02, 'Normalization', 'probability');
+set(gca, 'Box', 'On', 'XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, ...
+    'FontSize', 24, 'FontName', 'Times new roman')
+% Convert y-axis values to percentage values by multiplication
+a = cellstr(num2str(get(gca,'ytick')'*100));
+% Create a vector of '%' signs
+pct = char(ones(size(a,1),1)*'%');
+% Append the '%' signs after the percentage values
+new_yticks = [char(a),pct];
+for i=1:size(new_yticks,1); the_yticks{i} = new_yticks(i, :); end
+% 'Reflect the changes on the plot
+set(gca,'yticklabel',the_yticks)
+
+f=gcf;
+exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
+    '\Figures\Paper\delta_PDF.eps'])
