@@ -1044,7 +1044,7 @@ end
 
 hcb=colorbar('Ticks', -0.4:0.2:0.4); caxis([-0.4 0.4]); cmocean('balance'); % for plot y_c-y_0
 set(hcb, 'FontSize', 24, 'TickLabelInterpreter', 'latex')
-title(hcb,'$\Delta{y}_{\rm c}/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
+title(hcb,'$(y_{\rm c}-y_0)/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex'); grid on
 
 axis equal;  grid on; box on
 ylim([0.18 0.62]); xlim([-0.25 0.3]);
@@ -1055,8 +1055,12 @@ set(gca,'TickLabelInterpreter','latex','Fontsize',24,'XTick', ...
     -10/180*pi:5/180*pi:15/180*pi,'XTickLabel',-10:5:15);
 
 % annotation
-plot([-2.5/180*pi 1/180*pi], [0.475 0.475], 'k:', 'LineWidth', 2);
-annotation('textarrow',[0.575,0.469], [0.743,0.683],'String','$\Delta\theta_{\rm c}$', ...
+plot([0/180*pi 3.5/180*pi], [0.425 0.425], 'k:', 'LineWidth', 2);
+annotation('textarrow',[0.606,0.523], [0.662,0.593],'String','$(\theta_{\rm c} - \theta_0) > 0$', ...
+    'FontSize', 24, 'Interpreter', 'latex')
+
+plot([2.5/180*pi 5/180*pi], [0.25 0.25], 'k:', 'LineWidth', 2);
+annotation('textarrow',[0.475,0.548], [0.217,0.247],'String','$(\theta_{\rm c} - \theta_0) < 0$', ...
     'FontSize', 24, 'Interpreter', 'latex')
 
 set_plot(gcf, gca)
@@ -1064,7 +1068,7 @@ set_plot(gcf, gca)
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 %     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
-%     '\vector map\vectorMap_delta-theta_yc-y0_L1_switchXY.eps'])
+%     '\vector map\vectorMap_delta-theta_yc-y0_L1_switchXY_20230602.eps'])
 
 
 
@@ -1119,7 +1123,7 @@ ylabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 
 % annotation
 plot([0 2/180*pi], [0.475 0.475], 'k:', 'LineWidth', 2);
-annotation('textarrow',[0.639,0.527], [0.773,0.727],'String','$\Delta\theta_{\rm c}$', ...
+annotation('textarrow',[0.639,0.527], [0.773,0.727],'String','$\theta_{\rm c} - \theta_0$', ...
     'FontSize', 24, 'Interpreter', 'latex')
 
 legend([legend_txt, {''}], 'Location', 'southwest','FontSize', 24,'Interpreter', 'latex')
@@ -1131,7 +1135,7 @@ set_plot(gcf, gca)
 % f=gcf;
 % exportgraphics(f,['F:\Processing & Results\FSI - Rigid Fiber &  Individual Obstacle' ...
 %     '\Figures\about contact information vs initial condition\Simu data 2023-02-23' ...
-%     '\vector map\vectorMap_deltathetac_L_switchXY.eps'])
+%     '\vector map\vectorMap_deltathetac_L_switchXY_20230602.eps'])
 
 
 
