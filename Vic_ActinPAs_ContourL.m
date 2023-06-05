@@ -1,4 +1,4 @@
-%%%% Plot the chronophotograoh, bending energy and Lee of actin filaments.
+%%%% Calculate contour length and mu_bar %%%%
 % data from Vic_ActinAddInformationSave.m
 % data name format: PAsInfoAdded_trajectory_..._.mat
 % results save in the Excels named: Dynamics xxxxxxxx-Actin.xlsx
@@ -16,6 +16,8 @@ xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLine
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
 ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
+Init_U = xlsfile(:, 8);  % initial velocity, unit: m/s.
+D_pillar = xlsfile(:, 13);  % pillar diameter, unit: um
 
 excelpathname = ['F:\Processing & Results\Actin Filaments in Porous Media' ...
     '\Dynamics manually classification\'];
@@ -47,8 +49,13 @@ for no_Group = [7 8 13:28]
             ContourL_all = xy.arclen_spl(Good_case_frm);
             ContourL = VicFc_Get_ContourLength(ContourL_all) * mag; % unit: um
 
+            mu_bar = VicFc_Get_elastoviscousNum(ContourL*1e-6, Init_U{no_Group}, D_pillar{no_Group}*1e-6);
+
             Loc = ['B', num2str(excel_pos+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
             writematrix(ContourL,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
+
+            Loc = ['N', num2str(excel_pos+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+            writematrix(mu_bar,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
 
 %             % to plot the distribution of the lengths
 %             f.figure('');
