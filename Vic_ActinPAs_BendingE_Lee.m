@@ -47,11 +47,30 @@ for no_Group = [7 8 13:28]
 
             [intensity_base, ~, ~] = Vic_Fiber_Intensity(xy, the_fully_stretched_No, base_fiber_no, base_II, 30, lzero);
 
-            CoM_x = zeros(size(Good_case_frm,2), 1); Energy = zeros(size(Good_case_frm,2), 1);
+            CoM_x = zeros(size(Good_case_frm,2), 1); 
+            Energy = zeros(size(Good_case_frm,2), 1);
             L_ee_norm_belowOne =  zeros(size(Good_case_frm,2), 1); L_ee_norm =  zeros(size(Good_case_frm,2), 1);
+            Chi = zeros(size(Good_case_frm,2), 1);
+            aniso =  zeros(size(Good_case_frm,2), 1);
             for frm_ind = 1:size(Good_case_frm,2)
 
                 xy_ind = Good_case_frm(frm_ind);% index of the 'good' cases
+
+                crd = xy.crd{1,xy_ind};
+                CoM_xy = xy.centroid{1,xy_ind};
+
+                Gyr = 1/size(crd,1) * [sum((crd(:, 1)-CoM_xy(1)).^2),  sum((crd(:, 1)-CoM_xy(1)) .* (crd(:, 2)-CoM_xy(2)));
+                    sum((crd(:, 2)-CoM_xy(2)) .* (crd(:, 1)-CoM_xy(1))), sum((crd(:, 2)-CoM_xy(2)).^2)];
+
+                [eigenV,eigenD] = eig(Gyr);
+                [d,ind] = sort(diag(eigenD));
+                Ds = eigenD(ind,ind);
+                Vs = eigenV(:,ind);
+                Chi(frm_ind) = atan(Vs(2,2)/Vs(1,2)); % orientation
+
+                Lambda1 = eigenD(2,2); Lambda2 =  eigenD(1,1);
+                aniso(frm_ind) = 1 - 4*Lambda1*Lambda2/(Lambda1+Lambda2)^2; % sphericity
+
                 II = imread(fullfile(theimgs(1).folder, theimgs(image_ind).name), xy(1).frame(xy_ind)); % load the image
 
                 [~, IntensityAll,R2] = Vic_Fiber_Intensity(xy, frm_ind, xy_ind, II, 30, lzero);
@@ -101,9 +120,9 @@ for no_Group = [7 8 13:28]
 
             save([save_pathname, filesep, 'PlusInfo_', filename(14: end-4), '.mat'],'centers', ...
                 'circleMask', 'CoM_x', 'Energy', 'Good_case_frm', 'L_ee_norm', ...
-                'L_ee_norm_belowOne', 'lzero','metric','radii','xy')
+                'L_ee_norm_belowOne', 'lzero','metric','radii','xy', 'Chi', 'aniso')
 
-            clearvars CoM_x Energy xy centers radii L_ee_norm_belowOne L_ee_norm
+            clearvars CoM_x Energy xy centers radii L_ee_norm_belowOne L_ee_norm Chi aniso 
         end
     end
 end
