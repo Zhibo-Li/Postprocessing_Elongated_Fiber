@@ -22,28 +22,31 @@ for no_Group = 1: NumGroup
 
         for no_Case = 1:length(filelist)
 
-            load(PAsPath{no_Group}); % Load the pillar array information.
-            load([storePath{no_Group}, filesep , filelist(no_Case).name])
             filename = filelist(no_Case).name;
-            save_filename = ['PAsInfoAdded_', filename];
+            if startsWith(filename, 'trajectory_')
 
-            Good_case_frm = Good_case;
-            lzero = zeros(size(Good_case_frm,2), 1);
-            for frm_ind = 1:size(Good_case_frm,2)
-                xy_ind = Good_case_frm(frm_ind);
-                lzero(frm_ind) = max(lobject,ceil(5*lnoise));
+                load(PAsPath{no_Group}); % Load the pillar array information.
+                load([storePath{no_Group}, filesep , filelist(no_Case).name])
+                save_filename = ['PAsInfoAdded_', filename];
+
+                Good_case_frm = Good_case;
+                lzero = zeros(size(Good_case_frm,2), 1);
+                for frm_ind = 1:size(Good_case_frm,2)
+                    xy_ind = Good_case_frm(frm_ind);
+                    lzero(frm_ind) = max(lobject,ceil(5*lnoise));
+                end
+
+                % save ...
+%                 save([storePath{no_Group}, filesep , save_filename], 'ds','FilNum', ...
+%                     'final_frame','frame_step','framelist','Good_case','improc', ...
+%                     'InfoImage','initial_frame','lnoise','lobject', 'MinBranchLength', ...
+%                     'missed_frames','N_fil','npnts','prcs_img','ROI','sensitivity', ...
+%                     'structsensitivity','thickness','threshold','xskip','yskip', ...
+%                     'xy','xwin','ywin','centers','circleMask','metric','radii','Good_case_frm','lzero')
+
+                % clear the saved variables
+                clearvars -except PAsPath storePath NumGroup no_Group no_Case filelist
             end
-
-            % save ...
-%             save([storePath{no_Group}, filesep , save_filename], 'ds','FilNum', ...
-%                 'final_frame','frame_step','framelist','Good_case','improc', ...
-%                 'InfoImage','initial_frame','lnoise','lobject', 'MinBranchLength', ...
-%                 'missed_frames','N_fil','npnts','prcs_img','ROI','sensitivity', ...
-%                 'structsensitivity','thickness','threshold','xskip','yskip', ...
-%                 'xy','xwin','ywin','centers','circleMask','metric','radii','Good_case_frm','lzero')
-
-            % clear the saved variables
-            clearvars -except PAsPath storePath NumGroup no_Group no_Case filelist
         end
 
     else
@@ -51,21 +54,24 @@ for no_Group = 1: NumGroup
 
         for no_Case = 1:length(filelist)
 
-            load(PAsPath{no_Group}); % Load the pillar array information.
-            load([storePath{no_Group}, filesep , filelist(no_Case).name])
             filename = filelist(no_Case).name;
-            save_filename = ['PAsInfoAdded_', filename];
+            if startsWith(filename, 'trajectory_')
 
-            Good_case_frm = find(ismember(xy(1).frame, Good_case));
-            lzero = zeros(size(Good_case_frm,2), 1);
+                load(PAsPath{no_Group}); % Load the pillar array information.
+                load([storePath{no_Group}, filesep , filelist(no_Case).name])
+                save_filename = ['PAsInfoAdded_', filename];
 
-            % save ...
-%             save([storePath{no_Group}, filesep , save_filename], 'framelist', ...
-%                 'Good_case','InfoImage','prcs_img','prmt','ROI','xy','centers', ...
-%                 "circleMask",'metric','radii','Good_case_frm','lzero')
+                Good_case_frm = find(ismember(xy(1).frame, Good_case));
+                lzero = zeros(size(Good_case_frm,2), 1);
 
-            % clear the saved variables
-            clearvars -except PAsPath storePath NumGroup no_Group no_Case filelist
+                % save ...
+%                 save([storePath{no_Group}, filesep , save_filename], 'framelist', ...
+%                     'Good_case','InfoImage','prcs_img','prmt','ROI','xy','centers', ...
+%                     "circleMask",'metric','radii','Good_case_frm','lzero')
+
+                % clear the saved variables
+                clearvars -except PAsPath storePath NumGroup no_Group no_Case filelist
+            end
         end
     end
 end
