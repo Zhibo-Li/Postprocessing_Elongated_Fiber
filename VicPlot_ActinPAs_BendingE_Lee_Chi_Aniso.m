@@ -51,7 +51,14 @@ for no_Group = [7 8 13:28]
             plot((CoM_x+lzero)*mag, Chi/pi,'sm', 'LineStyle','none', 'MarkerSize', 8);
             hold on
             plot((CoM_x+lzero)*mag, aniso, '^k', 'LineStyle','none', 'MarkerSize', 8); 
-            ylim([-0.5 1.5]);
+            hold on
+            plot([0 2050]*mag, [1 1], ':k'); 
+            hold on
+            plot([0 2050]*mag, [0 0], ':k'); 
+            spl_Ls = xy.arclen_spl(Good_case_frm);
+            L_0 = VicFc_Get_ContourLength(spl_Ls); % get the filament length
+            text(175, 1.7, ['$L_0=', num2str(L_0*mag),'\mu m$']);
+            ylim([-0.5 1.6]);
             ylabel({'End-to-end distance, ','orientation, and sphericity'}, 'FontName', 'Times new roman');
 
             legend('$E_{Bending}\ (J)$', '$L_{ee}/L_0$', '$\chi / \pi$', ...
