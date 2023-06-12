@@ -1209,13 +1209,15 @@ exp_contact(theta_0<-10) = []; exp_delta(theta_0<-10) = [];
 exp_delta_contact = exp_delta(logical(exp_contact));
 exp_delta_NOcontact = exp_delta(~logical(exp_contact));
 
+binedges_sim = -0.39:0.02:0.65;
+
 figure('color', 'w'); set(gcf, 'Position', [100 100 800 600],'DefaultTextInterpreter', 'latex');
-histogram(delta_NOcontact, 'BinWidth',0.02, 'Normalization', 'probability'); hold on
-histogram(delta_contact, 'BinWidth',0.02, 'Normalization', 'probability');
+histogram(delta_NOcontact, 'BinEdges',binedges_sim, 'Normalization', 'probability'); hold on
+histogram(delta_contact, 'BinEdges',binedges_sim, 'Normalization', 'probability');
 set(gca, 'Box', 'On', 'XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, ...
     'FontSize', 24, 'FontName', 'Times new roman')
 legend('Non contact', 'Contact', 'location','northwest', 'FontSize', 22, 'FontName', 'Times new roman')
-text(0.33, 0.76, 'Experiment', 'FontSize', 22, 'FontName', 'Times new roman')
+text(0.33, 0.95, 'Experiment', 'FontSize', 22, 'FontName', 'Times new roman')
 
 % Convert y-axis values to percentage values by multiplication
 a = cellstr(num2str(get(gca,'ytick')'*100));
@@ -1229,10 +1231,11 @@ set(gca,'yticklabel',the_yticks)
 xlabel('$\delta$','FontSize', 24,'Interpreter', 'latex');
 ylabel('Probability','FontSize', 24, 'FontName', 'Times new roman');
 
+binedges_exp = -0.21:0.02:0.21;
 
 axes('Position',[.58 .50 .30 .35])
-histogram(exp_delta_NOcontact, 'BinWidth',0.02, 'Normalization', 'probability'); hold on
-histogram(exp_delta_contact, 'BinWidth',0.02, 'Normalization', 'probability');
+histogram(exp_delta_NOcontact, 'BinEdges',binedges_exp, 'Normalization', 'probability'); hold on
+histogram(exp_delta_contact, 'BinEdges',binedges_exp, 'Normalization', 'probability');
 set(gca, 'Box', 'On', 'XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, ...
     'FontSize', 24, 'FontName', 'Times new roman')
 % Convert y-axis values to percentage values by multiplication
