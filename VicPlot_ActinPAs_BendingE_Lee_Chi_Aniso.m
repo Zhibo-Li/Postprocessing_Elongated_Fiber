@@ -1,5 +1,5 @@
-%%%% Plot the chronophotograoh, bending energy and Lee of actin filaments.
-% data from Vic_ActinPAs_BendingE_Lee.m
+%%%% Plot the bending energy, Lee, Chi, and Aniso together.
+% data from Vic_ActinPAs_BendingE_Lee_Chi_Aniso.m
 % data name format: PlusInfo_..._.mat
 
 clear; close all; clc;
