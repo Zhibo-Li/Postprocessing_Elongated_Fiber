@@ -1,9 +1,8 @@
-%%%% Normalize the positions based on the pillar array.
-%%%% 
+%%%% Normalize the fiber CoM based on relative position of first fiber 
+%%%% CoM of the trajectory and its closest lower-left pillar center.
 %
 % data from PlusInfo_trajectory_..._batch1.mat
 % saving name format: PlusInfo_trajectory_..._batch1.mat
-%
 
 clear; close all; clc;
 
@@ -36,8 +35,8 @@ for no_Group = [7 8 13:28]
             filename = thefiles(file_ind).name
             load([save_pathname, filesep, 'PlusInfo_', filename(14: end-4), '.mat'])
 
-            centers(:, 2) = 2048 - centers(:, 2);  % flip to image coordinate
-            centers_new = (RotMatrix_init * centers')'; % rotate based on the design
+            centers_flip(:, 2) = 2048 - centers(:, 2);  % flip to image coordinate
+            centers_new = (RotMatrix_init * centers_flip')'; % rotate based on the design
             % viscircles(centers_new, radii,'LineStyle','--', 'LineWidth', 0.5, 'Color', 'k'); axis equal
 
             % correct the rotation degree
@@ -54,7 +53,7 @@ for no_Group = [7 8 13:28]
             corrected_angle = mean(corrected_angle);
             RotMatrix_correct = rotz(-Array_angle-corrected_angle);
             RotMatrix_correct = RotMatrix_correct(1:2, 1:2);
-            centers_corrected = (RotMatrix_correct * centers')';
+            centers_corrected = (RotMatrix_correct * centers_flip')';
             % viscircles(centers_corrected, radii,'LineStyle','--','LineWidth', 0.5, 'Color', 'r'); axis equal; hold on
 
             % get the approximate (after-gridlization) pillar center positions
@@ -68,11 +67,11 @@ for no_Group = [7 8 13:28]
                 PAs_Y(jj+2) = mean(sortyy(sortyy_ind(jj)+1:sortyy_ind(jj+1)));
             end
             % make a grid of pillar CoMs (enlarge the PAs area)
-            Ctr2Ctr_x = diff(PAs_X(3:end-2)); Ctr2Ctr_y = diff(PAs_Y(3:end-2));
-            PAs_X(2) = PAs_X(3) - mean(Ctr2Ctr_x); PAs_X(1) = PAs_X(2) - mean(Ctr2Ctr_x);
-            PAs_X(end-1) = PAs_X(end-2) + mean(Ctr2Ctr_x); PAs_X(end) = PAs_X(end-1) + mean(Ctr2Ctr_x);
-            PAs_Y(2) = PAs_Y(3) - mean(Ctr2Ctr_y); PAs_Y(1) = PAs_Y(2) - mean(Ctr2Ctr_y);
-            PAs_Y(end-1) = PAs_Y(end-2) + mean(Ctr2Ctr_y); PAs_Y(end) = PAs_Y(end-1) + mean(Ctr2Ctr_y);
+            Ctr2Ctr_x = mean(diff(PAs_X(3:end-2))); Ctr2Ctr_y = mean(diff(PAs_Y(3:end-2)));
+            PAs_X(2) = PAs_X(3) - Ctr2Ctr_x; PAs_X(1) = PAs_X(2) - Ctr2Ctr_x;
+            PAs_X(end-1) = PAs_X(end-2) + Ctr2Ctr_x; PAs_X(end) = PAs_X(end-1) + Ctr2Ctr_x;
+            PAs_Y(2) = PAs_Y(3) - Ctr2Ctr_y; PAs_Y(1) = PAs_Y(2) - Ctr2Ctr_y;
+            PAs_Y(end-1) = PAs_Y(end-2) + Ctr2Ctr_y; PAs_Y(end) = PAs_Y(end-1) + Ctr2Ctr_y;
 
             fiber_CoM_xy = reshape(cell2mat(xy.centroid(1,Good_case_frm)),2,[]); 
             Rotated_fiber_CoM_xy = RotMatrix_correct * fiber_CoM_xy; % fiber CoM after rotation
