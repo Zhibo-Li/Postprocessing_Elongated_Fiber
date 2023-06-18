@@ -35,7 +35,8 @@ for no_Group = [7 8 13:28]
             filename = thefiles(file_ind).name
             load([save_pathname, filesep, 'PlusInfo_', filename(14: end-4), '.mat'])
 
-            centers_flip(:, 2) = 2048 - centers(:, 2);  % flip to image coordinate
+            centers_flip = centers;
+            centers_flip(:, 2) = 2048 - centers_flip(:, 2);  % flip to image coordinate
             centers_new = (RotMatrix_init * centers_flip')'; % rotate based on the design
             % viscircles(centers_new, radii,'LineStyle','--', 'LineWidth', 0.5, 'Color', 'k'); axis equal
 
