@@ -79,13 +79,13 @@ for no_Group = [7 8 13:28]
             %             PAs_xy = complex(PAs_X_mesh(:), PAs_Y_mesh(:));
             PAs_xy = [PAs_X_mesh(:), PAs_Y_mesh(:)];
 
+            % normalize the fiber x-y coordinates in lattice
             for frm_ind = 1:size(Good_case_frm,2)
 
                 xy_ind = Good_case_frm(frm_ind); % index of the 'good' cases
                 spl = xy.spl{1,xy_ind};
-                Rotated_spl = RotMatrix_correct * spl';
-                %                 Rotated_spl = complex(Rotated_spl(1, :), Rotated_spl(2, :));
-                Rotated_spl = [Rotated_spl(1, :); Rotated_spl(2, :)]';
+                Rotated_spl = (RotMatrix_correct * spl')';
+                %                 Rotated_spl = complex(Rotated_spl(1, :), Rotated_spl(2, :));            
 
                 D = pdist2(PAs_xy, Rotated_spl); % distances between pillar and x-y coordinates of actin.
 
@@ -113,12 +113,41 @@ for no_Group = [7 8 13:28]
 
             end
 
+            % normalize the fiber CoM x-y coordinates in lattice
+            CoM_xy = reshape(cell2mat(xy.centroid(Good_case_frm)), 2, []); % x,y-position of fiber center-of-mass
+            Rotated_CoM_xy = (RotMatrix_correct * CoM_xy)';
+
+            D_ = pdist2(PAs_xy, Rotated_CoM_xy); % distances between pillar and x-y coordinates of actin.
+
+            PAs_x_repeat = repmat(PAs_X_mesh(:), 1, size(Rotated_CoM_xy, 1));
+            PAs_y_repeat = repmat(PAs_Y_mesh(:), 1, size(Rotated_CoM_xy, 1));
+
+            CoM_x_repeat = repmat(Rotated_CoM_xy(:, 1)', size(PAs_xy, 1), 1);
+            CoM_y_repeat = repmat(Rotated_CoM_xy(:, 2)', size(PAs_xy, 1), 1);
+
+            dist_CoM_x = CoM_x_repeat - PAs_x_repeat;
+            dist_CoM_y = CoM_y_repeat - PAs_y_repeat;
+
+            real_sign_CoM = dist_CoM_x > 0;
+            imag_sign_CoM = dist_CoM_y > 0;
+
+            the_dist_sign_CoM = (and(real_sign_CoM, imag_sign_CoM) - 0.5) * 2;
+            dist_CoM = the_dist_sign_CoM .* D_; % distances with sign (only lower-left pillar is positive)
+
+            dist_CoM(dist_CoM < 0) = nan;
+            [ref_x_ind_CoM, ref_y_ind_CoM] = find(dist_CoM == min(dist_CoM)); % find the closest lower-left pillar index.
+
+            fiber_CoM_xy_in_lattice = [diag(dist_CoM_x(ref_x_ind_CoM, ref_y_ind_CoM))/Ctr2Ctr_x, ...
+                diag(dist_CoM_y(ref_x_ind_CoM, ref_y_ind_CoM))/Ctr2Ctr_y];
+
             save([save_pathname, filesep, 'PlusInfo_', filename(14: end-4), '.mat'],'centers', ...
                 'circleMask', 'CoM_x', 'Energy', 'Good_case_frm', 'L_ee_norm', ...
                 'L_ee_norm_belowOne', 'lzero','metric','radii','xy', 'Chi', 'aniso', ...
-                'Rotated_fiber_CoM_xy_normalized', 'RotMatrix_correct', 'Ctr2Ctr_x', 'Ctr2Ctr_y');
+                'Rotated_fiber_CoM_xy_normalized', 'RotMatrix_correct', 'Ctr2Ctr_x', ...
+                'Ctr2Ctr_y','fiber_CoM_xy_in_lattice');
 
-            clearvars CoM_x Energy xy centers radii L_ee_norm_belowOne L_ee_norm Chi aniso Rotated_fiber_CoM_xy_normalized
+            clearvars CoM_x Energy xy centers radii L_ee_norm_belowOne L_ee_norm ...
+                      Chi aniso Rotated_fiber_CoM_xy_normalized fiber_CoM_xy_in_lattice
         end
     end
 end
