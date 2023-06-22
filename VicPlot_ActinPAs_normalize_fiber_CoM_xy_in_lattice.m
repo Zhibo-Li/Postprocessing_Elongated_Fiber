@@ -30,6 +30,8 @@ for current_angle = [0 10 15 20 30 35 45] % different angles
 
     if current_angle == 0
         Groups = [7;8];
+    elseif current_angle == 20
+        Groups = [16;17;18];
     else
         Groups = find(Array_angles == current_angle);
     end
@@ -59,9 +61,11 @@ for current_angle = [0 10 15 20 30 35 45] % different angles
     figure('color', 'w'); set(gcf, 'Position', [100 100 600 600]);
     h = histogram2(fiber_CoM_xy_in_lattice_all(:,1),fiber_CoM_xy_in_lattice_all(:,2), Xedges, ...
         Yedges, 'DisplayStyle','tile','ShowEmptyBins','on','Normalization','pdf');
-    xlim([0 1]); ylim([0 1]); 
     axis equal; axis off
-    cmocean('ice'); caxis([0 10]); % colorbar;   
+    cmocean('ice'); caxis([0 10]); % colorbar;  
+
+    viscircles([0 0; 0 1; 1 0; 1 1], mean(radii)*ones(4, 1)/mean([Ctr2Ctr_x, Ctr2Ctr_y]),'Color','r');
+    xlim([0 1]); ylim([0 1]); 
 
     f = gcf;
     savefig(f,['F:\Processing & Results\' ...
@@ -76,6 +80,45 @@ for current_angle = [0 10 15 20 30 35 45] % different angles
     clearvars fiber_xy_in_lattice
 
 end
+
+% another 20 degree:
+no_Group = 28;
+fiber_CoM_xy_in_lattice_all = [];
+
+the_exp_date = yyyymmdd(ExpDate{no_Group, 1});
+theTruestorePath = storePath{no_Group};
+theTruestorePath = strrep(theTruestorePath,'results','results_plus');
+thefiles = dir(fullfile(theTruestorePath,'*.mat'));
+for file_ind = 1:length(thefiles) % load the cases
+
+    filename = thefiles(file_ind).name;
+
+    if contains(filename, 'PlusInfo_')
+
+        load(fullfile(thefiles(1).folder, thefiles(file_ind).name));
+        fiber_CoM_xy_in_lattice_all = [fiber_CoM_xy_in_lattice_all; fiber_CoM_xy_in_lattice];
+
+    end
+end
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 600 600]);
+h = histogram2(fiber_CoM_xy_in_lattice_all(:,1),fiber_CoM_xy_in_lattice_all(:,2), Xedges, ...
+    Yedges, 'DisplayStyle','tile','ShowEmptyBins','on','Normalization','pdf');
+axis equal; axis off
+cmocean('ice'); caxis([0 10]); % colorbar;
+
+viscircles([0 0; 0 1; 1 0; 1 1], mean(radii)*ones(4, 1)/mean([Ctr2Ctr_x, Ctr2Ctr_y]),'Color','r');
+xlim([0 1]); ylim([0 1]);
+
+f = gcf;
+savefig(f,['F:\Processing & Results\' ...
+    'Actin Filaments in Porous Media\Figures\Position Distribution in Lattice\' ...
+    'actin_CoM_pos_distri_lattice_angle_20_.fig'])
+
+set(f,'renderer','Painters');
+print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
+    'Actin Filaments in Porous Media\Figures\Position Distribution in Lattice\' ...
+    'actin_CoM_pos_distri_lattice_angle_20_.eps']);
 
 %% Plot only the colorbar for the above figures.
 figure('color', 'w'); set(gcf, 'Position', [100 100 200 380]);
