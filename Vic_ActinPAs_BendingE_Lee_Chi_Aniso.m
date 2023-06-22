@@ -1,4 +1,4 @@
-%%%% Calculate the bending energy and Lee of actin filaments and save.
+%%%% Calculate the bending energy, Lee and others of actin filaments and save.
 %%%% data from Vic_ActinAddPAsInfo.m
 %%%% saving name format: PlusInfo_trajectory_..._batch1.mat
 
