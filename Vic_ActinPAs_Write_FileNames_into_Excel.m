@@ -27,7 +27,7 @@ excelpathname = 'F:\Processing & Results\Actin Filaments in Porous Media\Dynamic
 excelname = ['Dynamics ',exp_date,'-Actin.xlsx'];
 for kk = 1: length(Names_tobeWritten)
 
-    Loc = ['A', num2str(kk)];
+    Loc = ['A', num2str(kk+1)];
     writematrix(Names_tobeWritten{kk, 1},[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);
 
 end
