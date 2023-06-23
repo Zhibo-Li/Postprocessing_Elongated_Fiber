@@ -121,7 +121,7 @@ for file_ind = 1:length(Files)
 
         save([save_pathname, filesep, 'PlusInfo_', filename(9: end-4), '.mat'], ...
             'CoM_x', 'CoM_y', 'Energy', 'Good_case_frm', 'L_ee_norm', ...
-            'L_ee_norm_belowOne','xy', 'Chi', 'aniso')
+            'L_ee_norm_belowOne','xy', 'Chi', 'aniso','obs_2d')
 
         clearvars CoM_x Energy xy centers radii L_ee_norm_belowOne L_ee_norm Chi aniso
     end
