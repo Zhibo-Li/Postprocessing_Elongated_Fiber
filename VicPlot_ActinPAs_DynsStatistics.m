@@ -98,7 +98,7 @@ semilogy(FlowAngle(logical(if_coiled)), mu_bars_times_flow_strength(logical(if_c
     '^','MarkerSize', 9,'MarkerEdgeColor','g','LineWidth',2); hold on
 
 f.interp_font('latex')
-f.axes('linear',[-5 50],'log',[0 5e7],'$\alpha\,(^\circ)$','$\bar{\mu} \delta$',24);
+f.axes('linear',[-5 50],'log',[0 5e7],'$\alpha\,(^\circ)$','$\bar{\mu} \sigma$',24);
 f.axes_ticks([0:5:45], 10.^[1:7]); grid on
 legend({'2D deformation','3D deformation'}, 'FontName','Times New Roman', ...
     'Box','off','Location','southeast'); 
