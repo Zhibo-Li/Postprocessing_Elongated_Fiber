@@ -21,6 +21,7 @@ for file_ind = 1:length(Files)
     filename = Files(file_ind).name;
 
     if contains(filename, 'AddInfo_')
+%     if contains(filename, 'AddInfo_Slope_correction') % for the special case
 
         load(fullfile(Files(1).folder, Files(file_ind).name));
 
@@ -31,6 +32,7 @@ for file_ind = 1:length(Files)
         % find the cooresponding *.tif image
         image_names = struct2cell(theimgs); image_names = image_names(1, :);
         image_ind = find(cellfun(@(x) contains(x, filename(20:end-11)), image_names));
+%         image_ind = find(cellfun(@(x) contains(x, filename(37:end-11)), image_names)); % for the special case
 
         spl_Ls = xy.arclen_spl(Good_case_frm);
         L_0 = VicFc_Get_ContourLength(spl_Ls); % get the filament length
