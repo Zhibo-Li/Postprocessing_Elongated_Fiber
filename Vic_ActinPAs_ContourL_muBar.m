@@ -1,4 +1,4 @@
-%%%% Calculate contour length and mu_bar %%%%
+%%%% Calculate contour length, mu_bar and mean(U_x)/U_0 %%%%
 % data from Vic_ActinAddInformationSave.m
 % data name format: PAsInfoAdded_trajectory_..._.mat
 % results save in the Excels named: Dynamics xxxxxxxx-Actin.xlsx
@@ -51,11 +51,18 @@ for no_Group = [7 8 13:28]
 
             mu_bar = VicFc_Get_elastoviscousNum(ContourL*1e-6, Init_U{no_Group}, D_pillar{no_Group}*1e-6);
 
+            Ux_to_U0 = (xy.centroid{1, Good_case_frm(end)}(1) - ...
+                xy.centroid{1, Good_case_frm(1)}(1)) * mag * 1e-6 / ...
+                ((Good_case_frm(end) - Good_case_frm(1)) * 0.02) / Init_U{no_Group};
+            
             Loc = ['B', num2str(excel_pos+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
             writematrix(ContourL,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
 
             Loc = ['N', num2str(excel_pos+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
             writematrix(mu_bar,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
+
+            Loc = ['S', num2str(excel_pos+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+            writematrix(Ux_to_U0,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
 
 %             % to plot the distribution of the lengths
 %             f.figure('');
