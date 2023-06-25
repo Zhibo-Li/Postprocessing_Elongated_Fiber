@@ -143,7 +143,7 @@ ContourLs_trapping = ContourLs(logical(if_trapping));
 ContourLs_passing = ContourLs(logical(if_passing));
 ContourLs_others = ContourLs(logical(if_others));
 
-f = figuresetting('centimeters',20,16,'times new roman',20,'on',1,'off','off');
+f = figuresetting('centimeters',20,16,'times new roman',24,'on',1,'off','off');
 f.figure('');
 plot(FlowAngle_passing, ContourLs_passing, 'o','MarkerSize', 10,'MarkerEdgeColor','red','LineWidth',2); hold on
 plot(FlowAngle_others, ContourLs_others, '^','MarkerSize', 9,'MarkerEdgeColor','blue','LineWidth',2); hold on
@@ -152,9 +152,87 @@ plot(FlowAngle_trapping, ContourLs_trapping, 'diamond','MarkerSize', 9,'MarkerEd
 f.interp_font('latex')
 f.axes('linear',[-5 50],'linear',[0 80],'$\alpha\,(^\circ)$','$L\,(\rm{\mu m})$',24);
 f.axes_ticks([0:5:45], [0:10:80]); grid on
+set(gca,'XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.2)
 
 legend({'Passing','Gliding','Trapping'}, 'FontName','Times New Roman', 'Box','off'); 
 
-set(gcf,'renderer','Painters');
-print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
-    'Actin Filaments in Porous Media\Figures\Dynamics\actin_pillar_interaction.eps']);
+hhh = gcf;
+set(hhh,'Units','Inches');
+pos = get(hhh,'Position');
+set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(hhh, '-dpdf',['F:\Processing & Results\' ...
+    'Actin Filaments in Porous Media\Figures\Dynamics\actin_pillar_interaction.pdf']);
+
+
+%% Statistics about actin-pillar dynamics in PAs (lengths vs dyns).
+
+clear; close all; clc;
+xlsFolder = dir(['F:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Dynamics manually classification\*.xlsx']);
+
+case_names = [];             ContourLs = [];             mu_bars = [];
+FlowAngle = [];          
+if_trapping = [];        if_passing = [];            if_others = [];
+Ux_to_U0 = [];
+
+for ii = 1: length(xlsFolder)
+
+    xlsfile = readcell([xlsFolder(1).folder, filesep, xlsFolder(ii).name], ...
+        'Sheet','Sheet1','NumHeaderLines',1);
+
+    case_names = [case_names; xlsfile(:, 1)];
+    ContourLs = [ContourLs, xlsfile{:, 2}];
+    mu_bars = [mu_bars, xlsfile{:, 14}];
+
+    FlowAngle = [FlowAngle, xlsfile{:, 15}];
+
+    if_trapping = [if_trapping, xlsfile{:, 16}];
+    if_passing = [if_passing, xlsfile{:, 17}];
+    if_others = [if_others, xlsfile{:, 18}];
+
+    Ux_to_U0 = [Ux_to_U0, xlsfile{:, 19}];
+ 
+end
+
+% % choose an angle to plot
+% chosen_angle_to_plot = 45;
+% Ux_to_U0_trapping = Ux_to_U0(logical(if_trapping) & (FlowAngle == chosen_angle_to_plot));
+% Ux_to_U0_passing = Ux_to_U0(logical(if_passing) & (FlowAngle == chosen_angle_to_plot));
+% Ux_to_U0_others = Ux_to_U0(logical(if_others) & (FlowAngle == chosen_angle_to_plot));
+% histogram(Ux_to_U0_passing, 'BinWidth', 0.3, 'Normalization', 'probability'); hold on
+% histogram(Ux_to_U0_others, 'BinWidth', 0.3, 'Normalization', 'probability'); hold on
+% histogram(Ux_to_U0_trapping, 'BinWidth', 0.3, 'Normalization', 'probability'); 
+% legend({'Passing','Gliding','Trapping'}, 'FontName','Times New Roman', 'Box','off');
+
+% plot all angles
+Ux_to_U0_trapping = Ux_to_U0(logical(if_trapping));
+Ux_to_U0_passing = Ux_to_U0(logical(if_passing));
+Ux_to_U0_others = Ux_to_U0(logical(if_others));
+
+hhh = figure('color', 'w'); set(gcf, 'Position', [100 100 800 600],'DefaultTextInterpreter', 'latex');
+histogram(Ux_to_U0_passing, 'BinWidth', 0.25, 'Normalization', 'probability'); hold on
+histogram(Ux_to_U0_others, 'BinWidth', 0.25, 'Normalization', 'probability'); hold on
+histogram(Ux_to_U0_trapping, 'BinWidth', 0.25, 'Normalization', 'probability'); 
+
+set(gca, 'Box', 'On', 'XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.2, ...
+    'FontSize', 24, 'FontName', 'Times new roman')
+legend({'Passing','Gliding','Trapping'}, 'FontName','Times New Roman', 'Box','off');
+
+% Convert y-axis values to percentage values by multiplication
+a = cellstr(num2str(get(gca,'ytick')'*100));
+% Create a vector of '%' signs
+pct = char(ones(size(a,1),1)*'%');
+% Append the '%' signs after the percentage values
+new_yticks = [char(a),pct];
+for i=1:size(new_yticks,1); the_yticks{i} = new_yticks(i, :); end
+% 'Reflect the changes on the plot
+set(gca,'yticklabel',the_yticks)
+xlabel('$\overline{U}_x / U_0$','FontSize', 24,'Interpreter', 'latex');
+ylabel('Probability','FontSize', 24, 'FontName', 'Times new roman');
+
+set(hhh,'Units','Inches');
+pos = get(hhh,'Position');
+set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(hhh, '-dpdf',['F:\Processing & Results\' ...
+    'Actin Filaments in Porous Media\Figures\Dynamics\' ...
+    'actin_pillar_interaction_vs_velocity.pdf']);
