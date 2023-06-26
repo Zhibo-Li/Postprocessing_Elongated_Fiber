@@ -10,6 +10,7 @@ if_C_shape = [];        if_U_shape = [];            if_S_shape = [];
 if_plus_S_shape = [];   if_buckled_3D = [];
 if_folded = [];         if_coiled = [];             if_tumble = [];
 if_has_note = [];       if_out_of_plane = [];       if_bad_reconstruction = [];
+if_no_deform = [];
 
 for ii = 1: length(xlsFolder)
 
@@ -37,31 +38,43 @@ for ii = 1: length(xlsFolder)
     if_out_of_plane = [if_out_of_plane, xlsfile{:, 12}];
     if_bad_reconstruction = [if_bad_reconstruction, xlsfile{:, 13}];
 
+    if_no_deform = [if_no_deform, xlsfile{:, 22}];
+
 end
 
 f = figuresetting('centimeters',20,16,'times new roman',20,'on',1,'off','off');
 f.figure('');
 % for legends
-semilogy(nan, nan, 'o','MarkerSize', 10,'MarkerEdgeColor','m','LineWidth',2); hold on
-semilogy(nan, nan, '^','MarkerSize', 9,'MarkerEdgeColor','g','LineWidth',2); hold on
+semilogy(nan, nan, 'o','MarkerSize', 10,'MarkerEdgeColor',[229 120 148]/255,'LineWidth',2); hold on
+semilogy(nan, nan, '^','MarkerSize', 9,'MarkerEdgeColor',[62 187 229]/255,'LineWidth',2); hold on
+semilogy(nan, nan, 'diamond','MarkerSize', 9,'MarkerEdgeColor',[104 97 162]/255,'LineWidth',2); hold on
 % plot
-semilogy(FlowAngle(logical(if_C_shape)), mu_bars(logical(if_C_shape)), 'o','MarkerSize', 10,'MarkerEdgeColor','m','LineWidth',2); hold on
-semilogy(FlowAngle(logical(if_U_shape)), mu_bars(logical(if_U_shape)), 'o','MarkerSize', 10,'MarkerEdgeColor','m','LineWidth',2); hold on
-semilogy(FlowAngle(logical(if_S_shape)), mu_bars(logical(if_S_shape)), 'o','MarkerSize', 10,'MarkerEdgeColor','m','LineWidth',2); hold on
-semilogy(FlowAngle(logical(if_plus_S_shape)), mu_bars(logical(if_plus_S_shape)), 'o','MarkerSize', 10,'MarkerEdgeColor','m','LineWidth',2); hold on
-semilogy(FlowAngle(logical(if_buckled_3D)), mu_bars(logical(if_buckled_3D)), '^','MarkerSize', 9,'MarkerEdgeColor','g','LineWidth',2); hold on
-semilogy(FlowAngle(logical(if_folded)), mu_bars(logical(if_folded)), '^','MarkerSize', 9,'MarkerEdgeColor','g','LineWidth',2); hold on
-semilogy(FlowAngle(logical(if_coiled)), mu_bars(logical(if_coiled)), '^','MarkerSize', 9,'MarkerEdgeColor','g','LineWidth',2); hold on
+semilogy(FlowAngle(logical(if_C_shape)), mu_bars(logical(if_C_shape)), 'o','MarkerSize', 10,'MarkerEdgeColor',[229 120 148]/255,'LineWidth',2); hold on
+semilogy(FlowAngle(logical(if_U_shape)), mu_bars(logical(if_U_shape)), 'o','MarkerSize', 10,'MarkerEdgeColor',[229 120 148]/255,'LineWidth',2); hold on
+semilogy(FlowAngle(logical(if_S_shape)), mu_bars(logical(if_S_shape)), 'o','MarkerSize', 10,'MarkerEdgeColor',[229 120 148]/255,'LineWidth',2); hold on
+semilogy(FlowAngle(logical(if_plus_S_shape)), mu_bars(logical(if_plus_S_shape)), 'o','MarkerSize', 10,'MarkerEdgeColor',[229 120 148]/255,'LineWidth',2); hold on
+semilogy(FlowAngle(logical(if_buckled_3D)), mu_bars(logical(if_buckled_3D)), '^','MarkerSize', 9,'MarkerEdgeColor',[62 187 229]/255,'LineWidth',2); hold on
+semilogy(FlowAngle(logical(if_folded)), mu_bars(logical(if_folded)), '^','MarkerSize', 9,'MarkerEdgeColor',[62 187 229]/255,'LineWidth',2); hold on
+semilogy(FlowAngle(logical(if_coiled)), mu_bars(logical(if_coiled)), '^','MarkerSize', 9,'MarkerEdgeColor',[62 187 229]/255,'LineWidth',2); hold on
+semilogy(FlowAngle(logical(if_no_deform)), mu_bars(logical(if_no_deform)), 'diamond','MarkerSize', 9,'MarkerEdgeColor',[104 97 162]/255,'LineWidth',2); hold on
 
 f.interp_font('latex')
 f.axes('linear',[-5 50],'log',[0 1e7],'$\alpha\,(^\circ)$','$\bar{\mu}$',24);
-f.axes_ticks([0:5:45], 10.^[1:7]); grid on
-legend({'2D deformation','3D deformation'}, 'FontName','Times New Roman', ...
+f.axes_ticks([0:5:45], 10.^[1:7]); 
+set(gca, 'XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.2)
+legend({'2D deformation','3D deformation','No deformation'}, 'FontName','Times New Roman', ...
     'Box','off','Location','southeast'); 
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
     'Actin Filaments in Porous Media\Figures\Dynamics\actin_dyn_mubar.eps']);
+
+hhh = gcf;
+set(hhh,'Units','Inches');
+pos = get(hhh,'Position');
+set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(hhh, '-dpdf',['F:\Processing & Results\' ...
+    'Actin Filaments in Porous Media\Figures\Dynamics\actin_dyn_mubar.pdf']);
 
 
 % calculate mu_bar * flow_strength
@@ -79,33 +92,45 @@ mu_bars_times_flow_strength = mu_bars .* FlowStrength;
 f = figuresetting('centimeters',20,16,'times new roman',20,'on',1,'off','off');
 f.figure('');
 % for legends
-semilogy(nan, nan, 'o','MarkerSize', 10,'MarkerEdgeColor','m','LineWidth',2); hold on
-semilogy(nan, nan, '^','MarkerSize', 9,'MarkerEdgeColor','g','LineWidth',2); hold on
+semilogy(nan, nan, 'o','MarkerSize', 10,'MarkerEdgeColor',[229 120 148]/255,'LineWidth',2); hold on
+semilogy(nan, nan, '^','MarkerSize', 9,'MarkerEdgeColor',[62 187 229]/255,'LineWidth',2); hold on
+semilogy(nan, nan, 'diamond','MarkerSize', 9,'MarkerEdgeColor',[104 97 162]/255,'LineWidth',2); hold on
 % plot
 semilogy(FlowAngle(logical(if_C_shape)), mu_bars_times_flow_strength(logical(if_C_shape)), ...
-    'o','MarkerSize', 10,'MarkerEdgeColor','m','LineWidth',2); hold on
+    'o','MarkerSize', 10,'MarkerEdgeColor',[229 120 148]/255,'LineWidth',2); hold on
 semilogy(FlowAngle(logical(if_U_shape)), mu_bars_times_flow_strength(logical(if_U_shape)), ...
-    'o','MarkerSize', 10,'MarkerEdgeColor','m','LineWidth',2); hold on
+    'o','MarkerSize', 10,'MarkerEdgeColor',[229 120 148]/255,'LineWidth',2); hold on
 semilogy(FlowAngle(logical(if_S_shape)), mu_bars_times_flow_strength(logical(if_S_shape)), ...
-    'o','MarkerSize', 10,'MarkerEdgeColor','m','LineWidth',2); hold on
+    'o','MarkerSize', 10,'MarkerEdgeColor',[229 120 148]/255,'LineWidth',2); hold on
 semilogy(FlowAngle(logical(if_plus_S_shape)), mu_bars_times_flow_strength(logical(if_plus_S_shape)), ...
-    'o','MarkerSize', 10,'MarkerEdgeColor','m','LineWidth',2); hold on
+    'o','MarkerSize', 10,'MarkerEdgeColor',[229 120 148]/255,'LineWidth',2); hold on
 semilogy(FlowAngle(logical(if_buckled_3D)), mu_bars_times_flow_strength(logical(if_buckled_3D)), ...
-    '^','MarkerSize', 9,'MarkerEdgeColor','g','LineWidth',2); hold on
+    '^','MarkerSize', 9,'MarkerEdgeColor',[62 187 229]/255,'LineWidth',2); hold on
 semilogy(FlowAngle(logical(if_folded)), mu_bars_times_flow_strength(logical(if_folded)), ...
-    '^','MarkerSize', 9,'MarkerEdgeColor','g','LineWidth',2); hold on
+    '^','MarkerSize', 9,'MarkerEdgeColor',[62 187 229]/255,'LineWidth',2); hold on
 semilogy(FlowAngle(logical(if_coiled)), mu_bars_times_flow_strength(logical(if_coiled)), ...
-    '^','MarkerSize', 9,'MarkerEdgeColor','g','LineWidth',2); hold on
+    '^','MarkerSize', 9,'MarkerEdgeColor',[62 187 229]/255,'LineWidth',2); hold on
+semilogy(FlowAngle(logical(if_no_deform)), mu_bars_times_flow_strength(logical(if_no_deform)), ...
+    'diamond','MarkerSize', 9,'MarkerEdgeColor',[104 97 162]/255,'LineWidth',2); hold on
+
 
 f.interp_font('latex')
-f.axes('linear',[-5 50],'log',[0 5e7],'$\alpha\,(^\circ)$','$\bar{\mu} \sigma$',24);
-f.axes_ticks([0:5:45], 10.^[1:7]); grid on
-legend({'2D deformation','3D deformation'}, 'FontName','Times New Roman', ...
+f.axes('linear',[-5 50],'log',[100 5e7],'$\alpha\,(^\circ)$','$\bar{\mu}_{\rm m}$',24);
+f.axes_ticks([0:5:45], 10.^[1:7]);
+set(gca, 'XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.2)
+legend({'2D deformation','3D deformation', 'No deformation'}, 'FontName','Times New Roman', ...
     'Box','off','Location','southeast'); 
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
     'Actin Filaments in Porous Media\Figures\Dynamics\actin_dyn_mubar_times_delta.eps']);
+
+hhh = gcf;
+set(hhh,'Units','Inches');
+pos = get(hhh,'Position');
+set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(hhh, '-dpdf',['F:\Processing & Results\' ...
+    'Actin Filaments in Porous Media\Figures\Dynamics\actin_dyn_mubar_times_delta.pdf']);
 
 
 %% Statistics about actin-pillar dynamics in PAs.
@@ -145,9 +170,9 @@ ContourLs_others = ContourLs(logical(if_others));
 
 f = figuresetting('centimeters',20,16,'times new roman',24,'on',1,'off','off');
 f.figure('');
-plot(FlowAngle_passing, ContourLs_passing, 'o','MarkerSize', 10,'MarkerEdgeColor','red','LineWidth',2); hold on
-plot(FlowAngle_others, ContourLs_others, '^','MarkerSize', 9,'MarkerEdgeColor','blue','LineWidth',2); hold on
-plot(FlowAngle_trapping, ContourLs_trapping, 'diamond','MarkerSize', 9,'MarkerEdgeColor',[0.92, 0.70, 0.22],'LineWidth', 2); hold on
+plot(FlowAngle_passing, ContourLs_passing, 'o','MarkerSize', 10,'MarkerEdgeColor',[176 67 129]/255,'LineWidth',2); hold on
+plot(FlowAngle_others, ContourLs_others, '^','MarkerSize', 9,'MarkerEdgeColor',[117 152 196]/255,'LineWidth',2); hold on
+plot(FlowAngle_trapping, ContourLs_trapping, 'diamond','MarkerSize', 9,'MarkerEdgeColor',[123 164 47]/255,'LineWidth', 2); hold on
 
 f.interp_font('latex')
 f.axes('linear',[-5 50],'linear',[0 80],'$\alpha\,(^\circ)$','$L\,(\rm{\mu m})$',24);
