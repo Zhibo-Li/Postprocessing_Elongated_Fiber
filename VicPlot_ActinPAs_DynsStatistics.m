@@ -261,3 +261,64 @@ set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), po
 print(hhh, '-dpdf',['F:\Processing & Results\' ...
     'Actin Filaments in Porous Media\Figures\Dynamics\' ...
     'actin_pillar_interaction_vs_velocity.pdf']);
+
+
+
+%% Statistics about different actin dynamics in PAs.
+
+clear; close all; clc;
+xlsFolder = dir(['F:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Dynamics manually classification\*.xlsx']);
+
+case_names = [];             ContourLs = [];             mu_bars = [];
+FlowAngle = [];          
+if_partial_buckled = [];        if_global_buckled = [];   
+if_has_note = [];       if_out_of_plane = [];       if_bad_reconstruction = [];
+if_no_deform = [];
+
+for ii = 1: length(xlsFolder)
+
+    xlsfile = readcell([xlsFolder(1).folder, filesep, xlsFolder(ii).name], ...
+        'Sheet','Sheet1','NumHeaderLines',1);
+
+    case_names = [case_names; xlsfile(:, 1)];
+    ContourLs = [ContourLs, xlsfile{:, 2}];
+    mu_bars = [mu_bars, xlsfile{:, 14}];
+
+    FlowAngle = [FlowAngle, xlsfile{:, 15}];
+
+    if_has_note = [if_has_note, xlsfile{:, 11}];
+    if_out_of_plane = [if_out_of_plane, xlsfile{:, 12}];
+    if_bad_reconstruction = [if_bad_reconstruction, xlsfile{:, 13}];
+
+    if_partial_buckled = [if_partial_buckled, xlsfile{:, 20}];
+    if_global_buckled = [if_global_buckled, xlsfile{:, 21}];
+    if_no_deform = [if_no_deform, xlsfile{:, 22}];
+
+end
+
+f = figuresetting('centimeters',20,16,'times new roman',20,'on',1,'off','off');
+f.figure('');
+% plot
+plot(FlowAngle(logical(if_global_buckled)), ContourLs(logical(if_global_buckled)), ...
+    'v','MarkerSize', 10,'MarkerEdgeColor',[78 101 136]/255,'LineWidth',2); hold on
+plot(FlowAngle(logical(if_partial_buckled)), ContourLs(logical(if_partial_buckled)), ...
+    'square','MarkerSize', 10,'MarkerEdgeColor',[227 156 109]/255,'LineWidth',2); hold on
+
+f.interp_font('latex')
+f.axes('linear',[-5 50],'linear',[0 80],'$\alpha\,(^\circ)$','$L\,(\rm{\mu m})$',24);
+f.axes_ticks([0:5:45], [10:10:90]); 
+set(gca, 'XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.2)
+legend({'Global buckling','Partial buckling'}, 'FontName','Times New Roman', ...
+    'Box','off','Location','northeast'); 
+
+set(gcf,'renderer','Painters');
+print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
+    'Actin Filaments in Porous Media\Figures\Dynamics\actin_buckling_L.eps']);
+
+hhh = gcf;
+set(hhh,'Units','Inches');
+pos = get(hhh,'Position');
+set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(hhh, '-dpdf',['F:\Processing & Results\' ...
+    'Actin Filaments in Porous Media\Figures\Dynamics\actin_buckling_L.pdf']);
