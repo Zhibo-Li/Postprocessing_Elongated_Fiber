@@ -189,7 +189,7 @@ print(hhh, '-dpdf',['F:\Processing & Results\' ...
     'Actin Filaments in Porous Media\Figures\Dynamics\actin_pillar_interaction.pdf']);
 
 
-%% Statistics about actin-pillar dynamics in PAs (lengths vs dyns).
+%% Statistics about actin-pillar dynamics in PAs (mean velocity vs dyns).
 
 clear; close all; clc;
 xlsFolder = dir(['F:\Processing & Results\Actin Filaments in Porous Media\' ...
