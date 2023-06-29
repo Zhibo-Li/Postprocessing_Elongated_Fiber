@@ -1186,7 +1186,7 @@ delta_contact = together_contact(7, :);
 
 % load the experimental data
 load(['D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\FSI - Rigid Fiber ' ...
-    '&  Individual Obstacle\Rigid_Fiber_expdata.mat'])
+    '&  Individual Obstacle\Rigid_Fiber_expdata_20230629.mat'])
 
 
 exp_contact = AllinONE.if_Contacting;
@@ -1217,7 +1217,7 @@ histogram(delta_contact, 'BinEdges',binedges_sim, 'Normalization', 'probability'
 set(gca, 'Box', 'On', 'XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, ...
     'FontSize', 24, 'FontName', 'Times new roman')
 legend('Non contact', 'Contact', 'location','northwest', 'FontSize', 22, 'FontName', 'Times new roman')
-text(0.33, 0.95, 'Experiment', 'FontSize', 22, 'FontName', 'Times new roman')
+text(0.30, 0.95, 'Experiment', 'FontSize', 22, 'FontName', 'Times new roman')
 
 % Convert y-axis values to percentage values by multiplication
 a = cellstr(num2str(get(gca,'ytick')'*100));
@@ -1248,8 +1248,10 @@ for i=1:size(new_yticks,1); the_yticks{i} = new_yticks(i, :); end
 % 'Reflect the changes on the plot
 set(gca,'yticklabel',the_yticks)
 
-f=gcf;
-set(f,'renderer','Painters');
-print('-depsc2','-tiff','-r300','-painters',['F:\Processing & Results\' ...
+hhh = gcf;
+set(hhh,'Units','Inches');
+pos = get(hhh,'Position');
+set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(hhh, '-dpdf',['F:\Processing & Results\' ...
     'FSI - Rigid Fiber &  Individual Obstacle' ...
-    '\Figures\Paper\delta_PDF.eps'])
+    '\Figures\Paper\delta_PDF.pdf']);
