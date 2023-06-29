@@ -315,7 +315,7 @@ AllinONE.if_Trapping = [together_plot_filtered(15, :), trapped_together(15, :)];
 AllinONE.if_Contacting = [together_plot_filtered(22, :), trapped_together(22, :)]; % if 'Contacting'
 
 readme = 'See struct AllinONE, field name gives the data meaning!';
-save('D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\FSI - Rigid Fiber &  Individual Obstacle\Rigid_Fiber_expdata.mat','AllinONE', 'readme');
+save('D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\FSI - Rigid Fiber &  Individual Obstacle\Rigid_Fiber_expdata_20230629.mat','AllinONE', 'readme');
 
 
 %% plotting
@@ -414,7 +414,7 @@ xlim([-10 10]); ylim([0 1]);
 set_plot(gcf, gca)
 
 f=gcf;
-savefig(f,'D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\FSI - Rigid Fiber &  Individual Obstacle\delta_vs_theta0-y0_L0.5-1.5_20230110.fig')
+savefig(f,'D:\Dropbox\Collaboration - LadHyX\Give_to_Clement\FSI - Rigid Fiber &  Individual Obstacle\delta_vs_theta0-y0_L0.5-1.5_20230629.fig')
 
 
 %% plot the deviation vs chi_0 & y_0 (with classification and further data cleaning (optional)):  
