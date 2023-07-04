@@ -57,6 +57,8 @@ for file_ind = 1:length(Files)
         ContourL_all = xy.arclen_spl(Good_case_frm);
         ContourL = VicFc_Get_ContourLength(ContourL_all) * mag; % unit: um
 
+        mu_bar = VicFc_Get_elastoviscousNum(ContourL*1e-6, 2e-4, 2.5e-5); % U=200um/s, h_obs=25um
+
         try
             y_0 = mean(CoM_y(CoM_x < left_border)); y_f = mean(CoM_y(CoM_x > right_border));
             theta_0 = Chi(1);
@@ -74,6 +76,8 @@ for file_ind = 1:length(Files)
         writematrix(delta/obs_h,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
         Loc = ['E', num2str(excel_pos+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
         writematrix(-atand(theta_0),[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
+        Loc = ['F', num2str(excel_pos+1)];  % The locations in the excel should be written into. (+1 because there is headerline in the excel.)
+        writematrix(mu_bar,[excelpathname, excelname],'Sheet','Sheet1','Range', Loc);  % Write the value inti the excel.
         
     end
 end
