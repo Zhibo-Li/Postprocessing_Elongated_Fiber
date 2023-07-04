@@ -111,11 +111,13 @@ ylabel('$L/l_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 
 caxis([-0.1 0.1]); cmocean('balance')
 hcb=colorbar; 
-hcb.Label.String = '$\delta/h_{\rm obs}$';
-hcb.Label.Interpreter = 'LaTeX';
+t = title(hcb,'$\delta/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
+% hcb.Label.String = '$\delta/h_{\rm obs}$';
+% hcb.Label.Interpreter = 'LaTeX';
 hcb.TickLabelInterpreter = 'LaTeX';
-hcb.FontSize = 24;
-hcb.Location = 'eastoutside';
+% hcb.FontSize = 24;
+hcb.Position = [0.9, 0.15, 0.015, 0.66];
+t.Position = [11.6,327,0];
 
 yyaxis right
 plot(data_plot(2, :)', data_plot(5, :)', 'LineStyle','none');
@@ -123,7 +125,7 @@ set(gca, 'YScale', 'log', 'YLim', [0  VicFc_Get_elastoviscousNum(50*1e-6, 2e-4, 
 ylabel('$\bar{\mu}$','FontSize', 24,'Interpreter', 'latex');
 
 set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, 'FontSize', 24, ...
-    'NextPlot','replacechildren', 'TickLabelInterpreter','latex')
+    'NextPlot','replacechildren', 'TickLabelInterpreter','latex', 'Position', [0.13,0.15,0.61,0.8])
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
