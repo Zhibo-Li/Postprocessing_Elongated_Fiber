@@ -109,9 +109,13 @@ set(gca, 'YScale', 'log', 'YLim', [0 2], 'YTick', [0.25 0.5 1 2], 'YTickLabel', 
 xlabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 ylabel('$L/l_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 
-hcb=colorbar('Ticks', -0.1:0.05:0.1, 'TickLabelInterpreter','latex','FontSize',24); 
 caxis([-0.1 0.1]); cmocean('balance')
-title(hcb,'$\delta/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
+hcb=colorbar; 
+hcb.Label.String = '$\delta/h_{\rm obs}$';
+hcb.Label.Interpreter = 'LaTeX';
+hcb.TickLabelInterpreter = 'LaTeX';
+hcb.FontSize = 24;
+hcb.Location = 'eastoutside';
 
 yyaxis right
 plot(data_plot(2, :)', data_plot(5, :)', 'LineStyle','none');
