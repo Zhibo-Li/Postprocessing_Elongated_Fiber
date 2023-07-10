@@ -4,14 +4,15 @@ clear; close all; clc;
 
 % laod data and put all in one.
 xlsfile_1 = readcell(['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
-    'results_actin_filaments_2023_06_30.xlsx'],'Sheet','Sheet1','NumHeaderLines',1);
-the_data = cell2mat(xlsfile_1(:, 1:5));
+    'results_actin_filaments_2023_06_30_Zhibo.xlsx'],'Sheet','Sheet1','NumHeaderLines',1);
+the_data = cell2mat(xlsfile_1(:, 1:7));
 
 % %     No.1 column: theta0
 % %     No.2 column: normalized y0
 % %     No.3 column: normalized L 
 % %     No.4 column: elastoviscous number  
 % %     No.5 column: delta
+% %     No.7 column: elastoviscous number (consider slenderness c)
 
 % create dialog box to gather user input for plotting;
 data_plot = the_data';
@@ -45,56 +46,58 @@ data_plot(:, data_plot(2, :) > range_y0_up) = [];
 %%%%%%%%%%%%%%%%%%%%%%%%% scatter plots %%%%%%%%%%%%%%%%%%%%%%%%%%
 %% plot the deviation vs L (mubar) & y_0 (Notice the theta_0)
 figure;
-set(gcf, 'Position',[100 100 1100 600], 'Color','white', 'DefaultTextInterpreter', 'latex')
+set(gcf, 'Position',[100 100 1000 600], 'Color','white', 'DefaultTextInterpreter', 'latex')
 
 data_plot_close_to_exp_L0o5_mubar1e4 = data_plot;
-data_plot_close_to_exp_L0o5_mubar1e4(:, (data_plot_close_to_exp_L0o5_mubar1e4(4, :) ~= 1e4) ...
+data_plot_close_to_exp_L0o5_mubar1e4(:, (data_plot_close_to_exp_L0o5_mubar1e4(4, :) ~= 1e5) ...
     | (data_plot_close_to_exp_L0o5_mubar1e4(3, :) ~= 0.5)) = [];
-% choose the numerical data that close to actin property: L = 12um (L/l_obs = 0.5); mu_bar = 2.8e4
-data_plot_close_to_exp_L0o75_mubar1e5 = data_plot;
-data_plot_close_to_exp_L0o75_mubar1e5(:, (data_plot_close_to_exp_L0o75_mubar1e5(4, :) ~= 1e5) ...
-    | (data_plot_close_to_exp_L0o75_mubar1e5(3, :) ~= 0.75)) = [];
-% choose the numerical data that close to actin property: : L = 18um (L/l_obs = 0.75); mu_bar = 1.3e5
+% choose the numerical data that close to actin property: L = 12um (L/l_obs = 0.5); mu_bar = 3.2e4
+% % % data_plot_close_to_exp_L0o75_mubar1e5 = data_plot;
+% % % data_plot_close_to_exp_L0o75_mubar1e5(:, (data_plot_close_to_exp_L0o75_mubar1e5(4, :) ~= 1e5) ...
+% % %     | (data_plot_close_to_exp_L0o75_mubar1e5(3, :) ~= 0.75)) = [];
+% % % % choose the numerical data that close to actin property: : L = 18um (L/l_obs = 0.75); mu_bar = 1.5e5
 data_plot_NOT_close_to_exp = data_plot;
-data_plot_NOT_close_to_exp(:, (data_plot_NOT_close_to_exp(4, :) == 1e4) ...
-    & (data_plot_NOT_close_to_exp(3, :) == 0.5)) = [];
 data_plot_NOT_close_to_exp(:, (data_plot_NOT_close_to_exp(4, :) == 1e5) ...
-    & (data_plot_NOT_close_to_exp(3, :) == 0.75)) = [];
+    & (data_plot_NOT_close_to_exp(3, :) == 0.5)) = [];
+% % % data_plot_NOT_close_to_exp(:, (data_plot_NOT_close_to_exp(4, :) == 1e5) ...
+% % %     & (data_plot_NOT_close_to_exp(3, :) == 0.75)) = [];
 % the numerical data that NOT close to actin property
 
-scatter3(data_plot_close_to_exp_L0o5_mubar1e4(4, :)', data_plot_close_to_exp_L0o5_mubar1e4(3, :)', ...
+scatter3(data_plot_close_to_exp_L0o5_mubar1e4(7, :)', data_plot_close_to_exp_L0o5_mubar1e4(3, :)', ...
     data_plot_close_to_exp_L0o5_mubar1e4(2, :)', 300, data_plot_close_to_exp_L0o5_mubar1e4(5, :)', ...
     'o','Filled','MarkerEdgeColor','k'); hold on
-scatter3(data_plot_close_to_exp_L0o75_mubar1e5(4, :)', data_plot_close_to_exp_L0o75_mubar1e5(3, :)', ...
-    data_plot_close_to_exp_L0o75_mubar1e5(2, :)', 300, data_plot_close_to_exp_L0o75_mubar1e5(5, :)', ...
-    'o','Filled','MarkerEdgeColor','k'); hold on
-scatter3(data_plot_NOT_close_to_exp(4, :)', data_plot_NOT_close_to_exp(3, :)', ...
+% % % scatter3(data_plot_close_to_exp_L0o75_mubar1e5(7, :)', data_plot_close_to_exp_L0o75_mubar1e5(3, :)', ...
+% % %     data_plot_close_to_exp_L0o75_mubar1e5(2, :)', 300, data_plot_close_to_exp_L0o75_mubar1e5(5, :)', ...
+% % %     'o','Filled','MarkerEdgeColor','k'); hold on
+scatter3(data_plot_NOT_close_to_exp(7, :)', data_plot_NOT_close_to_exp(3, :)', ...
     data_plot_NOT_close_to_exp(2, :)', 300, data_plot_NOT_close_to_exp(5, :)', ...
     'square','Filled','MarkerEdgeColor','k'); hold on
-set(gca, 'XScale', 'log', 'XLim', [100 1e5])
-xlabel('$\bar{\mu}$','FontSize', 28,'Interpreter', 'latex');
-ylabel('$L/l_{\rm obs}$','FontSize', 28,'Interpreter', 'latex');
-zlabel('$y_0/h_{\rm obs}$','FontSize', 28,'Interpreter', 'latex');
+set(gca, 'XScale', 'log', 'XLim', [5 1e4])
+xlabel('$\bar{\mu}$','FontSize', 24,'Interpreter', 'latex');
+ylabel('$L/l_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
+zlabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 
 caxis([-0.2 0.2]); cmocean('balance')
 hcb=colorbar; 
 hcb.Label.String = '$\delta/h_{\rm obs}$';
 hcb.Label.Interpreter = 'LaTeX';
 hcb.TickLabelInterpreter = 'LaTeX';
-hcb.FontSize = 28;
-hcb.Location = 'eastoutside';
+hcb.FontSize = 24;
+% hcb.Location = 'eastoutside';
+hcb.Position = [0.87, 0.2, 0.015, 0.66];
 
-set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'FontSize', 28, 'TickLabelInterpreter','latex')
+set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, 'FontSize', 24, ...
+    'TickLabelInterpreter','latex', 'Position', [0.13,0.15,0.68,0.8])
 
 view(-11.71, 4.55)
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
-    'FSI - Actin &  Individual Obstacle\Figure\deviation_y0_L_mubar_simu_theta_m10.eps']);
+    'FSI - Actin &  Individual Obstacle\Figure\deviation_y0_L_mubar_simu_theta_0.eps']);
 
 hhh = gcf;
 set(hhh,'Units','Inches');
 pos = get(hhh,'Position');
 set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 print(hhh, '-dpdf',['F:\Processing & Results\FSI - Actin &  Individual Obstacle' ...
-    '\Figure\deviation_y0_L_mubar_simu_theta_m10.pdf']);
+    '\Figure\deviation_y0_L_mubar_simu_theta_0.pdf']);
