@@ -77,17 +77,17 @@ xlabel('$\bar{\mu}$','FontSize', 24,'Interpreter', 'latex');
 ylabel('$L/l_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 zlabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 
-caxis([-0.2 0.2]); cmocean('balance')
+caxis([-0.1 0.1]); cmocean('balance')
 hcb=colorbar; 
 hcb.Label.String = '$\delta/h_{\rm obs}$';
 hcb.Label.Interpreter = 'LaTeX';
 hcb.TickLabelInterpreter = 'LaTeX';
 hcb.FontSize = 24;
 % hcb.Location = 'eastoutside';
-hcb.Position = [0.87, 0.2, 0.015, 0.66];
+hcb.Position = [0.86, 0.2, 0.015, 0.66];
 
 set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, 'FontSize', 24, ...
-    'TickLabelInterpreter','latex', 'Position', [0.13,0.15,0.68,0.8])
+    'TickLabelInterpreter','latex', 'Position', [0.13,0.15,0.63,0.8])
 
 view(-11.71, 4.55)
 
