@@ -90,6 +90,90 @@ end
 
 
 
+%% only chronophotograph
+clear; close all; clc;
+
+set(0,'DefaultAxesFontSize',14);
+set(0,'defaulttextfontsize',14);
+% set(0,'defaultAxesFontName', 'times new roman');
+% set(0,'defaultTextFontName', 'times new roman');
+set(0,'defaultAxesFontName', 'Arial');
+set(0,'defaultTextFontName', 'Arial');
+set(0,'defaulttextInterpreter','latex') 
+
+mag = 0.1; % um/pixel
+
+xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLines',1);
+% This is the file that contains all the information about the later processing (in sheet 1).
+
+NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
+ExpDate = xlsfile(:, 1);  % The experiment date.
+storePath = xlsfile(:, 2);  % Path of the data to be processed.
+
+for no_Group = 16
+
+    the_exp_date = yyyymmdd(ExpDate{no_Group, 1});
+    theTruestorePath = storePath{no_Group};
+    theTruestorePath = strrep(theTruestorePath,'results','results_plus');
+    thefiles = dir(fullfile(theTruestorePath,'*.mat'));
+
+    for file_ind = 1:length(thefiles)
+
+        filename = thefiles(file_ind).name;
+
+        if contains(filename, 'PlusInfo_') 
+
+            load(fullfile(thefiles(1).folder, thefiles(file_ind).name));
+
+            pathname = thefiles(1).folder;
+            filename = thefiles(file_ind).name
+
+            figure('color', 'w'); set(gcf, 'Position', [100 300 1600 400]);
+            cmap = colormap('jet');
+
+            for frm_ind = 1:7:size(Good_case_frm,2)
+
+                xy_ind = Good_case_frm(frm_ind);
+
+                plot((xy.spl{xy_ind}(:,1)+lzero(frm_ind))*mag, ...
+                    (xy.spl{xy_ind}(:,2)+lzero(frm_ind))*mag, 'color', ...
+                    cmap(mod(frm_ind*32, 255)+1, :), 'LineWidth', 2);
+                hold on
+
+            end
+
+            centers(:, 2) = 2048 - centers(:, 2);
+            viscircles(centers*mag, radii*mag,'LineStyle','--', 'LineWidth', 1, 'Color', 'k'); hold on
+
+            fiber_centers = reshape(cell2mat(xy.centroid(1, Good_case_frm)), 2, ''); 
+            plot(fiber_centers(1, :)*mag, fiber_centers(2, :)*mag, ':k','LineWidth', 1); hold on
+
+            plot([0 2050]*mag, [(mean(fiber_centers(2, :)*mag)-30) (mean(fiber_centers(2, :)*mag)-30)], 'k', 'LineWidth', 2); hold on
+            plot([0 2050]*mag, [(mean(fiber_centers(2, :)*mag)+30) (mean(fiber_centers(2, :)*mag)+30)], 'k', 'LineWidth', 2); hold on
+            plot([0 0]*mag, [(mean(fiber_centers(2, :)*mag)-30) (mean(fiber_centers(2, :)*mag)+30)], 'k', 'LineWidth', 2); hold on
+            plot([2050 2050]*mag, [(mean(fiber_centers(2, :)*mag)-30) (mean(fiber_centers(2, :)*mag)+30)], 'k', 'LineWidth', 2); hold on
+
+            set(gca,'box','off'); set(gca,'ytick',[],'xtick',[]);
+            xlim([0 2050]*mag); 
+            ylim([(mean(fiber_centers(2, :)*mag)-30) (mean(fiber_centers(2, :)*mag)+30)])
+            axis equal; axis off; 
+
+            savepath = 'D:\Dropbox\Research\My PhD thesis\Figures\5-flexible_fiber_array\Fiber_PAs_Chronophotograph'; 
+            if ~exist(savepath, 'dir')
+                mkdir(savepath)
+            end
+
+            set(gcf,'renderer','Painters');
+            print('-depsc2','-tiff','-r100','-vector',[savepath, filesep, filename(1: end-4), '_Chronophotograph.eps']);
+
+            close all
+            clearvars CoM_x Energy xy centers radii
+        end
+    end
+end
+
+
+
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%% Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function addaxis(varargin)
