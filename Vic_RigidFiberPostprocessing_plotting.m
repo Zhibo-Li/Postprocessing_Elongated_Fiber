@@ -723,7 +723,31 @@ xlim([-300 300])
 % f=gcf;
 % exportgraphics(f,'deltaU_vs_chi0__eltaU_vs_chif.png','Resolution',100)
 
+%% plot <interaction3> 'contact probability' vs. deviation (with further data cleaning):
+figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
+together_plot_filtered = together_plot;
+abs_delta_U = abs(together_plot_filtered(21, :) - together_plot_filtered(20, :)); % |U_f - u_0|
+abs_delta_chi = abs(together_plot_filtered(16, :) - together_plot_filtered(3, :)); % |chi_f - chi_0|
+together_plot_filtered(:, and(abs_delta_U > 100, abs_delta_chi < 10)) = []; % remove the cases that have large U-differences but very small chi-differences.
 
+plot(together_plot_filtered(19, :), together_plot_filtered(1, :), 'ok', 'MarkerSize', 9, 'LineWidth', 1.5)
+
+xlim([-0.1 1.1]); ylim([-0.2 0.3]);
+xlabel('Contact probability','FontSize', 24,'FontName', 'Times New Roman'); 
+ylabel('$\delta/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
+text(-0.05, 0.25, 'Experiment','FontSize', 24, 'Interpreter', 'latex','BackgroundColor',[.7 .7 .7])
+set(gca,'Box', 'On','XGrid', 'On','YGrid', 'On','FontSize', 24)
+
+hhh = gcf;
+set(hhh,'Units','Inches');
+pos = get(hhh,'Position');
+set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(hhh, '-dpdf',['F:\Processing & Results\FSI - Rigid Fiber &  Individual ' ...
+    'Obstacle\Figures\about interaction index\Contact_probability_delta_exp.pdf']);
+
+
+
+%%
 function data_out = delta_correction(data_in, slope)
 % Only for obstacle points below!
 % data_in should be 'All_data'.
