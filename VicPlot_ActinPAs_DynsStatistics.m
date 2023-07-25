@@ -170,9 +170,12 @@ ContourLs_others = ContourLs(logical(if_others));
 
 f = figuresetting('centimeters',20,16,'times new roman',24,'on',1,'off','off');
 f.figure('');
-plot(FlowAngle_passing, ContourLs_passing, 'o','MarkerSize', 10,'MarkerEdgeColor',[176 67 129]/255,'LineWidth',2); hold on
-plot(FlowAngle_others, ContourLs_others, '^','MarkerSize', 9,'MarkerEdgeColor',[117 152 196]/255,'LineWidth',2); hold on
-plot(FlowAngle_trapping, ContourLs_trapping, 'diamond','MarkerSize', 9,'MarkerEdgeColor',[123 164 47]/255,'LineWidth', 2); hold on
+plot(FlowAngle_passing + 2*rand(1,length(FlowAngle_passing))-1, ContourLs_passing, ...
+    'o','MarkerSize', 10,'MarkerEdgeColor',[176 67 129]/255,'LineWidth',2); hold on
+plot(FlowAngle_others + 2*rand(1,length(FlowAngle_others))-1, ContourLs_others, ...
+    '^','MarkerSize', 9,'MarkerEdgeColor',[117 152 196]/255,'LineWidth',2); hold on
+plot(FlowAngle_trapping + 2*rand(1,length(FlowAngle_trapping))-1, ContourLs_trapping, ...
+    'diamond','MarkerSize', 9,'MarkerEdgeColor',[123 164 47]/255,'LineWidth', 2); hold on
 
 f.interp_font('latex')
 f.axes('linear',[-5 50],'linear',[0 80],'$\alpha\,(^\circ)$','$L\,(\rm{\mu m})$',24);
@@ -186,7 +189,7 @@ set(hhh,'Units','Inches');
 pos = get(hhh,'Position');
 set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 print(hhh, '-dpdf',['F:\Processing & Results\' ...
-    'Actin Filaments in Porous Media\Figures\Dynamics\actin_pillar_interaction.pdf']);
+    'Actin Filaments in Porous Media\Figures\Dynamics\actin_pillar_interaction_add_NOISE.pdf']);
 
 
 %% Statistics about actin-pillar dynamics in PAs (mean velocity vs dyns).
