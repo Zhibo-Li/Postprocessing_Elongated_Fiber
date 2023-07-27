@@ -137,9 +137,9 @@ plot(theforce / max(abs(theforce)), thedelta, '.k', 'MarkerSize', 15)
 
 xlim([-0.1 1.1]); ylim([-0.3 0.7]);
 xlabel('$f_y/|f_y|_{\rm max}$','FontSize', 24,'Interpreter', 'latex'); 
-ylabel('$\delta/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
+ylabel('$\delta$','FontSize', 24,'Interpreter', 'latex');
 text(-0.05, 0.6, 'Simulation','FontSize', 24, 'Interpreter', 'latex','BackgroundColor',[.7 .7 .7])
-set(gca,'Box', 'On','XGrid', 'On','YGrid', 'On','FontSize', 24)
+set(gca,'Box', 'On','XGrid', 'On','YGrid', 'On','FontSize', 24,'TickLabelInterpreter','latex')
 
 hhh = gcf;
 set(hhh,'Units','Inches');
@@ -165,9 +165,9 @@ plot(contact_prob, thedelta, '.k', 'MarkerSize', 15)
 
 xlim([-0.1 1.1]); ylim([-0.3 0.7]);
 xlabel('Contact probability','FontSize', 24,'FontName', 'Times New Roman'); 
-ylabel('$\delta/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
+ylabel('$\delta$','FontSize', 24,'Interpreter', 'latex');
 text(-0.05, 0.6, 'Simulation','FontSize', 24, 'Interpreter', 'latex','BackgroundColor',[.7 .7 .7])
-set(gca,'Box', 'On','XGrid', 'On','YGrid', 'On','FontSize', 24)
+set(gca,'Box', 'On','XGrid', 'On','YGrid', 'On','FontSize', 24,'TickLabelInterpreter','latex')
 
 hhh = gcf;
 set(hhh,'Units','Inches');

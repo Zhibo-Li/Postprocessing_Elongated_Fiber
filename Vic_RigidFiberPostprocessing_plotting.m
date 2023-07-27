@@ -734,9 +734,9 @@ plot(together_plot_filtered(19, :), together_plot_filtered(1, :), 'ok', 'MarkerS
 
 xlim([-0.1 1.1]); ylim([-0.2 0.3]);
 xlabel('Contact probability','FontSize', 24,'FontName', 'Times New Roman'); 
-ylabel('$\delta/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
+ylabel('$\delta$','FontSize', 24,'Interpreter', 'latex');
 text(-0.05, 0.25, 'Experiment','FontSize', 24, 'Interpreter', 'latex','BackgroundColor',[.7 .7 .7])
-set(gca,'Box', 'On','XGrid', 'On','YGrid', 'On','FontSize', 24)
+set(gca,'Box', 'On','XGrid', 'On','YGrid', 'On','FontSize', 24,'TickLabelInterpreter','latex')
 
 hhh = gcf;
 set(hhh,'Units','Inches');
