@@ -164,7 +164,7 @@ figure('color', 'w'); set(gcf, 'Position', [100 100 800 600]);
 plot(contact_prob, thedelta, '.k', 'MarkerSize', 15)
 
 xlim([-0.1 1.1]); ylim([-0.3 0.7]);
-xlabel('Contact probability','FontSize', 24,'FontName', 'Times New Roman'); 
+xlabel('Contact index','FontSize', 24,'FontName', 'Times New Roman'); 
 ylabel('$\delta$','FontSize', 24,'Interpreter', 'latex');
 text(-0.05, 0.6, 'Simulation','FontSize', 24, 'Interpreter', 'latex','BackgroundColor',[.7 .7 .7])
 set(gca,'Box', 'On','XGrid', 'On','YGrid', 'On','FontSize', 24,'TickLabelInterpreter','latex')
