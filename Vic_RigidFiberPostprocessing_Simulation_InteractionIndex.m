@@ -176,3 +176,31 @@ set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), po
 print(hhh, '-dpdf',['F:\Processing & Results\FSI - Rigid Fiber &  Individual ' ...
     'Obstacle\Figures\about interaction index\Contact_probability_delta_simu.pdf']);
 
+%% plot interaction index vs steric force
+clear; close all; clc;
+
+xlsfile = readcell(['D:\Dropbox\Collaboration - LadHyX\' ...
+    'Give_to_Zhibo_nonShared\Data_Give_to_Zhibo_20230223\' ...
+    'results_2023_02_23_test.xlsx'],'Sheet','Sheet1','NumHeaderLines',1); 
+
+thedyn = cell2mat(xlsfile(:, 5)); % the dynamics: 3 is trapping
+
+theforce = cell2mat(xlsfile(:, 11)); % theforce(thedyn==3) = [];
+contact_prob = cell2mat(xlsfile(:, 13)); % theforce(thedyn==3) = [];
+
+figure('color', 'w'); set(gcf, 'Position', [100 100 600 600]);
+plot(theforce / max(abs(theforce)), contact_prob, '.k', 'MarkerSize', 15)
+
+xlim([-0.001 1.001]); ylim([-0.001 1.001]);
+ylabel('Contact index','FontSize', 24,'FontName', 'Times New Roman'); 
+xlabel('$f_y/|f_y|_{\rm max}$','FontSize', 24,'Interpreter', 'latex');
+% text(-0.05, 0.6, 'Simulation','FontSize', 24, 'Interpreter', 'latex','BackgroundColor',[.7 .7 .7])
+set(gca,'Box', 'On','XGrid', 'On','YGrid', 'On','FontSize', 24,'TickLabelInterpreter','latex')
+set(gca,'YTick', [0 0.5 1])
+
+hhh = gcf;
+set(hhh,'Units','Inches');
+pos = get(hhh,'Position');
+set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(hhh, '-dpdf',['F:\Processing & Results\FSI - Rigid Fiber &  Individual ' ...
+    'Obstacle\Figures\about interaction index\Contact_probability_F_y_simu.pdf']);
