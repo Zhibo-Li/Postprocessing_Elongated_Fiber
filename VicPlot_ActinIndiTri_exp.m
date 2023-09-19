@@ -109,7 +109,7 @@ set(gca, 'YScale', 'log', 'YLim', [0 2], 'YTick', [0.25 0.5 1 2], 'YTickLabel', 
 xlabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 ylabel('$L/l_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 
-caxis([-0.1 0.1]); cmocean('balance')
+caxis([-0.2 0.2]); cmocean('balance')
 hcb=colorbar; 
 t = title(hcb,'$\delta/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
 % hcb.Label.String = '$\delta/h_{\rm obs}$';
@@ -137,3 +137,28 @@ pos = get(hhh,'Position');
 set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 print(hhh, '-dpdf',['F:\Processing & Results\FSI - Actin &  Individual Obstacle' ...
     '\Figure\deviation_y0_L_mubar.pdf']);
+
+
+
+%% For defense plotting
+figure('color', 'w'); 
+set(gcf, 'Position',[100 100 1000 600], 'Color','white', 'DefaultTextInterpreter', 'latex')
+
+scatter(data_plot(1, :)', data_plot(2, :)', 200, data_plot(3, :)', 'Filled','MarkerEdgeColor','k'); hold on
+set(gca, 'XLim', [0 2])
+ylabel('$y_0/h_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
+xlabel('$L/l_{\rm obs}$','FontSize', 24,'Interpreter', 'latex');
+
+caxis([-0.2 0.2]); cmocean('balance')
+hcb=colorbar; 
+hcb.Label.String = '$\delta$';
+hcb.Label.Interpreter = 'LaTeX';
+hcb.TickLabelInterpreter = 'LaTeX';
+hcb.FontSize = 24;
+
+set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, 'FontSize', 24, ...
+    'NextPlot','replacechildren', 'TickLabelInterpreter','latex', 'Position', [0.13,0.15,0.61,0.8])
+
+set(gcf,'renderer','Painters');
+print('-depsc2','-tiff','-r100','-vector',['D:\Dropbox\Research\Zhibo PhD thesis' ...
+    '\Defense\Figures and videos\deviation_y0_L_actin.eps']);
