@@ -5,6 +5,7 @@
 clear; close all; clc;
 
 B = 6.9e-26;  % Bending rigidity
+mag = 0.1; % um/pixel
 
 xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLines',1);
 % This is the file that contains all the information about the later processing (in sheet 1).
@@ -12,6 +13,7 @@ xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLine
 NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
 ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
+Init_U = xlsfile(:, 8);  % initial velocity, unit: m/s.
 
 for no_Group = [7 8 13:28]
 
@@ -47,11 +49,12 @@ for no_Group = [7 8 13:28]
 
             [intensity_base, ~, ~] = Vic_Fiber_Intensity(xy, the_fully_stretched_No, base_fiber_no, base_II, 30, lzero);
 
-            CoM_x = nan(size(Good_case_frm,2), 1); 
+            CoM_x = nan(size(Good_case_frm,2), 1); CoM_y = nan(size(Good_case_frm,2), 1); 
             Energy = nan(size(Good_case_frm,2), 1);
             L_ee_norm_belowOne =  nan(size(Good_case_frm,2), 1); L_ee_norm =  nan(size(Good_case_frm,2), 1);
             Chi = nan(size(Good_case_frm,2), 1);
             aniso =  nan(size(Good_case_frm,2), 1);
+            Instan_V = nan(size(Good_case_frm,2)-1, 1);
             for frm_ind = 1:size(Good_case_frm,2)
 
                 xy_ind = Good_case_frm(frm_ind);% index of the 'good' cases
@@ -79,6 +82,7 @@ for no_Group = [7 8 13:28]
 
                 if spl_L_current > 2*L_0 % discard the too-long fiber
                     CoM_x(frm_ind) = xy.centroid{1, xy_ind}(1); % x-position of fiber center-of-mass
+                    CoM_y(frm_ind) = xy.centroid{1, xy_ind}(2); % y-position of fiber center-of-mass
                     Energy(frm_ind) = nan;
                 else
                     fold_no_max = floor(L_0/spl_L_current) + 1; % maximum folder number based on the fiber length
@@ -102,6 +106,7 @@ for no_Group = [7 8 13:28]
 
                     seglen_spl = xy.seglen_spl{1, xy_ind}; % segment lengths
                     CoM_x(frm_ind) = xy.centroid{1, xy_ind}(1); % x-position of fiber center-of-mass
+                    CoM_y(frm_ind) = xy.centroid{1, xy_ind}(2); % y-position of fiber center-of-mass
 
                     L_ee_norm(frm_ind) = sqrt((xy.spl{xy_ind}(1,1)-xy.spl{xy_ind}(end,1))^2 ...
                         + (xy.spl{xy_ind}(1,2)-xy.spl{xy_ind}(end,2))^2) / L_0;
@@ -118,11 +123,19 @@ for no_Group = [7 8 13:28]
                 end
             end
 
-            save([save_pathname, filesep, 'PlusInfo_', filename(14: end-4), '.mat'],'centers', ...
-                'circleMask', 'CoM_x', 'Energy', 'Good_case_frm', 'L_ee_norm', ...
-                'L_ee_norm_belowOne', 'lzero','metric','radii','xy', 'Chi', 'aniso')
+            if contains(filename, 'interval2')
+                Instan_V = (sqrt(diff(CoM_x).^2+diff(CoM_y).^2))' * mag * 1e-6 ./ ...
+                ((diff(xy(1).frame(Good_case_frm))) * 0.04) / Init_U{no_Group};
+            else
+                Instan_V = (sqrt(diff(CoM_x).^2+diff(CoM_y).^2))' * mag * 1e-6 ./ ...
+                ((diff(xy(1).frame(Good_case_frm))) * 0.02) / Init_U{no_Group};
+            end
 
-            clearvars CoM_x Energy xy centers radii L_ee_norm_belowOne L_ee_norm Chi aniso 
+            save([save_pathname, filesep, 'PlusInfo_', filename(14: end-4), '.mat'],'centers', ...
+                'circleMask', 'CoM_x', 'CoM_y', 'Energy', 'Good_case_frm', 'L_ee_norm', ...
+                'L_ee_norm_belowOne', 'lzero','metric','radii','xy', 'Chi', 'aniso', 'Instan_V')
+
+            clearvars CoM_x CoM_y Energy xy centers radii L_ee_norm_belowOne L_ee_norm Chi aniso Instan_V
         end
     end
 end
