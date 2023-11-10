@@ -8,11 +8,11 @@
 
 clear; close all; clc;
 
-crop_size = 512;
+crop_size = 1024;
 % save_pathname = ['F:\Experimental Data (EXTRACTED)\Actin Filaments in ' ...
 %     'Porous Media\Cropped images for AI tracking\'];
 save_pathname_uint8 = ['F:\Experimental Data (EXTRACTED)\Actin Filaments in ' ...
-    'Porous Media\Cropped images for AI tracking (uint8)\'];
+    'Porous Media\Cropped images for AI tracking 1024x1024 (uint8)\'];
 
 xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLines',1);
 % This is the file that contains all the information about the later processing (in sheet 1).
@@ -20,7 +20,7 @@ xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLine
 ExpDate = xlsfile(:, 1);  % The experiment date.
 storePath = xlsfile(:, 2);  % Path of the data to be processed.
 
-for no_Group = [7 8 13:28]
+for no_Group = [24:28]
 
     the_exp_date = yyyymmdd(ExpDate{no_Group, 1});
     thefiles = dir(fullfile(storePath{no_Group},'*.mat'));
@@ -46,7 +46,7 @@ for no_Group = [7 8 13:28]
                 image_ind = find(cellfun(@(x) strcmp(x(1:end-4), filename(25:end-17)), image_names));
             end
 
-            for frm_ind = 1:size(Good_case_frm,2)
+            for frm_ind = 1:5:size(Good_case_frm,2)
 
                 xy_ind = Good_case_frm(frm_ind); % index of the 'good' cases
                 II = imread(fullfile(theimgs(1).folder, theimgs(image_ind).name), ...
