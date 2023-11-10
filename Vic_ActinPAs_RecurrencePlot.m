@@ -282,8 +282,125 @@ grid on
 text(0.05, 0.9, ['$\alpha =',num2str(Simu_deg),'^{\circ}$'],'FontSize', 22, ...
     'Interpreter', 'latex','BackgroundColor',[.7 .7 .7])
 
-f=gcf;
-exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\' ...
-    'Figures\Poincare plots\Simu_theta=',num2str(Simu_deg),'_tracer.eps'])
+% f=gcf;
+% exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\' ...
+%     'Figures\Poincare plots\Simu_theta=',num2str(Simu_deg),'_tracer.eps'])
+
+
+
+%% Draw Poincare for tracer and actin (overlapping)
+clear; close all; clc;
+
+load('F:\Processing & Results\Actin Filaments in Porous Media\Figures\Poincare plots\Poincare_Map_data_202306.mat');
+
+Obj_Mag = 0.1; % um/pixel
+
+theFlAng = Info.FlowAngle;
+[C, ia, ic] = unique(theFlAng,'stable');
+
+for ii = 1: length(C)
+
+    Lattice_in_all = []; Lattice_out_all = []; L_toPlot_all = [];
+    current_deg = C(ii);
+
+    % the contour lengths
+    L_all = Info.L  * Obj_Mag;
+
+    % in & out position in a unit cell
+    current_deg_index = find(theFlAng == current_deg);
+    for jj = 1:length(current_deg_index)
+        Lattice_in = Info.map{1, current_deg_index(jj)};
+
+        Lattice_out = [[Lattice_in(2:end, 1);nan], Lattice_in(:, 2:3)];
+        out_in_diff = Lattice_out(:, 2) - Lattice_in(:, 2);
+
+        Lattice_in = Lattice_in(out_in_diff==0)';
+        Lattice_out = Lattice_out(out_in_diff==0)';
+
+        Lattice_in_all = [Lattice_in_all, Lattice_in];
+        Lattice_out_all = [Lattice_out_all, Lattice_out];
+        L_toPlot_all = [L_toPlot_all, L_all(current_deg_index(jj)) * ones(1, numel(Lattice_in))];
+
+    end
+
+    f = figuresetting('centimeters',10,10,'times new roman',20,'off',2,'off','off');
+    f.figure('');
+    scatter(Lattice_in_all, Lattice_out_all, 20, L_toPlot_all, 'Filled', 'o','MarkerEdgeColor','none');
+    cmocean('amp'); caxis([0 50]);
+
+    hold on
+    % plot for tracer
+    Simu_deg = current_deg;  
+    Simu_data = readmatrix(['F:\Simulation\202208_differentFlowangles_relatedto_' ...
+        '0811exp_45deg\',num2str(Simu_deg),'deg\Data\Streamline_forPoincare_moreLines.csv']);
+    XXYY_Simu = Simu_data(1:end, 13:14);  % (x, y) of the streamline
+    IntegrationTime = Simu_data(1:end, 4);  % use to separate the different streamlines
+
+    locs = find(IntegrationTime==0);
+    ave_ele = size(XXYY_Simu, 1) / (length(locs)-1);  % average element number of each trajectory
+
+    RotMatrix = rotz(-Simu_deg); RotMatrix = RotMatrix(1:2, 1:2);
+    XXYY_Simu = (RotMatrix * XXYY_Simu')';  % after rotation
+
+    PAs_X = (-30:3:30)*1e-4; PAs_Y = (-30:3:30)*1e-4;  % pillar positions
+    ave_y_gap = 3e-4;
+
+    for streamline_i = round((length(locs)-150)/2):3:length(locs)-round((length(locs)-150)/2)
+
+        XXYY_Simu_i = XXYY_Simu(locs(streamline_i):locs(streamline_i+1)-1, :);
+
+        XXYY_Simu_i(XXYY_Simu_i(:, 1) > 0.0015, :) = [];
+        XXYY_Simu_i(XXYY_Simu_i(:, 1) < -0.0015, :) = [];  
+        fiber_Y_indicator = XXYY_Simu_i(:, 2);
+        for kk = 1: length(PAs_Y)-1
+            fiber_Y_indicator(fiber_Y_indicator > PAs_Y(kk) & fiber_Y_indicator < PAs_Y(kk+1)) = kk;
+        end
+
+        % the 'entering lattice' positions
+        ind_ToBeMoved = min(abs(repmat(XXYY_Simu_i(:, 1), 1, length(PAs_X)) - PAs_X), [], 2) > 6e-6;
+        XXYY_Simu_i(ind_ToBeMoved, :) = [];  % only keep the cases that close to the lattice verticle edge
+        fiber_Y_indicator(ind_ToBeMoved) = [];  % Y indicator as well
+        fiber_X = XXYY_Simu_i(:, 1);
+        For_Poincare = nan(length(PAs_X), 3);
+        for kk = 1: length(PAs_X)
+            to_be_fitted2 = XXYY_Simu_i(abs(fiber_X-PAs_X(kk))<=6e-6, :);
+            if ~isempty(to_be_fitted2) && numel(to_be_fitted2) > 2
+                fit_linear2 = fit(to_be_fitted2(:, 1), to_be_fitted2(:, 2), 'poly1');
+                For_Poincare(kk, 1) = mod((fit_linear2(PAs_X(kk))-PAs_Y(1)), ave_y_gap) / ave_y_gap;
+                % Correct: add '-PAs_Y(1)' @ 20230217
+                For_Poincare(kk, 2) = kk;
+                For_Poincare(kk, 3) = fiber_Y_indicator(to_be_fitted2(1,1)==XXYY_Simu_i(:,1));
+                % Correct: change 'fiber_Y_indicator(kk)' to fiber_Y_indicator(to_be_fitted2(1,1)==XXYY_Simu_i(:,1))
+            end
+        end
+
+        For_Poincare(:, 3) = For_Poincare(:, 3) - min(For_Poincare(:, 3)) + 1;
+        Lattice_in = For_Poincare;
+        Lattice_out = [[Lattice_in(2:end, 1);nan], Lattice_in(:, 2:3)];
+        out_in_diff = Lattice_out(:, 2) - Lattice_in(:, 2);
+
+        Lattice_in = Lattice_in(out_in_diff==0)';
+        Lattice_out = Lattice_out(out_in_diff==0)';
+
+        plot(Lattice_in, Lattice_out, 'cx', 'LineStyle', 'none','MarkerSize', 3); hold on
+
+    end
+
+    title_txt = strcat('$\alpha=', num2str(C(ii)), '^{\circ}$');
+    f.interp_font('latex')
+    f.axes('linear',[0 1],'linear',[0 1],'$\eta_{i}$','$\eta_{i+1}$',20);
+    f.axes_ticks([0:0.2:1], [0:0.2:1]);
+    grid on
+    text(0.05, 0.9, title_txt,'FontSize', 20, ...
+        'Interpreter', 'latex','BackgroundColor',[.7 .7 .7])
+
+    set(gcf,'renderer','Painters');
+    print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
+        'Actin Filaments in Porous Media\Figures\Poincare plots\', ...
+        title_txt(2:end-9),'_colorcode-L_with_tracer.eps']);
+
+    close
+
+end
 
 
