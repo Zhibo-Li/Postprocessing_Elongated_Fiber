@@ -267,7 +267,7 @@ print(hhh, '-dpdf',['F:\Processing & Results\' ...
 
 
 
-%% Statistics about different actin dynamics in PAs.
+%% Statistics about different actin dynamics in PAs (partial buckling).
 
 clear; close all; clc;
 xlsFolder = dir(['F:\Processing & Results\Actin Filaments in Porous Media\' ...
@@ -325,3 +325,69 @@ pos = get(hhh,'Position');
 set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 print(hhh, '-dpdf',['F:\Processing & Results\' ...
     'Actin Filaments in Porous Media\Figures\Dynamics\actin_buckling_L.pdf']);
+
+
+
+%% Statistics about actin-pillar dynamics in PAs (mean velocity vs actin length).
+
+clear; close all; clc;
+xlsFolder = dir(['F:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Dynamics manually classification\*.xlsx']);
+
+case_names = [];             ContourLs = [];             mu_bars = [];
+FlowAngle = [];          
+if_trapping = [];        if_passing = [];            if_others = [];
+Ux_to_U0 = [];
+
+for ii = 1: length(xlsFolder)
+
+    xlsfile = readcell([xlsFolder(1).folder, filesep, xlsFolder(ii).name], ...
+        'Sheet','Sheet1','NumHeaderLines',1);
+
+    case_names = [case_names; xlsfile(:, 1)];
+    ContourLs = [ContourLs, xlsfile{:, 2}];
+    mu_bars = [mu_bars, xlsfile{:, 14}];
+
+    FlowAngle = [FlowAngle, xlsfile{:, 15}];
+
+    if_trapping = [if_trapping, xlsfile{:, 16}];
+    if_passing = [if_passing, xlsfile{:, 17}];
+    if_others = [if_others, xlsfile{:, 18}];
+
+    Ux_to_U0 = [Ux_to_U0, xlsfile{:, 19}];
+ 
+end
+
+% % plot for different angles
+for chosen_angle_to_plot = [0 10 15 20 30 35 45]
+    Ux_to_U0_trapping = Ux_to_U0(logical(if_trapping) & (FlowAngle == chosen_angle_to_plot));
+    Ux_to_U0_passing = Ux_to_U0(logical(if_passing) & (FlowAngle == chosen_angle_to_plot));
+    Ux_to_U0_others = Ux_to_U0(logical(if_others) & (FlowAngle == chosen_angle_to_plot));
+
+    ContourLs_trapping = ContourLs(logical(if_trapping) & (FlowAngle == chosen_angle_to_plot));
+    ContourLs_passing = ContourLs(logical(if_passing) & (FlowAngle == chosen_angle_to_plot));
+    ContourLs_others = ContourLs(logical(if_others) & (FlowAngle == chosen_angle_to_plot));
+
+    hhh = figure('color', 'w'); set(gcf, 'Position', [100 100 800 600],'DefaultTextInterpreter', 'latex');
+    plot(ContourLs_passing, 1./Ux_to_U0_passing, 'o','MarkerSize', 15, 'MarkerFaceColor', ...
+        [176 67 129]/255, 'MarkerEdgeColor', [176 67 129]/255); hold on
+    plot(ContourLs_others, 1./Ux_to_U0_others, 'o','MarkerSize', 15, 'MarkerFaceColor', ...
+        [117 152 196]/255, 'MarkerEdgeColor', [117 152 196]/255); hold on
+    plot(ContourLs_trapping, 1./Ux_to_U0_trapping, 'o','MarkerSize', 15, 'MarkerFaceColor', ...
+        [123 164 47]/255, 'MarkerEdgeColor', [123 164 47]/255);
+    hold on
+
+    set(gca, 'Box', 'On', 'XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.2, ...
+        'FontSize', 24, 'FontName', 'Times new roman')
+    legend({'Passing','Gliding','Trapping'}, 'FontName','Times New Roman', 'Box','off','Location','northwest');
+
+    xlabel('$L\,(\rm{\mu m})$','FontSize', 24,'Interpreter', 'latex');
+    ylabel('$\overline{t}_x / t_0$','FontSize', 24, 'FontName', 'Times new roman');
+
+    set(hhh,'Units','Inches');
+    pos = get(hhh,'Position');
+    set(hhh,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+    print(hhh, '-dpdf',['F:\Processing & Results\' ...
+        'Actin Filaments in Porous Media\Figures\Dynamics\' ...
+        'actin_pillar_interaction_velocity_vs_length_alpha',num2str(chosen_angle_to_plot),'deg.pdf']);
+end
