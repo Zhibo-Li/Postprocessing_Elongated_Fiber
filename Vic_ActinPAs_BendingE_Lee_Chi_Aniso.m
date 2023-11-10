@@ -47,11 +47,11 @@ for no_Group = [7 8 13:28]
 
             [intensity_base, ~, ~] = Vic_Fiber_Intensity(xy, the_fully_stretched_No, base_fiber_no, base_II, 30, lzero);
 
-            CoM_x = zeros(size(Good_case_frm,2), 1); 
-            Energy = zeros(size(Good_case_frm,2), 1);
-            L_ee_norm_belowOne =  zeros(size(Good_case_frm,2), 1); L_ee_norm =  zeros(size(Good_case_frm,2), 1);
-            Chi = zeros(size(Good_case_frm,2), 1);
-            aniso =  zeros(size(Good_case_frm,2), 1);
+            CoM_x = nan(size(Good_case_frm,2), 1); 
+            Energy = nan(size(Good_case_frm,2), 1);
+            L_ee_norm_belowOne =  nan(size(Good_case_frm,2), 1); L_ee_norm =  nan(size(Good_case_frm,2), 1);
+            Chi = nan(size(Good_case_frm,2), 1);
+            aniso =  nan(size(Good_case_frm,2), 1);
             for frm_ind = 1:size(Good_case_frm,2)
 
                 xy_ind = Good_case_frm(frm_ind);% index of the 'good' cases
