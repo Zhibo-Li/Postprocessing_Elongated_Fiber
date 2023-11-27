@@ -1,4 +1,4 @@
-%%%% Plot normalized the fiber x-y coordinates in the lattice.
+%% Plot normalized the fiber x-y coordinates in the lattice.
 % data from Vic_ActinPAs_Normalize_fiber_xy_in_lattice.m
 % data name format: PlusInfo_trajectory_..._batch1.mat
 
@@ -152,8 +152,7 @@ print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
 
 
 
-%%
-%%%% Plot normalized the fiber x-y coordinates in the lattice.
+%% Plot normalized the fiber x-y coordinates in the lattice (L < 30um).
 % data from Vic_ActinPAs_Normalize_fiber_xy_in_lattice.m
 % data name format: PlusInfo_trajectory_..._batch1.mat
 
@@ -294,9 +293,7 @@ print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
 
 
 
-%%
-%%%% Plot normalized the fiber x-y coordinates in the lattice.
-% With colorbar
+%% Plot normalized the fiber x-y coordinates in the lattice (L < 30um; with colorbar).
 
 clear; close all; clc;
 
