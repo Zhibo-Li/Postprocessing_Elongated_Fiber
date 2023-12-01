@@ -88,7 +88,7 @@ for current_angle = [0 10 15 20 30 35 45] % different angles
     fiber_xy_in_lattice(fiber_xy_in_lattice < 0) = 0;  % to make sure no error in accumarray
     [~,~,~,ind_x,ind_y] = histcounts2(fiber_xy_in_lattice(:,1), ...
         fiber_xy_in_lattice(:,2), Xedges, Yedges);
-    binned = accumarray([ind_y,ind_x],curvature,[numel(Xedges)-1 numel(Xedges)-1],@median,0);
+    binned = accumarray([ind_y,ind_x],curvature,[numel(Xedges)-1 numel(Xedges)-1],@VicMean,0);
 
     [x_plot,y_plot] = meshgrid(0.5/plot_resolution:1/plot_resolution:1-0.5/plot_resolution, ...
         0.5/plot_resolution:1/plot_resolution:1-0.5/plot_resolution);
@@ -160,7 +160,7 @@ fiber_xy_in_lattice(fiber_xy_in_lattice > 1) = 1;
 fiber_xy_in_lattice(fiber_xy_in_lattice < 0) = 0;  % to make sure no error in accumarray
 [~,~,~,ind_x,ind_y] = histcounts2(fiber_xy_in_lattice(:,1), ...
     fiber_xy_in_lattice(:,2), Xedges, Yedges);
-binned = accumarray([ind_y,ind_x],curvature,[numel(Xedges)-1 numel(Xedges)-1],@median,0);
+binned = accumarray([ind_y,ind_x],curvature,[numel(Xedges)-1 numel(Xedges)-1],@VicMean,0);
 
 [x_plot,y_plot] = meshgrid(0.5/plot_resolution:1/plot_resolution:1-0.5/plot_resolution, ...
     0.5/plot_resolution:1/plot_resolution:1-0.5/plot_resolution);
@@ -280,7 +280,7 @@ for current_angle = [0 10 15 20 30 35 45] % different angles
     fiber_xy_in_lattice(fiber_xy_in_lattice < 0) = 0;  % to make sure no error in accumarray
     [~,~,~,ind_x,ind_y] = histcounts2(fiber_xy_in_lattice(:,1), ...
         fiber_xy_in_lattice(:,2), Xedges, Yedges);
-    binned = accumarray([ind_y,ind_x],curvature,[numel(Xedges)-1 numel(Xedges)-1],@median,0);
+    binned = accumarray([ind_y,ind_x],curvature,[numel(Xedges)-1 numel(Xedges)-1],@VicMean,0);
 
     [x_plot,y_plot] = meshgrid(0.5/plot_resolution:1/plot_resolution:1-0.5/plot_resolution, ...
         0.5/plot_resolution:1/plot_resolution:1-0.5/plot_resolution);
@@ -342,7 +342,7 @@ fiber_xy_in_lattice(fiber_xy_in_lattice > 1) = 1;
 fiber_xy_in_lattice(fiber_xy_in_lattice < 0) = 0;  % to make sure no error in accumarray
 [~,~,~,ind_x,ind_y] = histcounts2(fiber_xy_in_lattice(:,1), ...
     fiber_xy_in_lattice(:,2), Xedges, Yedges);
-binned = accumarray([ind_y,ind_x],curvature,[numel(Xedges)-1 numel(Xedges)-1],@median,0);
+binned = accumarray([ind_y,ind_x],curvature,[numel(Xedges)-1 numel(Xedges)-1],@VicMean,0);
 
 [x_plot,y_plot] = meshgrid(0.5/plot_resolution:1/plot_resolution:1-0.5/plot_resolution, ...
     0.5/plot_resolution:1/plot_resolution:1-0.5/plot_resolution);
@@ -440,7 +440,7 @@ for current_angle = [0 30 45] % different angles
     fiber_xy_in_lattice(fiber_xy_in_lattice < 0) = 0;  % to make sure no error in accumarray
     [~,~,~,ind_x,ind_y] = histcounts2(fiber_xy_in_lattice(:,1), ...
         fiber_xy_in_lattice(:,2), Xedges, Yedges);
-    binned = accumarray([ind_y,ind_x],curvature,[numel(Xedges)-1 numel(Xedges)-1],@median,0);
+    binned = accumarray([ind_y,ind_x],curvature,[numel(Xedges)-1 numel(Xedges)-1],@VicMean,0);
 
     [x_plot,y_plot] = meshgrid(0.5/plot_resolution:1/plot_resolution:1-0.5/plot_resolution, ...
         0.5/plot_resolution:1/plot_resolution:1-0.5/plot_resolution);
@@ -467,4 +467,11 @@ for current_angle = [0 30 45] % different angles
 
     clearvars fiber_xy_in_lattice curvature
 
+end
+
+
+function y = VicMean(x)
+xx = sort(x);
+trash_no = floor(length(x) * 0.5);
+y = mean(xx(trash_no+1: end));
 end
