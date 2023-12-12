@@ -15,7 +15,7 @@ plot_resolution = 50;
 Xedges = [0:1/plot_resolution:1]; Yedges = [0:1/plot_resolution:1]; % for the histogram
 
 parent_path = ['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
-    'FSI - Actin in PAs\send_zhibo\simulations_results'];
+    'FSI - Actin in PAs\Simulations\simulations_results'];
 
 for current_angle = 0:5:45 % different angles
 
@@ -26,11 +26,13 @@ for current_angle = 0:5:45 % different angles
     load_results_list = dir(fullfile(current_load_path, '\*.mat'));
 
     for ii = 1:length(load_results_list)
-        load(fullfile(load_results_list(ii).folder, load_results_list(ii).name));
+        if contains(load_results_list(ii).name, '15um')
+            load(fullfile(load_results_list(ii).folder, load_results_list(ii).name));
 
-        for jj = 1:length(fiberInfo)
-            fiber_xy_in_lattice = [fiber_xy_in_lattice; fiberInfo(jj).fiber_xy_in_lattice];
-            curvature = [curvature; fiberInfo(jj).curvature]; % unit: 1/um
+            for jj = 1:length(fiberInfo)
+                fiber_xy_in_lattice = [fiber_xy_in_lattice; fiberInfo(jj).fiber_xy_in_lattice];
+                curvature = [curvature; fiberInfo(jj).curvature]; % unit: 1/um
+            end
         end
     end
 
@@ -53,13 +55,13 @@ for current_angle = 0:5:45 % different angles
 
     f = gcf;
     savefig(f,['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\FSI - Actin in PAs' ...
-        '\send_zhibo\figures\Curvature Distribution in Lattice\' ...
-        'actin_curvature_lattice_angle_',num2str(current_angle),'_Simulation.fig'])
+        '\Simulations\figures\Curvature Distribution in Lattice\' ...
+        'actin_curvature_lattice_angle_',num2str(current_angle),'_Simulation_FiberCoMinLatticeCenter.fig'])
 
     set(f,'renderer','Painters');
     print('-depsc2','-tiff','-r100','-vector',['D:\Dropbox\Collaboration - LadHyX\' ...
-        'Give_to_Zhibo_nonShared\FSI - Actin in PAs\send_zhibo\figures\Curvature Distribution in Lattice\' ...
-        'actin_curvature_lattice_angle_',num2str(current_angle),'_Simulation.eps']);
+        'Give_to_Zhibo_nonShared\FSI - Actin in PAs\Simulations\figures\Curvature Distribution in Lattice\' ...
+        'actin_curvature_lattice_angle_',num2str(current_angle),'_Simulation_FiberCoMinLatticeCenter.eps']);
 
     clearvars fiber_xy_in_lattice curvature
 
