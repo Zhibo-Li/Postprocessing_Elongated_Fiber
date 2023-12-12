@@ -7,7 +7,7 @@ PAs_C2C = 30.25; % center to center distance in X, Y direction (notice that it's
 
 parent_path = ['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\FSI - Actin in PAs\Simulations_based_on_Experiment'];
 sub_path1 = dir(parent_path);
-for sub2Path_i = 15:length(sub_path1)-1
+for sub2Path_i = 3:length(sub_path1)-2
     caseName = sub_path1(sub2Path_i).name;
     newStr = strrep(caseName,'o','.');
 
@@ -45,18 +45,18 @@ for sub2Path_i = 15:length(sub_path1)-1
         fiber_xy_in_lattice = [mod(abs(spl(:,1)+PAs_C2C), PAs_C2C)/PAs_C2C, ...
             mod(abs(spl(:,2)-PAs_C2C), PAs_C2C)/PAs_C2C];
 
-        plot(spl(:,1), spl(:,2),'m.', "LineStyle","none");
-        axis equal; hold on
-        [x_plot,y_plot] = meshgrid(0:PAs_C2C:450, 0:-PAs_C2C:-450);
-        viscircles([x_plot(:), y_plot(:)], 10*ones(length(x_plot(:)), 1),'Color','r');
-
-        plot(fiber_xy_in_lattice(:,1), fiber_xy_in_lattice(:,2),'m.', "LineStyle","none");
-        axis equal; hold on
-        viscircles([0 0; 0 1; 1 0; 1 1], 1/3*ones(4, 1),'Color','r');
-        xlim([0 1]); ylim([0 1]);
-
-        pause(0.2)
-        close
+%         plot(spl(:,1), spl(:,2),'m.', "LineStyle","none");
+%         axis equal; hold on
+%         [x_plot,y_plot] = meshgrid(0:PAs_C2C:450, 0:-PAs_C2C:-450);
+%         viscircles([x_plot(:), y_plot(:)], 10*ones(length(x_plot(:)), 1),'Color','r');
+% 
+%         plot(fiber_xy_in_lattice(:,1), fiber_xy_in_lattice(:,2),'m.', "LineStyle","none");
+%         axis equal; hold on
+%         viscircles([0 0; 0 1; 1 0; 1 1], 1/3*ones(4, 1),'Color','r');
+%         xlim([0 1]); ylim([0 1]);
+% 
+%         pause(0.2)
+%         close
 
         % fiberInfo is based on 'rotated' pillar array (the flow direction changes)
         fiberInfo(ii).name = caseName;
@@ -76,11 +76,11 @@ for sub2Path_i = 15:length(sub_path1)-1
 
     end
 
-%     save_dir = [parent_path, '\simulations_results'];
-%     if ~exist(save_dir, "dir")
-%         mkdir(save_dir)
-%     end
-%     save([save_dir, filesep, caseName, '.mat'], "fiberInfo");
+    save_dir = [parent_path, '\simulations_results'];
+    if ~exist(save_dir, "dir")
+        mkdir(save_dir)
+    end
+    save([save_dir, filesep, caseName, '.mat'], "fiberInfo");
 
     clearvars fiberInfo
 end
