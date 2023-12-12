@@ -5,92 +5,84 @@ time_step = 0.01; % unit:s
 B = 6.9e-26;  % Bending rigidity
 PAs_C2C = 30.25; % center to center distance in X, Y direction (notice that it's not 30!)
 
-parent_path = ['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\' ...
-    'FSI - Actin in PAs\send_zhibo\simulations'];
-sub1_path = dir(parent_path);
-for sub1Path_i = 3:length(sub1_path)
-    flowAngle_str = sub1_path(sub1Path_i).name;
-    flowAngle_num = str2double(flowAngle_str(8:end));
-    sub2_path = dir(fullfile(parent_path, flowAngle_str));
-    for sub2Path_i = 3:length(sub2_path)-1
-        caseName = sub2_path(sub2Path_i).name;
-        newStr = strrep(caseName,'o','.');
-        L_num = str2double(newStr(3:5)) * 20; % unit: um
-        y0_num = str2double(newStr(10:11)); % unit: um
-        theta0_num = str2double(newStr(22:end));  % unit: deg
+parent_path = ['D:\Dropbox\Collaboration - LadHyX\Give_to_Zhibo_nonShared\FSI - Actin in PAs\Simulations_based_on_Experiment'];
+sub_path1 = dir(parent_path);
+for sub2Path_i = 15:length(sub_path1)-1
+    caseName = sub_path1(sub2Path_i).name;
+    newStr = strrep(caseName,'o','.');
 
-        fileinfo = dir(fullfile(parent_path, flowAngle_str, caseName, '\output_data\*.vtk'));
+    fileinfo = dir(fullfile(parent_path, caseName, '\output_data\*.vtk'));
 
-        for ii = 1:length(fileinfo)
-            snapshot = readVTK(fullfile(fileinfo(ii).folder, fileinfo(ii).name));
-            XY = snapshot.points(:, 1:2) * 1e6; % Positions of fiber beads. (unit: um)
-            xy_contact = movmean(XY, 2, 1, 'Endpoints', 'discard');
-            xy_start = 2*XY(1, :) - xy_contact(1, :); xy_end = 2*XY(end, :) - xy_contact(end, :);
-            xy = double([xy_start; xy_contact; xy_end]); % unit: um
-            CoM_xy = mean(xy, 1); % center of mass
+    for ii = 1:length(fileinfo)
+        snapshot = readVTK(fullfile(fileinfo(ii).folder, fileinfo(ii).name));
+        XY = snapshot.points(:, 1:2) * 1e6; % Positions of fiber beads. (unit: um)
+        xy_contact = movmean(XY, 2, 1, 'Endpoints', 'discard');
+        xy_start = 2*XY(1, :) - xy_contact(1, :); xy_end = 2*XY(end, :) - xy_contact(end, :);
+        xy = double([xy_start; xy_contact; xy_end]); % unit: um
+        CoM_xy = mean(xy, 1); % center of mass
 
-            spl = BSpline(xy, 'order', 2, 'nint', 10);
-            seg = diff(spl);
-            seg_len = sqrt(seg(:,1).^2 + seg(:,2).^2);
+        spl = BSpline(xy, 'order', 2, 'nint', 10);
+        seg = diff(spl);
+        seg_len = sqrt(seg(:,1).^2 + seg(:,2).^2);
 
-            [L2,R2,K2] = curvature(spl);
-            R2(isnan(R2)) = inf;
-            RR2 = movmean(R2,ceil(size(spl,1)/100));
-            Curvature = 1./RR2; % orientation
+        [L2,R2,K2] = curvature(spl);
+        R2(isnan(R2)) = inf;
+        RR2 = movmean(R2,ceil(size(spl,1)/100));
+        Curvature = 1./RR2; % orientation
 
-            Energy = B / 2 * sum((Curvature(2:end)).^2 .* seg_len, 'omitnan') / 1e-6;
+        Energy = B / 2 * sum((Curvature(2:end)).^2 .* seg_len, 'omitnan') / 1e-6;
+        L_num = sum(seg_len); % unit: um
 
-            Gyr = 1/size(spl,1) * [sum((spl(:, 1)-CoM_xy(1)).^2),  sum((spl(:, 1)-CoM_xy(1)) .* (spl(:, 2)-CoM_xy(2)));
-                sum((spl(:, 2)-CoM_xy(2)) .* (spl(:, 1)-CoM_xy(1))), sum((spl(:, 2)-CoM_xy(2)).^2)];
+        Gyr = 1/size(spl,1) * [sum((spl(:, 1)-CoM_xy(1)).^2),  sum((spl(:, 1)-CoM_xy(1)) .* (spl(:, 2)-CoM_xy(2)));
+            sum((spl(:, 2)-CoM_xy(2)) .* (spl(:, 1)-CoM_xy(1))), sum((spl(:, 2)-CoM_xy(2)).^2)];
 
-            [eigenV,eigenD] = eig(Gyr);
-            [d,ind] = sort(diag(eigenD));
-            Ds = eigenD(ind,ind);
-            Vs = eigenV(:,ind);
-            Lambda1 = eigenD(2,2); Lambda2 =  eigenD(1,1);
+        [eigenV,eigenD] = eig(Gyr);
+        [d,ind] = sort(diag(eigenD));
+        Ds = eigenD(ind,ind);
+        Vs = eigenV(:,ind);
+        Lambda1 = eigenD(2,2); Lambda2 =  eigenD(1,1);
 
-            fiber_xy_in_lattice = [mod(abs(spl(:,1)+PAs_C2C), PAs_C2C)/PAs_C2C, ...
-                mod(abs(spl(:,2)-PAs_C2C), PAs_C2C)/PAs_C2C];
+        fiber_xy_in_lattice = [mod(abs(spl(:,1)+PAs_C2C), PAs_C2C)/PAs_C2C, ...
+            mod(abs(spl(:,2)-PAs_C2C), PAs_C2C)/PAs_C2C];
 
-%             plot(spl(:,1), spl(:,2),'m.', "LineStyle","none");
-%             axis equal; hold on
-%             [x_plot,y_plot] = meshgrid(0:PAs_C2C:450, 0:-PAs_C2C:-450);
-%             viscircles([x_plot(:), y_plot(:)], 10*ones(length(x_plot(:)), 1),'Color','r');
+        plot(spl(:,1), spl(:,2),'m.', "LineStyle","none");
+        axis equal; hold on
+        [x_plot,y_plot] = meshgrid(0:PAs_C2C:450, 0:-PAs_C2C:-450);
+        viscircles([x_plot(:), y_plot(:)], 10*ones(length(x_plot(:)), 1),'Color','r');
 
-%             plot(fiber_xy_in_lattice(:,1), fiber_xy_in_lattice(:,2),'m.', "LineStyle","none");
-%             axis equal; hold on
-%             viscircles([0 0; 0 1; 1 0; 1 1], 1/3*ones(4, 1),'Color','r');
-%             xlim([0 1]); ylim([0 1]);
-%             
-%             pause(0.2)
-%             close
-            
-            % fiberInfo is based on 'rotated' pillar array (the flow direction changes)
-            fiberInfo(ii).name = ['FlowAng_', flowAngle_str, '_', caseName];
-            fiberInfo(ii).xy = xy; 
-            fiberInfo(ii).spl = spl; % coordinates after B-spline interpolation
-            fiberInfo(ii).length = L_num; % fiber length in um.
-            fiberInfo(ii).Chi = atan(Vs(2,2)/Vs(1,2)); % orientation
-            fiberInfo(ii).aniso = 1 - 4*Lambda1*Lambda2/(Lambda1+Lambda2)^2; % sphericity
-            fiberInfo(ii).center = CoM_xy;
-            fiberInfo(ii).Lee = norm(spl(end, :) - spl(1, :))/L_num;
-            fiberInfo(ii).curvature = Curvature; % Curvature
-            fiberInfo(ii).energy = Energy; % Bending energy
+        plot(fiber_xy_in_lattice(:,1), fiber_xy_in_lattice(:,2),'m.', "LineStyle","none");
+        axis equal; hold on
+        viscircles([0 0; 0 1; 1 0; 1 1], 1/3*ones(4, 1),'Color','r');
+        xlim([0 1]); ylim([0 1]);
 
-            fiberInfo(ii).fiber_xy_in_lattice = fiber_xy_in_lattice;
-            fiberInfo(ii).fiber_CoM_xy_in_lattice = [sign(CoM_xy(:,1)) .* mod(abs(CoM_xy(:,1)), PAs_C2C)/PAs_C2C, ...
-                sign(CoM_xy(:,2)) .* mod(abs(CoM_xy(:,2)), PAs_C2C)/PAs_C2C];
+        pause(0.2)
+        close
 
-        end
+        % fiberInfo is based on 'rotated' pillar array (the flow direction changes)
+        fiberInfo(ii).name = caseName;
+        fiberInfo(ii).xy = xy;
+        fiberInfo(ii).spl = spl; % coordinates after B-spline interpolation
+        fiberInfo(ii).length = L_num; % fiber length in um.
+        fiberInfo(ii).Chi = atan(Vs(2,2)/Vs(1,2)); % orientation
+        fiberInfo(ii).aniso = 1 - 4*Lambda1*Lambda2/(Lambda1+Lambda2)^2; % sphericity
+        fiberInfo(ii).center = CoM_xy;
+        fiberInfo(ii).Lee = norm(spl(end, :) - spl(1, :))/L_num;
+        fiberInfo(ii).curvature = Curvature; % Curvature
+        fiberInfo(ii).energy = Energy; % Bending energy
 
-        save_dir = [parent_path, '_results\Flow_Ang_',flowAngle_str];
-        if ~exist(save_dir, "dir")
-            mkdir(save_dir)
-        end
-        save([save_dir, filesep, caseName, '.mat'], "fiberInfo");
+        fiberInfo(ii).fiber_xy_in_lattice = fiber_xy_in_lattice;
+        fiberInfo(ii).fiber_CoM_xy_in_lattice = [sign(CoM_xy(:,1)) .* mod(abs(CoM_xy(:,1)), PAs_C2C)/PAs_C2C, ...
+            sign(CoM_xy(:,2)) .* mod(abs(CoM_xy(:,2)), PAs_C2C)/PAs_C2C];
 
-        clearvars fiberInfo
     end
+
+%     save_dir = [parent_path, '\simulations_results'];
+%     if ~exist(save_dir, "dir")
+%         mkdir(save_dir)
+%     end
+%     save([save_dir, filesep, caseName, '.mat'], "fiberInfo");
+
+    clearvars fiberInfo
 end
 
 
@@ -120,9 +112,9 @@ function BS = BSpline(knots,varargin)
 %
 % BSPLINE(KNOTS,'order',n) Uses n -th order approximation (default: n=2)
 %
-% BSPLINE(KNOTS,'nint',m) gives m points per interval (default: m=10) 
+% BSPLINE(KNOTS,'nint',m) gives m points per interval (default: m=10)
 % Zhibo: include the two endpoints.
-% 
+%
 % If KNOTS is of size [p,q], the result will be of size [(p-1)*(m-1)+1 ,q],
 % except if periodicity is requested (see below).
 %
@@ -163,7 +155,7 @@ for m = 1:n-1
         BS=BS(1:m-1,:);
         return;
     end
-    Xl(:,1,:) = knots(k-order+1:k,:);   
+    Xl(:,1,:) = knots(k-order+1:k,:);
     if k<=order+1
         m_min=max(m,m_min);
     end
