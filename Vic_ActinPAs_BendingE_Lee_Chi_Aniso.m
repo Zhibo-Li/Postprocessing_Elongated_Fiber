@@ -123,7 +123,10 @@ for no_Group = [7 8 13:28]
                 end
             end
 
-            if contains(filename, 'interval2')
+            if contains(filename, 'interval4')
+                Instan_V = (sqrt(diff(CoM_x).^2+diff(CoM_y).^2))' * mag * 1e-6 ./ ...
+                ((diff(xy(1).frame(Good_case_frm))) * 0.08) / Init_U{no_Group};
+            elseif contains(filename, 'interval2')
                 Instan_V = (sqrt(diff(CoM_x).^2+diff(CoM_y).^2))' * mag * 1e-6 ./ ...
                 ((diff(xy(1).frame(Good_case_frm))) * 0.04) / Init_U{no_Group};
             else
