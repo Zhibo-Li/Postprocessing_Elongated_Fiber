@@ -181,6 +181,75 @@ end
 
 
 
+%% Plot the fiber CoM speed along x-direction (flow direction).
 
+clear; close all; clc;
 
+set(0,'DefaultAxesFontSize',14);
+set(0,'defaulttextfontsize',14);
+% set(0,'defaultAxesFontName', 'times new roman');
+% set(0,'defaultTextFontName', 'times new roman');
+set(0,'defaultAxesFontName', 'Arial');
+set(0,'defaultTextFontName', 'Arial');
+set(0,'defaulttextInterpreter','latex') 
+
+mag = 0.1; % um/pixel
+
+xlsfile = readcell('ForActinPostprocessing.xlsx','Sheet','Sheet1','NumHeaderLines',1);
+% This is the file that contains all the information about the later processing (in sheet 1).
+
+NumGroup = size(xlsfile, 1);  % Number of the groups to be calculated.
+ExpDate = xlsfile(:, 1);  % The experiment date.
+storePath = xlsfile(:, 2);  % Path of the data to be processed.
+Init_U = xlsfile(:, 8);  % initial velocity, unit: m/s.
+alpha = xlsfile(:, 14); % tilt angle
+
+for no_Group = [7 8 13:28]
+
+    the_exp_date = yyyymmdd(ExpDate{no_Group, 1});
+    theTruestorePath = storePath{no_Group};
+    theTruestorePath = strrep(theTruestorePath,'results','results_plus');
+    thefiles = dir(fullfile(theTruestorePath,'*.mat'));
+
+    for file_ind = 1:length(thefiles)
+
+        filename = thefiles(file_ind).name;
+
+        if contains(filename, 'PlusInfo_') 
+
+            load(fullfile(thefiles(1).folder, thefiles(file_ind).name));        
+
+            pathname = thefiles(1).folder;
+            filename = thefiles(file_ind).name
+
+            figure('color', 'w'); set(gcf, 'Position', [100 300 1200 400]);
+            CoM_X_avg = movmean(CoM_x+lzero, 2); % movmean by 2 to get x-position for speed
+            plot(CoM_X_avg(2:end)*mag, Instan_V, '.b', 'LineStyle','none', 'MarkerSize', 25);
+            xlabel('$x\ (\mu{m})$')
+            ylabel('$|U|/U_0$', 'FontName', 'Times new roman');
+
+            spl_Ls = xy.arclen_spl(Good_case_frm);
+            L_0 = VicFc_Get_ContourLength(spl_Ls); % get the filament length
+
+            text(3, 0.5, ['$U_0=', num2str(Init_U{no_Group}*1e6),'\,\mu m/s$', ...
+                ', ','$L_0=', num2str(L_0*mag),'\mu m$',' and ','$\alpha=', ...
+                num2str(alpha{no_Group}),'^\circ$'],'BackgroundColor', 'y');
+            ylim([0 6]); xlim([0 2048]*mag);
+            grid on; hold on
+            set(gca, 'Box', 'On', 'FontSize', 18, 'TickLabelInterpreter','latex')
+
+            savepath = ['F:\Processing & Results\Actin Filaments in Porous Media\Figures\Fiber CoM speed',...
+                pathname(56:70), pathname(end-7:end)]; 
+            if ~exist(savepath, 'dir')
+                mkdir(savepath)
+            end
+
+            f=gcf;
+            exportgraphics(f,[savepath, filesep, filename(41: end-17), '_fiberCoM_speed.png'],'Resolution',100)
+
+            close all
+            clearvars CoM_x Instan_V
+        end 
+    end
+end
 
