@@ -265,17 +265,17 @@ end
 clear; close all; clc;
 
 % The .tif file you just calculated.
-[filename, pathname]=uigetfile({['F:\Experimental Data (EXTRACTED)\Actin Filaments' ...
-    ' in Porous Media\20210914-Actin\AfterAveBGR\*.tif']}, 'Choose a *.tif to be processed');  % input file
+[filename, pathname]=uigetfile({['Z:\Experimental Data (RAW)\Actin tracking\' ...
+    'Z-scan data\Zhibo Z scan 2024-02-23\*.tif']}, 'Choose a *.tif to be processed');  % input file
 basepath=pathname;
 tifname=filename;
 
 % The .mat file where stores your results.
-[filename, pathname]=uigetfile({['F:\Processing & Results\Actin Filaments in ' ...
-    'Porous Media\20210914-Actin\results\*.mat']}, 'Choose a *.mat to be processed');  % input file
+[filename, pathname]=uigetfile({['Z:\Experimental Data (RAW)\Actin tracking\Z-scan data\' ...
+    'Zhibo Z scan 2024-02-23\Results\*.mat']}, 'Choose a *.mat to be processed');  % input file
 load([pathname, filename]);
 
-v = VideoWriter(strcat(filename),'MPEG-4');   % To make a video!
+v = VideoWriter(strcat(filename(1:end-14)),'MPEG-4');   % To make a video!
 v.FrameRate = 24;  % Frame rate in the video.
 v.Quality = 100;
 open(v);   % For the video.
@@ -289,116 +289,123 @@ ywin_max = round(ywin_max/2)*2; xwin_max = round(xwin_max/2)*2;
 % The frame size in the video and make sure they are even numbers because 
 % will need half of the size. 
 
-false_ind = ~ismember(xy(1).frame, Good_case);
-% Here, the 'Good_case' means the absolute frame number, not the index of
-% xy.frame (different to the code before which calculation and selection
-% are two processes.
+for xy_no = 1:length(xy)
 
-xy.crd(false_ind) = [];
-xy.centroid(false_ind) = [];
-xy.arclen(false_ind) = [];
-xy.seglen(false_ind) = [];
-xy.nframe = length(Good_case);
-xy.frame(false_ind) = [];
-xy.spl(false_ind) = [];
-xy.knots(false_ind) = [];
-xy.arclen_spl(false_ind) = [];
-xy.seglen_spl(false_ind) = [];
+    false_ind = ~ismember(xy(xy_no).frame, Good_case);
+    % Here, the 'Good_case' means the absolute frame number, not the index of
+    % xy.frame (different to the code before which calculation and selection
+    % are two processes.
 
-for j = 1:xy.nframe
+    xy(xy_no).crd(false_ind) = [];
+    xy(xy_no).centroid(false_ind) = [];
+    xy(xy_no).arclen(false_ind) = [];
+    xy(xy_no).seglen(false_ind) = [];
+    xy(xy_no).nGoodframe = length(Good_case) - xy(1).nframe + xy(xy_no).nframe;
+    xy(xy_no).frame(false_ind) = [];
+    xy(xy_no).spl(false_ind) = [];
+    xy(xy_no).knots(false_ind) = [];
+    xy(xy_no).arclen_spl(false_ind) = [];
+    xy(xy_no).seglen_spl(false_ind) = [];
+end
 
-    % The real parameters used to do the calculation because the first
-    % processing frame might not be 1. Here is mainly for xwin and ywin
-    % below.
-    prmt_i = xy(1).frame(j) - xy(1).frame(1) + 1;
-    Foo = imread([basepath, tifname],xy(1).frame(j));
+for xy_no = 1:length(xy)
 
-    % tranfrom the coordinate because of the different original point
-    % between the image and plot.
-    C1 = xy(1).centroid{j}(:,1); C2 = xy(1).centroid{j}(:,2); % Center-of-mass
-    T_C1 = C1;  T_C2 = size(Foo,1)-C2;
-    spl1 = xy(1).spl{j}(:,1); spl2 = xy(1).spl{j}(:,2); % x-y coordinates of the B-spline
-    T_spl1 = spl1;  T_spl2 = size(Foo,1)-spl2;
+    for j = 1:xy(xy_no).nGoodframe
 
-    % calculate the curvature
-    X = xy(1).spl{j};
-    [L2,R2,K2] = curvature(X);
-    RR2 = movmean(R2,ceil(size(X,1)/100));
+        % The real parameters used to do the calculation because the first
+        % processing frame might not be 1. Here is mainly for xwin and ywin
+        % below.
+        prmt_i = xy(xy_no).frame(j) - xy(xy_no).frame(1) + 1;
+        Foo = imread([basepath, tifname],xy(xy_no).frame(j));
 
-    % Zoom in (based on the center-of-mass [C1, C2]) and show the image.
-    % The size of the ROI depends on the [xwin, ywin]
-    fig = figure('Name','filaments','Position', [0 0 100 100]);
-    Zoom_in = Foo(max(T_C2-ywin_max/2,1):min(T_C2+ywin_max/2,size(Foo,1)),...
-        max(T_C1-xwin_max/2,1):min(T_C1+xwin_max/2,size(Foo,2)))*1000;
+        % tranfrom the coordinate because of the different original point
+        % between the image and plot.
+        C1 = xy(xy_no).centroid{j}(:,1); C2 = xy(xy_no).centroid{j}(:,2); % Center-of-mass
+        T_C1 = C1;  T_C2 = size(Foo,1)-C2;
+        spl1 = xy(xy_no).spl{j}(:,1); spl2 = xy(xy_no).spl{j}(:,2); % x-y coordinates of the B-spline
+        T_spl1 = spl1;  T_spl2 = size(Foo,1)-spl2;
 
-    % How much should the plot be shifted (ensure the center-of-mass is
-    % fixed). It's equal to "xy_mov = size(the_frame)-size(Zoom_in)"
-    xy_mov = [ywin_max+1, xwin_max+1]-size(Zoom_in);
-    
-    if abs(j - 1)  < abs(j - size(Good_case,2))  % To fix the center-of-mass position in the video.
-        the_frame = uint16(zeros(ywin_max+1, xwin_max+1));
-        % Will put the Zoom_in into this frame so that every figure has the same
-        % size to make the video.
-        the_frame(padarray(true(size(Zoom_in)), xy_mov, 'pre')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
+        % % %     % calculate the curvature
+        % % %     X = xy(xy_no).spl{j};
+        % % %     [L2,R2,K2] = curvature(X);
+        % % %     RR2 = movmean(R2,ceil(size(X,1)/100));
 
-        imshow(the_frame, 'InitialMagnification', 200); hold on;
-        % Show the B-spline, the idea is to change the original point according
-        % to the required window.
-        % h = plot(T_spl1,T_spl2,'-','linewidth',6);
-        h = plot(T_spl1-max(T_C1-xwin_max/2,1) + xy_mov(2), T_spl2-max(T_C2-ywin_max/2,1) + xy_mov(1),'-','linewidth',0.1);
-        set(h,'marker','.');
-        % title(['No.',num2str(xy.frame(j))],'Color','red','FontSize',14);
+        % Zoom in (based on the center-of-mass [C1, C2]) and show the image.
+        % The size of the ROI depends on the [xwin, ywin]
+        fig = figure('Name','filaments','Position', [0 0 100 100]);
+        Zoom_in = Foo(max(T_C2-ywin_max/2,1):min(T_C2+ywin_max/2,size(Foo,1)),...
+            max(T_C1-xwin_max/2,1):min(T_C1+xwin_max/2,size(Foo,2)))*200;
 
-        title(['No.',num2str(j)],'Color','red','FontSize',14);
-        hold on
-        %     quiver(lzero+X(:,1),size(Foo,1)-lzero-X(:,2),K2(:,1),-K2(:,2));  % WHY it is '-K2(:,2)'??
-        %     hold on;
+        % How much should the plot be shifted (ensure the center-of-mass is
+        % fixed). It's equal to "xy_mov = size(the_frame)-size(Zoom_in)"
+        xy_mov = [ywin_max+1, xwin_max+1]-size(Zoom_in);
 
-        plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin_max/2,1) + xy_mov(2),T_spl2(RR2==min(RR2))...
-            -max(T_C2-ywin_max/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
-        hold on;
+        if abs(j - 1)  < abs(j - size(Good_case,2))  % To fix the center-of-mass position in the video.
+            the_frame = uint16(zeros(ywin_max+1, xwin_max+1));
+            % Will put the Zoom_in into this frame so that every figure has the same
+            % size to make the video.
+            the_frame(padarray(true(size(Zoom_in)), xy_mov, 'pre')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
 
-        plot(T_C1-max(T_C1-xwin_max/2,1) + xy_mov(2),T_C2-max(T_C2-ywin_max/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
-        hold off;
+            imshow(the_frame, 'InitialMagnification', 200); hold on;
+            % Show the B-spline, the idea is to change the original point according
+            % to the required window.
+            % h = plot(T_spl1,T_spl2,'-','linewidth',6);
+            h = plot(T_spl1-max(T_C1-xwin_max/2,1) + xy_mov(2), T_spl2-max(T_C2-ywin_max/2,1) + xy_mov(1),'-','linewidth',0.1);
+            set(h,'marker','.');
+            % title(['No.',num2str(xy(xy_no).frame(j))],'Color','red','FontSize',14);
 
-    else
-        the_frame = uint16(zeros(ywin_max+1, xwin_max+1));
-        % Will put the Zoom_in into this frame so that every figure has the same
-        % size to make the video.
-        the_frame(padarray(true(size(Zoom_in)), xy_mov, 'post')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
-        imshow(the_frame, 'InitialMagnification', 200); hold on;
-        h = plot(T_spl1-max(T_C1-xwin_max/2,1), T_spl2-max(T_C2-ywin_max/2,1) + xy_mov(1),'-','linewidth',0.1);
-        set(h,'marker','.');
-        title(['No.',num2str(j)],'Color','red','FontSize',14);
-        hold on
-        plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin_max/2,1),T_spl2(RR2==min(RR2))...
-            -max(T_C2-ywin_max/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
-        hold on;
-        plot(T_C1-max(T_C1-xwin_max/2,1),T_C2-max(T_C2-ywin_max/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
-        hold off;
+            title(['No.',num2str(j)],'Color','red','FontSize',14);
+            hold on
+            %     quiver(lzero+X(:,1),size(Foo,1)-lzero-X(:,2),K2(:,1),-K2(:,2));  % WHY it is '-K2(:,2)'??
+            %     hold on;
+
+            % % %         plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin_max/2,1) + xy_mov(2),T_spl2(RR2==min(RR2))...
+            % % %             -max(T_C2-ywin_max/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
+            % % %         hold on;
+
+            plot(T_C1-max(T_C1-xwin_max/2,1) + xy_mov(2),T_C2-max(T_C2-ywin_max/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
+            hold off;
+
+        else
+            the_frame = uint16(zeros(ywin_max+1, xwin_max+1));
+            % Will put the Zoom_in into this frame so that every figure has the same
+            % size to make the video.
+            the_frame(padarray(true(size(Zoom_in)), xy_mov, 'post')) = Zoom_in;  % insert the Zoom_in matrix into the frame.
+            imshow(the_frame, 'InitialMagnification', 200); hold on;
+            h = plot(T_spl1-max(T_C1-xwin_max/2,1), T_spl2-max(T_C2-ywin_max/2,1) + xy_mov(1),'-','linewidth',0.1);
+            set(h,'marker','.');
+            title(['No.',num2str(j)],'Color','red','FontSize',14);
+            % % %         hold on
+            % % %         plot(T_spl1(RR2==min(RR2))-max(T_C1-xwin_max/2,1),T_spl2(RR2==min(RR2))...
+            % % %             -max(T_C2-ywin_max/2,1) + xy_mov(1),'o','markeredgecolor','g','markerfacecolor','g','MarkerSize',5);
+            hold on;
+            plot(T_C1-max(T_C1-xwin_max/2,1),T_C2-max(T_C2-ywin_max/2,1) + xy_mov(1),'*','markeredgecolor','r','MarkerSize',5);
+            hold off;
+        end
+
+        pause(0.001);
+        frame = getframe(gcf);
+        writeVideo(v,frame);
+        close
+
     end
-
-    pause(0.001);
-    frame = getframe(gcf);
-    writeVideo(v,frame);
-    close
-
 end
 close(v);  % For the video.
 
 figure('color', 'w'); set(gcf, 'Position', [100 300 1000 500]);
-Good_case_frm = find(ismember(xy(1).frame, Good_case));
-for j = 1:size(Good_case_frm,2)
+for pp = 1:length(xy)
+    Good_case_frm = find(ismember(xy(pp).frame, Good_case));
+    for j = 1:size(Good_case_frm,2)
 
-    i = Good_case_frm(j);% index of the 'good' cases
+        i = Good_case_frm(j);% index of the 'good' cases
 
-    plot(xy.spl{i}(:,1),xy.spl{i}(:,2))
-    hold on
-
-    axis equal
-    xlim('auto')
-    ylim('auto')
-    xlabel(' x [ px ] ')
-    ylabel(' y [ px ] ')
-
+        plot(xy(pp).spl{i}(:,1),xy(pp).spl{i}(:,2))
+        hold on
+    end
 end
+axis equal
+xlim('auto')
+ylim('auto')
+xlabel(' x [ px ] ')
+ylabel(' y [ px ] ')
+
