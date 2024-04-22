@@ -100,9 +100,9 @@ print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
 
 %% errorbar plot
 n = 1;
-for ii = 5:10:55
+for ii = 5:10:100
 
-    if ii < 50
+    if ii < 80
         YY = fiber_Ys(fiber_lengths > ii & fiber_lengths < ii+10);
         LL = fiber_lengths(fiber_lengths > ii & fiber_lengths < ii+10);
     else
@@ -116,20 +116,20 @@ for ii = 5:10:55
 end
 
 figure('Color','w','Position',[100 100 800 600]); 
+plot(fiber_lengths,fiber_Ys, 'm.', 'MarkerSize', 12);
+hold on;
 errorbar(L_mean, Y_mean, Y_std, Y_std, L_std, L_std, 'ok', 'LineStyle', ...
     'none', 'LineWidth',2);
 hold on;
-plot(fiber_lengths,fiber_Ys, 'm.', 'MarkerSize', 12);
-hold on;
 ylabel('$y\ (\mathrm{\mu m})$','FontSize', 24,'Interpreter', 'latex');
 xlabel('$L\ (\mathrm{\mu m})$','FontSize', 24,'Interpreter', 'latex');
-xlim([0 70]); ylim([0 1500])
+xlim([0 100]); ylim([0 1500])
 set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, 'FontSize', 24)
 
 f=gcf;
 exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\' ...
-    'Figures\Actin-DLD\Y-positon_Length_errorbarPlot.png'],'Resolution',100)
+    'Figures\Actin-DLD\Y-positon_Length_errorbarPlot_exp20231030_exp20240415.png'],'Resolution',100)
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
-    'Actin Filaments in Porous Media\Figures\Actin-DLD\Y-positon_Length_errorbarPlot.eps']);
+    'Actin Filaments in Porous Media\Figures\Actin-DLD\Y-positon_Length_errorbarPlot_exp20231030_exp20240415.eps']);
