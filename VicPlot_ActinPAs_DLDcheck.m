@@ -2,6 +2,7 @@
 
 clear; close all; clc;
 
+image_height = 204.8; % the height of the image, unit: um 
 magni = 0.1; % the magnification of the objective (um/pixel)
 
 set(0, 'defaulttextinterpreter','latex');  
@@ -22,8 +23,8 @@ for exp_date = 1:2
 
     for ii = 1:length(exp2proc)
 
-        X_base = exp2proc(ii).name;
-        X_base = str2double(cell2mat((extractBetween(X_base,'Y','um'))));
+        Y_base = exp2proc(ii).name;
+        Y_base = str2double(cell2mat((extractBetween(Y_base,'Y','um'))));
 
         Tracings = dir(fullfile(exp2proc(ii).folder, exp2proc(ii).name, 'Tracings_*.csv'));
         Vertices = dir(fullfile(exp2proc(ii).folder, exp2proc(ii).name, 'Vertices_*.csv'));
@@ -42,7 +43,7 @@ for exp_date = 1:2
                 fiber_xy = cell2mat(Vertice_info(fiber_index == kk,5:6));
                 fiber_CoM_xy = mean(fiber_xy,1)*magni;
 
-                fiber_Ys = [fiber_Ys; fiber_CoM_xy(2)+X_base];
+                fiber_Ys = [fiber_Ys; image_height-fiber_CoM_xy(2)+Y_base];
 
             end
         end
