@@ -10,7 +10,7 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex');
 set(groot, 'defaultLegendInterpreter','latex');
 
 fiber_lengths = []; fiber_Ys = [];
-for exp_date = 1:2
+for exp_date = 1:2 % 3
 
     switch exp_date
         case 1
@@ -19,6 +19,9 @@ for exp_date = 1:2
         case 2
             exp2proc = dir(['F:\Processing & Results\Actin Filaments in Porous Media\' ...
                 '20240415-Actin-DLD\Y*']);
+        case 3
+            exp2proc = dir(['F:\Processing & Results\Actin Filaments in Porous Media\' ...
+                '20240522-Actin-DLD\Y*']);
     end
 
     for ii = 1:length(exp2proc)
