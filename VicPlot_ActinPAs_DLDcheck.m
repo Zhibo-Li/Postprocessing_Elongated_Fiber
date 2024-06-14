@@ -120,20 +120,49 @@ for ii = 5:10:100
 end
 
 figure('Color','w','Position',[100 100 800 600]); 
-plot(fiber_lengths,fiber_Ys, 'm.', 'MarkerSize', 12);
+plot(fiber_lengths/20, atand(fiber_Ys/9000), 'm.', 'MarkerSize', 12);
 hold on;
-errorbar(L_mean, Y_mean, Y_std, Y_std, L_std, L_std, 'ok', 'LineStyle', ...
+errorbar(L_mean/20, atand(Y_mean/9000), atand(Y_std/9000), atand(Y_std/9000), L_std/20, L_std/20, 'ok', 'LineStyle', ...
     'none', 'LineWidth',2);
 hold on;
-ylabel('$y\ (\mathrm{\mu m})$','FontSize', 24,'Interpreter', 'latex');
-xlabel('$L\ (\mathrm{\mu m})$','FontSize', 24,'Interpreter', 'latex');
-xlim([0 100]); ylim([0 1500])
+% ylabel('$y\ (\mathrm{\mu m})$','FontSize', 24,'Interpreter', 'latex');
+% xlabel('$L\ (\mathrm{\mu m})$','FontSize', 24,'Interpreter', 'latex');
+ylabel('$\beta\ (\mathrm{^\circ})$','FontSize', 24,'Interpreter', 'latex');
+xlabel('$L/d_{\mathrm{obs}}$','FontSize', 24,'Interpreter', 'latex');
+xlim([0 5]); ylim([0 10])
 set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, 'FontSize', 24)
+
+%%% errorbar plot: overlap on the previous plot 
+n = 1;
+for ii = 5:10:100
+
+    if ii < 80
+        YY = fiber_Ys(fiber_lengths > ii & fiber_lengths < ii+10);
+        LL = fiber_lengths(fiber_lengths > ii & fiber_lengths < ii+10);
+    else
+        YY = fiber_Ys(fiber_lengths > ii);
+        LL = fiber_lengths(fiber_lengths > ii);
+    end
+    L_mean(n) = mean(LL); L_std(n) = std(LL);
+    Y_mean(n) = mean(YY); Y_std(n) = std(YY);
+    n=n+1;
+
+end
+
+plot(fiber_lengths/30, atand(fiber_Ys/4000), 'c.', 'MarkerSize', 20);
+hold on;
+errorbar(L_mean/30, atand(Y_mean/4000), atand(Y_std/4000), atand(Y_std/4000), L_std/30, L_std/30, '*b', 'LineStyle', ...
+    'none', 'LineWidth', 3);
+
+legend({'$d_{\mathrm{obs}}=20\mathrm{\mu m}, G=10\mathrm{\mu m}$', ...
+    '$d_{\mathrm{obs}}=20\mathrm{\mu m}, G=10\mathrm{\mu m}$', ...
+    '$d_{\mathrm{obs}}=30\mathrm{\mu m}, G=15\mathrm{\mu m}$', ...
+    '$d_{\mathrm{obs}}=30\mathrm{\mu m}, G=15\mathrm{\mu m}$'},'Interpreter', 'latex', 'FontSize', 18)
 
 f=gcf;
 exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\' ...
-    'Figures\Actin-DLD\Y-positon_Length_errorbarPlot_exp20231030_exp20240415.png'],'Resolution',100)
+    'Figures\Actin-DLD\Beta_Length_errorbarPlot_exp20231030_exp20240415_exp20240522.png'],'Resolution',100)
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
-    'Actin Filaments in Porous Media\Figures\Actin-DLD\Y-positon_Length_errorbarPlot_exp20231030_exp20240415.eps']);
+    'Actin Filaments in Porous Media\Figures\Actin-DLD\Beta_Length_errorbarPlot_exp20231030_exp20240415_exp20240522.eps']);
