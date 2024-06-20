@@ -84,6 +84,17 @@ for ii = 1:size(TheDD, 2)
             plot3(the_Gx_Gy(foo), the_alpha(foo), reshape_x(optim_alpha(foo), ...
                 optim_Gx_Gy(foo)), marker{foo}, 'MarkerSize', 30); hold on
         end
+        % because p=1-q, so find q-p~0.3 is equivalent to find p~0.35
+        % find all the corresponding Gx_Gy and alpha that satisify reshape_x~0.35
+        [row, col] = find(abs(reshape_x-0.35) < 0.01);
+        Gx_Gy_optimal = zeros(1, length(row)); alpha_optimal = zeros(1, length(row)); reshape_x_optimal = zeros(1, length(row));
+        for foo = 1:length(row)
+            Gx_Gy_optimal(foo) = Gx_Gy(col(foo));
+            alpha_optimal(foo) = alpha(row(foo));
+            reshape_x_optimal(foo) = reshape_x(row(foo), col(foo));
+        end        
+        plot3(Gx_Gy_optimal, alpha_optimal, reshape_x_optimal, '.g', 'MarkerSize', 7); hold on
+
     else
         surf(XX, YY, reshape_x,'FaceColor','c','FaceAlpha',0.3,'EdgeColor','c','EdgeAlpha',0.3); hold on
         for foo = 1:3
@@ -94,7 +105,7 @@ for ii = 1:size(TheDD, 2)
 
 end
 
-legend({'p','','','','q'}, 'FontName','Times New Roman')
+legend({'p','','','','optimal','q'}, 'FontName','Times New Roman')
 
 xlim([0.5 2]); ylim([0 45]); zlim([0 1])
 xlabel('$G_x/G_y$','FontSize', 24,'Interpreter', 'latex');
@@ -104,3 +115,20 @@ view(65.5,14.5)
 
 f=gcf;
 exportgraphics(f,'D:\Dropbox\Transfer\flow_lane_3D.png','Resolution',100)
+
+
+%% plot the expected drift angle under optimal Gx_Gy and alpha
+figure('color', 'w');
+The_expected_drift_angle = alpha_optimal - atand(1/6*(1./Gx_Gy_optimal)+1/3);
+hold off
+plot3(Gx_Gy_optimal, alpha_optimal, The_expected_drift_angle, '.y', 'MarkerSize', 7);
+xlabel('$G_x/G_y$','FontSize', 24,'Interpreter', 'latex'); 
+ylabel('$\alpha$','FontSize', 24,'Interpreter', 'latex');
+zlabel('Expected Drift Angle','FontSize', 24,'Interpreter', 'latex');
+set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'ZGrid', 'On', 'FontSize', 24, 'TickLabelInterpreter','latex')
+view(65.5,14.5)
+
+f=gcf;
+exportgraphics(f,'D:\Dropbox\Transfer\expected_drift_angle.png','Resolution',100)
+
+
