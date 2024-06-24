@@ -114,12 +114,19 @@ set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'FontSize', 24, 'TickLabelInte
 view(65.5,14.5)
 
 f=gcf;
-exportgraphics(f,'D:\Dropbox\Transfer\flow_lane_3D.png','Resolution',100)
+exportgraphics(f,'F:\Processing & Results\Actin Filaments in Porous Media\Figures\Flow lanes\flow_lane_3D_.png','Resolution',100)
 
 
 %% plot the expected drift angle under optimal Gx_Gy and alpha
 figure('color', 'w');
-The_expected_drift_angle = alpha_optimal - atand(1/6*(1./Gx_Gy_optimal)+1/3);
+The_expected_drift_angle = zeros(1, length(Gx_Gy_optimal));
+for ii = 1:length(Gx_Gy_optimal)
+    if 1-Gx_Gy_optimal(ii) >= 0
+        The_expected_drift_angle(ii) = alpha_optimal(ii) - atand(1/6*(1/Gx_Gy_optimal(ii))+1/3);
+    else
+        The_expected_drift_angle(ii) = alpha_optimal(ii) - atand(2/3*(1/Gx_Gy_optimal(ii))+4/3);
+    end
+end
 hold off
 plot3(Gx_Gy_optimal, alpha_optimal, The_expected_drift_angle, '.y', 'MarkerSize', 7);
 xlabel('$G_x/G_y$','FontSize', 24,'Interpreter', 'latex'); 
@@ -129,6 +136,6 @@ set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'ZGrid', 'On', 'FontSize', 24,
 view(65.5,14.5)
 
 f=gcf;
-exportgraphics(f,'D:\Dropbox\Transfer\expected_drift_angle.png','Resolution',100)
+exportgraphics(f,'F:\Processing & Results\Actin Filaments in Porous Media\Figures\Flow lanes\expected_drift_angle.png','Resolution',100)
 
 
