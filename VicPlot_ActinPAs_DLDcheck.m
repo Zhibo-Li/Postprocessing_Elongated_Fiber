@@ -127,8 +127,8 @@ errorbar(L_mean/20, atand(Y_mean/9000), atand(Y_std/9000), atand(Y_std/9000), L_
 hold on;
 % ylabel('$y\ (\mathrm{\mu m})$','FontSize', 24,'Interpreter', 'latex');
 % xlabel('$L\ (\mathrm{\mu m})$','FontSize', 24,'Interpreter', 'latex');
-ylabel('$\beta\ (\mathrm{^\circ})$','FontSize', 24,'Interpreter', 'latex');
-xlabel('$L/d_{\mathrm{obs}}$','FontSize', 24,'Interpreter', 'latex');
+ylabel('$\mathrm{Drift\,angle:}\,\sim\beta\ (\mathrm{^\circ})$','FontSize', 24,'Interpreter', 'latex');
+xlabel('$L/a$','FontSize', 24,'Interpreter', 'latex');
 xlim([0 5]); ylim([0 10])
 set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'GridAlpha', 0.5, 'FontSize', 24)
 
@@ -154,15 +154,15 @@ hold on;
 errorbar(L_mean/30, atand(Y_mean/4000), atand(Y_std/4000), atand(Y_std/4000), L_std/30, L_std/30, '*b', 'LineStyle', ...
     'none', 'LineWidth', 3);
 
-legend({'$d_{\mathrm{obs}}=20\mathrm{\mu m}, G=10\mathrm{\mu m}$', ...
-    '$d_{\mathrm{obs}}=20\mathrm{\mu m}, G=10\mathrm{\mu m}$', ...
-    '$d_{\mathrm{obs}}=30\mathrm{\mu m}, G=15\mathrm{\mu m}$', ...
-    '$d_{\mathrm{obs}}=30\mathrm{\mu m}, G=15\mathrm{\mu m}$'},'Interpreter', 'latex', 'FontSize', 18)
+legend({'$a=20\mathrm{\mu m}, \lambda=30\mathrm{\mu m}$', ...
+    '$a=20\mathrm{\mu m}, \lambda=30\mathrm{\mu m}$', ...
+    '$a=30\mathrm{\mu m}, \lambda=45\mathrm{\mu m}$', ...
+    '$a=30\mathrm{\mu m}, \lambda=45\mathrm{\mu m}$'},'Interpreter', 'latex', 'FontSize', 18)
 
 f=gcf;
 exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\' ...
-    'Figures\Actin-DLD\Beta_Length_errorbarPlot_exp20231030_exp20240415_exp20240522.png'],'Resolution',100)
+    'Figures\Actin-DLD\Beta_Length_errorbarPlot_exp20231030_exp20240415_exp20240522_newLegend.png'],'Resolution',100)
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\' ...
-    'Actin Filaments in Porous Media\Figures\Actin-DLD\Beta_Length_errorbarPlot_exp20231030_exp20240415_exp20240522.eps']);
+    'Actin Filaments in Porous Media\Figures\Actin-DLD\Beta_Length_errorbarPlot_exp20231030_exp20240415_exp20240522_newLegend.eps']);
