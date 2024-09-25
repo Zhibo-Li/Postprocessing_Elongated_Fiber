@@ -213,7 +213,7 @@ print('-depsc2','-tiff','-r100','-vector',['F:\Processing & Results\Actin Filame
 %% Draw Poincare for tracer from simulation
 clear; close all; clc;
 
-Simu_deg = 45;  % Change this to choose the PAs angle (flow angle)
+Simu_deg = 25;  % Change this to choose the PAs angle (flow angle)
 Simu_data = readmatrix(['F:\Simulation\202208_differentFlowangles_relatedto_' ...
     '0811exp_45deg\',num2str(Simu_deg),'deg\Data\Streamline_forPoincare_moreLines.csv']);
 XXYY_Simu = Simu_data(1:end, 13:14);  % (x, y) of the streamline
@@ -276,15 +276,15 @@ for streamline_i = round((length(locs)-150)/2):length(locs)-round((length(locs)-
 end
 
 f.interp_font('latex')
-f.axes('linear',[0 1],'linear',[0 1],'$\eta_{i}$','$\eta_{i+1}$',22);
+f.axes('linear',[0 1],'linear',[0 1],'$\eta_{i}=y_{\mathrm{in}}/\lambda$','$\eta_{i+1}=y_{\mathrm{out}}/\lambda$',22);
 f.axes_ticks([0:0.2:1], [0:0.2:1]);
 grid on
 text(0.05, 0.9, ['$\alpha =',num2str(Simu_deg),'^{\circ}$'],'FontSize', 22, ...
     'Interpreter', 'latex','BackgroundColor',[.7 .7 .7])
 
-% f=gcf;
-% exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\' ...
-%     'Figures\Poincare plots\Simu_theta=',num2str(Simu_deg),'_tracer.eps'])
+f=gcf;
+exportgraphics(f,['F:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Figures\Poincare plots\Simu_theta=',num2str(Simu_deg),'_tracer_newXYlabels.eps'])
 
 
 
