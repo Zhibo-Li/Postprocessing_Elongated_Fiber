@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%% Gx = Gy (only change alpha) %%%%%%%%%%%%%%%%%
 clc; close all; clear
 
-alpha = 0:1:45; % the flow angles
+alpha = 0:0.01:45; % the flow angles
 im_i = sqrt(-1); % imaginary
 
 the_ones = ones(1, length(alpha)); %
@@ -9,9 +9,9 @@ the_ones = ones(1, length(alpha)); %
 TheDD = [tand(alpha)-1*the_ones; -tand(alpha)]; % p, q
 % TheDD = [-tand(alpha); tand(alpha)-1*the_ones; -2*tand(alpha)]; % p, q, r
 
-figure('color', 'w'); 
-set(gcf, 'Position',[100 100 800 600], 'DefaultTextInterpreter', 'latex')
-
+% figure('color', 'w'); 
+% set(gcf, 'Position',[100 100 800 600], 'DefaultTextInterpreter', 'latex')
+PQ = zeros(size(TheDD, 1), length(alpha)); % the roots
 for ii = 1:size(TheDD, 1)
 
     a = -2; b = 3; c = 0; d = TheDD(ii, :); %  coefficients of cubic equation
@@ -27,12 +27,26 @@ for ii = 1:size(TheDD, 1)
         ) + (((-1+sqrt(3)*im_i)/2)^k * (9*a*b*c*the_ones - 27*a^2*d - 2*b^3*the_ones + delta).^(1/3) ...
         )./(3*2^(1/3)*a*the_ones); % the roots
 
-    plot(alpha, x, 'LineWidth', 2); hold on
+    PQ(ii,:) = real(x); 
+    % plot(alpha, x, 'LineWidth', 2); hold on
 
 end
 
-xlabel('$\alpha$','FontSize', 24,'Interpreter', 'latex');
-set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'FontSize', 24, 'TickLabelInterpreter','latex')
+figure('color', 'w', 'Position',[100 100 800 600]);
+w_1 = PQ(1,:); w_2 = PQ(2,:)-PQ(1,:);
+plot(alpha(w_2>0), w_1(w_2>0), 'LineWidth', 2.5, 'Color', 'b'); hold on
+plot(alpha(w_2>0), w_2(w_2>0), 'LineWidth', 2.5, 'Color', 'r');
+xlabel('$\alpha\,(^\circ)$','FontSize', 24,'Interpreter', 'latex');
+ylabel('$w/(\lambda-2R)$','FontSize', 24,'Interpreter', 'latex');
+legend('show', 'Location', 'best', 'Interpreter', 'latex');
+set(gca,'Box', 'On','XGrid', 'On', 'YGrid', 'On', 'FontSize', 24, 'TickLabelInterpreter','latex');
+xlim([0 45]); ylim([0 1]);
+legend({'$w_1$','$w_2$'}, 'FontSize', 24, 'Interpreter', 'latex');
+grid on;
+
+set(gcf,'renderer','Painters');
+print('-depsc2','-tiff','-r100','-vector',['D:\Dropbox\Research\' ...
+    'Actin Filaments in Porous Media (Paper)\Figure 3\New Figure 3\FlowLaneWidths.eps']);
 
 
 
