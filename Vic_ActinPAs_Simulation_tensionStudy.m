@@ -559,10 +559,10 @@ figure_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Me
 parent_path = 'E:\Experimental Data (RAW)\Simulation\data';
 sub1_path = dir(parent_path);
 
-% Case: n30, no.17 (Short fiber)
-sub1Path_i = 11; sub2Path_i = 14;
-% % % % Case: n90, no.1 (Long fiber)
-% % % sub1Path_i = 17; sub2Path_i = 6;
+% % % % Case: n30, no.17 (Short fiber)
+% % % sub1Path_i = 11; sub2Path_i = 14;
+% Case: n90, no.1 (Long fiber)
+sub1Path_i = 17; sub2Path_i = 6;
 
 current_beadsNum = sub1_path(sub1Path_i).name;
 beads_num = str2double(current_beadsNum(2:end));
@@ -580,12 +580,17 @@ disp(['Current simulation number: ', num2str(sim_no)]);
 fileinfo = dir(fullfile(parent_path, current_beadsNum, current_sim, 'output_data\*.vtk'));
 
 XY = zeros(length(fileinfo), beads_num, 2);
+ContactBeads_index_current = zeros(length(fileinfo), beads_num);
 XY_tension = zeros(length(fileinfo), beads_num-1, 2);
 XY_tension_rotated = zeros(length(fileinfo), beads_num-1, 2);
 f_tension_magnitude = zeros(length(fileinfo), beads_num-1);
 for ii = 1:length(fileinfo)
     snapshot = readVTK(fullfile(fileinfo(ii).folder, fileinfo(ii).name));
     XY_current = snapshot.points(:, 1:2);
+
+    XY_current_in_lattice = mod(XY_current-C2C_pillar/2, C2C_pillar);
+    dist2origin = sqrt((XY_current_in_lattice(:,1)-C2C_pillar/2).^2 + (XY_current_in_lattice(:,2)-C2C_pillar/2).^2);
+    ContactBeads_index_current(ii, :) = dist2origin < R_pillar + 0.3 * 1e-6;
 
     XY(ii, :, :) = XY_current;
     XY_tension(ii, :, :) = 0.5*(XY_current(1:end-1, :)+XY_current(2:end, :));
@@ -597,80 +602,158 @@ for ii = 1:length(fileinfo)
     f_tension_magnitude(ii, :) = ks*(l_im - 2*R_fib); % Notice the sign
 end
 
-% Plot the tension along the fiber (Short fiber)
-figure('Position', [100, 100, 800, 600], 'Color', 'w');
-unused_color_ratio = 0.2;
-start_snapshot = 1005; end_snapshot = 1020; % n90, no.1 (Long fiber)
-total_snapshots = end_snapshot-start_snapshot+1;
-color_group = cmocean('tempo', round(total_snapshots/(1-unused_color_ratio)));
-for ii = start_snapshot:2:end_snapshot
-    plot((1:beads_num-1)/beads_num, f_tension_magnitude(ii, :)/f_bead, 'Color', ...
-        color_group(ii-start_snapshot+1+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 1); 
-    hold on;
-end
-plot((1:beads_num-1)/beads_num, mean(f_tension_magnitude(start_snapshot:2:end_snapshot, :), 1)/f_bead, 'm-', 'LineWidth', 2);
-xlabel('$s/L$', 'FontSize', 28, 'Interpreter', 'latex');
-ylabel('$F_{\rm{tension}}/F_{\rm{bead}}$', 'FontSize', 28, 'Interpreter', 'latex');
-xlim([0 1]); ylim([0 8]); grid on
-set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
-set(gcf,'renderer','Painters');
-print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Short_fiber_tension_profile.eps']);
-
-% Plot the chronophotography (Short fiber)
-figure('Position', [100, 100, 800, 600], 'Color', 'w');
-for ii = start_snapshot:2:end_snapshot
-    plot(XY_tension_rotated(ii, :, 1), XY_tension_rotated(ii, :, 2), 'Color', ...
-        color_group(ii-start_snapshot+1+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 2);
-    hold on;
-end
-XY_pillar_rotated(XY_pillar_rotated(:, 2) < 0, :) = [];
-XY_pillar_rotated(XY_pillar_rotated(:, 2) > 2e-4, :) = [];
-XY_pillar_rotated(XY_pillar_rotated(:, 1) < 6.6e-3, :) = [];
-XY_pillar_rotated(XY_pillar_rotated(:, 1) > 7e-3, :) = [];
-viscircles(XY_pillar_rotated, R_pillar*ones(size(XY_pillar_rotated, 1), 1), 'Color', 'k', 'LineWidth', 0.2);
-axis equal; axis off
-xlim([67 69]*1e-4); ylim([1 1.5]*1e-4);
-set(gcf,'renderer','Painters');
-print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Short_fiber_chronophotography.eps']);
-
-
-% % % % Plot the tension along the fiber (Long fiber)
+% % % %%%%%% Plot the tension along the fiber (Short fiber) %%%%%%
 % % % figure('Position', [100, 100, 800, 600], 'Color', 'w');
-% % % unused_color_ratio = 0.2;
-% % % start_snapshot = 1005; end_snapshot = 1020; % n90, no.1 (Long fiber)
-% % % total_snapshots = end_snapshot-start_snapshot+1;
-% % % color_group = cmocean('tempo', round(total_snapshots/(1-unused_color_ratio)));
-% % % for ii = start_snapshot:2:end_snapshot
-% % %     plot((1:beads_num-1)/beads_num, f_tension_magnitude(ii, :)/f_bead, 'Color', ...
-% % %         color_group(ii-start_snapshot+1+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 1); 
+% % % unused_color_ratio = 0.4;
+% % % 
+% % % start_snapshot = 54; end_snapshot = 63; 
+% % % picked_snaps = start_snapshot:end_snapshot;
+% % % logical(sum(ContactBeads_index_current(picked_snaps, :), 2));
+% % % 
+% % % picked_snaps_noncontact = picked_snaps(~logical(sum(ContactBeads_index_current(picked_snaps, :), 2)));
+% % % total_snapshots = numel(picked_snaps_noncontact);
+% % % color_group_noncontact = cmocean('algae', round(total_snapshots/(1-unused_color_ratio)));
+% % % f_tension_magnitude_plotted = zeros(numel(picked_snaps), beads_num-1);
+% % % n = 1; no_color = 1; 
+% % % for ii = picked_snaps_noncontact
+% % %     f_tension_magnitude_to_plot = f_tension_magnitude(ii, :)/f_bead;
+% % %     if XY(ii, 1, 1) > XY(ii, end, 1)
+% % %         f_tension_magnitude_to_plot = flip(f_tension_magnitude_to_plot);
+% % %     end
+% % %     plot((1:beads_num-1)/beads_num, f_tension_magnitude_to_plot, 'Color', ...
+% % %         color_group_noncontact(no_color+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 1.5); 
 % % %     hold on;
+% % %     f_tension_magnitude_plotted(n, :) = f_tension_magnitude_to_plot;
+% % %     n = n + 1; no_color = no_color + 1;
 % % % end
-% % % plot((1:beads_num-1)/beads_num, mean(f_tension_magnitude(start_snapshot:2:end_snapshot, :), 1)/f_bead, 'm-', 'LineWidth', 2);
+% % % 
+% % % picked_snaps_contact = picked_snaps(logical(sum(ContactBeads_index_current(picked_snaps, :), 2)));
+% % % total_snapshots = numel(picked_snaps_contact);
+% % % color_group_contact = cmocean('solar', round(total_snapshots/(1-unused_color_ratio)));
+% % % no_color = 1;
+% % % for ii = picked_snaps_contact
+% % %     f_tension_magnitude_to_plot = f_tension_magnitude(ii, :)/f_bead;
+% % %     f_tension_magnitude_to_plot(logical(ContactBeads_index_current(ii, 1:end-1))) = NaN;
+% % %     if XY(ii, 1, 1) > XY(ii, end, 1)
+% % %         f_tension_magnitude_to_plot = flip(f_tension_magnitude_to_plot);
+% % %     end
+% % %     plot((1:beads_num-1)/beads_num, f_tension_magnitude_to_plot, 'Color', ...
+% % %         color_group_contact(no_color+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 1.5); 
+% % %     hold on;
+% % %     f_tension_magnitude_plotted(n, :) = f_tension_magnitude_to_plot;
+% % %     n = n + 1; no_color = no_color + 1;
+% % % end
+% % % plot((1:beads_num-1)/beads_num, mean(f_tension_magnitude_plotted, 1, 'omitnan'), 'm-', 'LineWidth', 3);
 % % % xlabel('$s/L$', 'FontSize', 28, 'Interpreter', 'latex');
 % % % ylabel('$F_{\rm{tension}}/F_{\rm{bead}}$', 'FontSize', 28, 'Interpreter', 'latex');
 % % % xlim([0 1]); ylim([0 8]); grid on
 % % % set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
 % % % set(gcf,'renderer','Painters');
-% % % print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_fiber_tension_profile.eps']);
+% % % print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Short_fiber_tension_profile_new.eps']);
 % % % 
-% % % % Plot the chronophotography (Long fiber)
+% % % % Plot the chronophotography (Short fiber)
 % % % figure('Position', [100, 100, 800, 600], 'Color', 'w');
-% % % for ii = start_snapshot:2:end_snapshot
+% % % no_color = 1;
+% % % for ii = picked_snaps_noncontact
 % % %     plot(XY_tension_rotated(ii, :, 1), XY_tension_rotated(ii, :, 2), 'Color', ...
-% % %         color_group(ii-start_snapshot+1+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 2);
+% % %         color_group_noncontact(no_color+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 2);
 % % %     hold on;
+% % %     no_color = no_color + 1;
 % % % end
-% % % XY_pillar_rotated(XY_pillar_rotated(:, 2) < 1e-3, :) = [];
-% % % XY_pillar_rotated(XY_pillar_rotated(:, 2) > 1.2e-3, :) = [];
-% % % XY_pillar_rotated(XY_pillar_rotated(:, 1) < 7e-3, :) = [];
-% % % XY_pillar_rotated(XY_pillar_rotated(:, 1) > 7.4e-3, :) = [];
+% % % no_color = 1;
+% % % for ii = picked_snaps_contact
+% % %     plot(XY_tension_rotated(ii, :, 1), XY_tension_rotated(ii, :, 2), 'Color', ...
+% % %         color_group_contact(no_color+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 2);
+% % %     hold on;
+% % %     no_color = no_color + 1;
+% % % end
+% % % XY_pillar_rotated(XY_pillar_rotated(:, 2) < -5e-5, :) = [];
+% % % XY_pillar_rotated(XY_pillar_rotated(:, 2) > 8e-5, :) = [];
+% % % XY_pillar_rotated(XY_pillar_rotated(:, 1) < 4e-4, :) = [];
+% % % XY_pillar_rotated(XY_pillar_rotated(:, 1) > 7e-4, :) = [];
 % % % viscircles(XY_pillar_rotated, R_pillar*ones(size(XY_pillar_rotated, 1), 1), 'Color', 'k', 'LineWidth', 0.2);
 % % % axis equal; axis off
-% % % xlim([70.8 72.8]*1e-4); ylim([10.5 11]*1e-4);
+% % % xlim([4.8 6.2]*1e-4); ylim([0 5]*1e-5);
 % % % set(gcf,'renderer','Painters');
-% % % print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_fiber_chronophotography.eps']);
-% % % 
-% % % 
+% % % print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Short_fiber_chronophotography_new.eps']);
+
+
+%%%%%% Plot the tension along the fiber (Long fiber) %%%%%%
+figure('Position', [100, 100, 800, 600], 'Color', 'w');
+unused_color_ratio = 0.4;
+
+start_snapshot = 55; end_snapshot = 64; 
+picked_snaps = start_snapshot:end_snapshot;
+logical(sum(ContactBeads_index_current(picked_snaps, :), 2));
+
+picked_snaps_noncontact = picked_snaps(~logical(sum(ContactBeads_index_current(picked_snaps, :), 2)));
+total_snapshots = numel(picked_snaps_noncontact);
+color_group_noncontact = cmocean('algae', round(total_snapshots/(1-unused_color_ratio)));
+f_tension_magnitude_plotted = zeros(numel(picked_snaps), beads_num-1);
+n = 1; no_color = 1; 
+for ii = picked_snaps_noncontact
+    f_tension_magnitude_to_plot = f_tension_magnitude(ii, :)/f_bead;
+    if XY(ii, 1, 1) > XY(ii, end, 1) 
+        f_tension_magnitude_to_plot = flip(f_tension_magnitude_to_plot);
+    end
+    plot((1:beads_num-1)/beads_num, f_tension_magnitude_to_plot, 'Color', ...
+        color_group_noncontact(no_color+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 1.5); 
+    hold on;
+    f_tension_magnitude_plotted(n, :) = f_tension_magnitude_to_plot;
+    n = n + 1; no_color = no_color + 1;
+end
+
+picked_snaps_contact = picked_snaps(logical(sum(ContactBeads_index_current(picked_snaps, :), 2)));
+total_snapshots = numel(picked_snaps_contact);
+color_group_contact = cmocean('solar', round(total_snapshots/(1-unused_color_ratio)));
+no_color = 1;
+for ii = picked_snaps_contact
+    f_tension_magnitude_to_plot = f_tension_magnitude(ii, :)/f_bead;
+    f_tension_magnitude_to_plot(logical(ContactBeads_index_current(ii, 1:end-1))) = NaN;
+    if XY(ii, 1, 1) > XY(ii, end, 1) 
+        f_tension_magnitude_to_plot = flip(f_tension_magnitude_to_plot);
+    end
+    plot((1:beads_num-1)/beads_num, f_tension_magnitude_to_plot, 'Color', ...
+        color_group_contact(no_color+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 1.5); 
+    hold on;
+    f_tension_magnitude_plotted(n, :) = f_tension_magnitude_to_plot;
+    n = n + 1; no_color = no_color + 1;
+end
+plot((1:beads_num-1)/beads_num, mean(f_tension_magnitude_plotted, 1, 'omitnan'), 'm-', 'LineWidth', 3);
+xlabel('$s/L$', 'FontSize', 28, 'Interpreter', 'latex');
+ylabel('$F_{\rm{tension}}/F_{\rm{bead}}$', 'FontSize', 28, 'Interpreter', 'latex');
+xlim([0 1]); ylim([0 8]); grid on
+set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
+set(gcf,'renderer','Painters');
+print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_fiber_tension_profile_new.eps']);
+
+% Plot the chronophotography (Long fiber)
+figure('Position', [100, 100, 800, 600], 'Color', 'w');
+no_color = 1;
+for ii = picked_snaps_noncontact
+    plot(XY_tension_rotated(ii, :, 1), XY_tension_rotated(ii, :, 2), 'Color', ...
+        color_group_noncontact(no_color+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 2);
+    hold on;
+    no_color = no_color + 1;
+end
+no_color = 1;
+for ii = picked_snaps_contact
+    plot(XY_tension_rotated(ii, :, 1), XY_tension_rotated(ii, :, 2), 'Color', ...
+        color_group_contact(no_color+round(total_snapshots*unused_color_ratio/2), :), 'LineWidth', 2);
+    hold on;
+    no_color = no_color + 1;
+end
+XY_pillar_rotated(XY_pillar_rotated(:, 2) < 0.2e-4, :) = [];
+XY_pillar_rotated(XY_pillar_rotated(:, 2) > 1.3e-4, :) = [];
+XY_pillar_rotated(XY_pillar_rotated(:, 1) < 2.5e-4, :) = [];
+XY_pillar_rotated(XY_pillar_rotated(:, 1) > 5.5e-4, :) = [];
+viscircles(XY_pillar_rotated, R_pillar*ones(size(XY_pillar_rotated, 1), 1), 'Color', 'k', 'LineWidth', 0.2);
+axis equal; axis off
+xlim([3.3 4.7]*1e-4); ylim([5.5 9.5]*1e-5);
+set(gcf,'renderer','Painters');
+print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_fiber_chronophotography_new.eps']);
+
+
 % % % Plot the colorbrar
 % % % figure('color', 'w'); set(gcf, 'Position', [100 100 1800 400]);
 % % % cmocean('tempo', round(total_snapshots/(1-unused_color_ratio)));
