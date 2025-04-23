@@ -20,7 +20,9 @@ data_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Medi
 
 parent_path = 'E:\Experimental Data (RAW)\Simulation\data';
 sub1_path = dir(parent_path);
-for sub1Path_i = 3:length(sub1_path)-1
+% only keep the folders whose name start with "n*"
+sub1_path = sub1_path(arrayfun(@(x) startsWith(x.name, 'n'), sub1_path));
+for sub1Path_i = 1:length(sub1_path)
     current_beadsNum = sub1_path(sub1Path_i).name;
     beads_num = str2double(current_beadsNum(2:end));
 
@@ -33,8 +35,9 @@ for sub1Path_i = 3:length(sub1_path)-1
     f_tension_magnitude = cell(1500, length(sub2_path)-5); % 1500 is the maximum number of snapshots (roughly)
     ContactBeads_index = cell(1500, length(sub2_path)-5); % 1500 is the maximum number of snapshots (roughly)
 
-
-    for sub2Path_i = 6:length(sub2_path)
+    % only keep the folders whose name start with "sim*"
+    sub2_path = sub2_path(arrayfun(@(x) startsWith(x.name, 'sim'), sub2_path));
+    for sub2Path_i = 1:length(sub2_path)
         current_sim = sub2_path(sub2Path_i).name;
         sim_no = str2double(current_sim(11:end));
 
@@ -46,9 +49,11 @@ for sub1Path_i = 3:length(sub1_path)-1
 
             XY_current_in_lattice = mod(XY_current-C2C_pillar/2, C2C_pillar);
             dist2origin = sqrt((XY_current_in_lattice(:,1)-C2C_pillar/2).^2 + (XY_current_in_lattice(:,2)-C2C_pillar/2).^2);
-            ContactBeads_index_current = dist2origin < R_pillar + 0.3 * 1e-6;
+            R_ref_Clement = R_pillar + 1.1*R_fib; % Clement's
+            R_ref_Zhibo = R_pillar + R_fib; % Zhibo's
+            ContactBeads_index_current = dist2origin < R_ref_Clement;
 
-            ContactBeads_index{ii, sub2Path_i-5} = ContactBeads_index_current;
+            ContactBeads_index{ii, sub2Path_i} = ContactBeads_index_current;
 
             % % plot XY_current_in_lattice in the unit cell with the pillars, each dot represents a bead with a radius of R_fib
             % figure('Position', [100, 100, 800, 800], 'Color', 'w');
@@ -64,13 +69,13 @@ for sub1Path_i = 3:length(sub1_path)-1
             % axis equal; axis off
             % xlim([0 1]); ylim([0 1]);
             
-            XY{ii, sub2Path_i-5} = XY_current;
+            XY{ii, sub2Path_i} = XY_current;
 
             vec_im = diff(XY_current);
             l_im = vecnorm(vec_im')';
             vec_t = vec_im./l_im;
-            f_tension_vector{ii, sub2Path_i-5} = -ks*(l_im - 2*R_fib).*vec_t;
-            f_tension_magnitude{ii, sub2Path_i-5} = ks*(l_im - 2*R_fib); % Notice the sign
+            f_tension_vector{ii, sub2Path_i} = -ks*(l_im - 2*R_fib).*vec_t;
+            f_tension_magnitude{ii, sub2Path_i} = ks*(l_im - 2*R_fib); % Notice the sign
 
         end
     end
@@ -425,6 +430,7 @@ figure_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Me
 
 L_0_group = zeros(1, length(saved_data));
 max_ensemble_tension = zeros(1, length(saved_data));
+max_ensemble_tension_std = zeros(1, length(saved_data));
 for ii = 1:length(saved_data)
 
     load(fullfile(saved_data(ii).folder, saved_data(ii).name));
@@ -439,6 +445,7 @@ for ii = 1:length(saved_data)
     % Choose only the contact cases
     f_tension_magnitude_Contact = f_tension_magnitude(If_contact_all);
     f_tension_XY_Contact = f_tension_XY(If_contact_all);
+    ContactBeads_index_Contact = ContactBeads_index(If_contact_all);
     %%%%%%%%%%%%%%%%%%%%% To select the contact cases %%%%%%%%%%%%%%%%%%%%%
 
     %%%%%%%%%%%%%%%%%%%%% To check the order of the beads in the fiber %%%%%%%%%%%%%%%%%%%%%
@@ -472,23 +479,31 @@ for ii = 1:length(saved_data)
     If_inOrder_all = cell2mat(If_inOrder);
     
     f_tension_magnitude_Contact_all = reshape(cell2mat(f_tension_magnitude_Contact), [], numel(f_tension_magnitude_Contact));
+    ContactBeads_index_Contact_all = reshape(cell2mat(ContactBeads_index_Contact), [], numel(ContactBeads_index_Contact));
+    ContactBeads_index_Contact_all(end, :) = []; % remove the last row (to align with the f_tension_magnitude_Contact_all)
 
     % Flip the order of f_tension_magnitude_Contact_all based on If_inOrder_all
     f_tension_magnitude_Contact_all(:, ~If_inOrder_all) = flipud(f_tension_magnitude_Contact_all(:, ~If_inOrder_all));
+    ContactBeads_index_Contact_all(:, ~If_inOrder_all) = flipud(ContactBeads_index_Contact_all(:, ~If_inOrder_all));
 
-    f_tension_magnitude_Contact_average = mean(f_tension_magnitude_Contact_all, 2);
-    f_tension_magnitude_Contact_std = std(f_tension_magnitude_Contact_all, 0, 2);
+    % set the f_tension_magnitude to NaN for the beads that are in contact with the pillars
+    f_tension_magnitude_Contact_all(ContactBeads_index_Contact_all == 1) = NaN;
+
+    f_tension_magnitude_Contact_average = mean(f_tension_magnitude_Contact_all, 2, 'omitnan');
+    f_tension_magnitude_Contact_std = std(f_tension_magnitude_Contact_all, 0, 2, 'omitnan');
 
     figure('Position', [100, 100, 800, 600], 'Color', 'w');
     plot((1:numel(f_tension_magnitude_Contact_average))'/bead_num, f_tension_magnitude_Contact_average/f_bead, 'k--', 'LineWidth', 3); hold on;
     for jj = 1:round(size(f_tension_magnitude_Contact_all, 2)/100):size(f_tension_magnitude_Contact_all, 2)
         plot((1:numel(f_tension_magnitude_Contact_average))'/bead_num, f_tension_magnitude_Contact_all(:, jj)/f_bead, 'Color', [1 0 1 0.1]); hold on;
     end
-    xlim([0 1]); ylim([0 6]);
+    plot((1:numel(f_tension_magnitude_Contact_average))'/bead_num, f_tension_magnitude_Contact_average/f_bead, 'k--', 'LineWidth', 3); hold on;
+    xlim([0 1]); ylim([0 8]);
     legend('Average', 'Location', 'northeast', 'FontSize', 40, 'FontName', 'Times New Roman');
     xlabel('$s/L$', 'FontSize', 40, 'Interpreter', 'latex');
-    ylabel('$F_{\rm{tension}}/F_{\rm{bead}}$', 'FontSize', 40, 'Interpreter', 'latex');
+    ylabel('$\tilde{F}_{\rm{tension}}$', 'FontSize', 40, 'Interpreter', 'latex');
     % title(['Tension along the fiber, L = ', L_0{1}, ' um'], 'FontSize', 20);
+    text(0.25, 7.1, ['L = ', L_0{1}, ' ', char(181) 'm'], 'FontSize', 40, 'FontName', 'Times New Roman', 'HorizontalAlignment', 'center');
     set(gca, 'FontSize', 40, 'FontName', 'Times New Roman');
     grid on
     set(gcf,'renderer','Painters');
@@ -497,9 +512,30 @@ for ii = 1:length(saved_data)
     % saveas(gcf, [figure_mother_save_path, filesep, 'Normalized tension along the fiber, ' ...
     %     'only contact cases and beads reordered downstream, L = ', L_0{1}, ' um.png']);
   
-    L_0_group(ii) = str2double(L_0{1});
-    max_ensemble_tension(ii) = max(f_tension_magnitude_Contact_average/f_bead);
+    f_tension_X_Contact_rotated_all = reshape(cell2mat(f_tension_X_Contact_rotated), [], numel(f_tension_X_Contact_rotated));
+    x_position = mean(f_tension_X_Contact_rotated_all);
+    % determine the trajectories based on the x-position by finding the sudden drops in the x-position
+    x_diff = diff(x_position);
+    sudden_drops = find(x_diff < -10*C2C_pillar); % threshold for sudden drop
+    start_idx = 1;
+    max_ensemble_tension_per_case = zeros(numel(sudden_drops), 1);
+    for jj = 1:length(sudden_drops)
 
+        end_idx = sudden_drops(jj);
+
+        current_f_tension_magnitude = f_tension_magnitude_Contact_all(:, start_idx:end_idx);
+        current_f_tension_magnitude_average = mean(current_f_tension_magnitude, 2, 'omitnan');
+
+        max_ensemble_tension_per_case(jj) = max(current_f_tension_magnitude_average)/f_bead;
+        
+        start_idx = end_idx + 1;
+    end
+
+    L_0_group(ii) = str2double(L_0{1});
+    max_ensemble_tension(ii) = mean(max_ensemble_tension_per_case);
+    max_ensemble_tension_std(ii) = std(max_ensemble_tension_per_case);
+
+    close all
     clearvars XY f_tension ContactBeads_index
 end
 
@@ -508,13 +544,16 @@ figure('Position', [100, 100, 800, 600], 'Color', 'w');
 yyaxis left
 ax = gca; 
 ax.YColor = [231, 138, 195]/256;
-plot(L_0_group*1e-6/C2C_pillar, max_ensemble_tension, 'o', ...
+errorbar(L_0_group*1e-6/C2C_pillar, max_ensemble_tension, max_ensemble_tension_std, 'o', ...
      'MarkerFaceColor', [231, 138, 195]/256, 'MarkerEdgeColor', 'k', ...
-     'MarkerSize', 15, 'LineWidth', 1.5);
+     'MarkerSize', 15, 'LineWidth', 1.5, 'Color', 'k');
 xlabel('$L/\lambda$', 'FontSize', 28, 'Interpreter', 'latex');
-ylabel('$\overline{\langle F_{\rm{tension}}/F_{\rm{bead}} \rangle {_{\rm{max}}}}$', 'FontSize', 28, 'Interpreter', 'latex');
+ylabel('$\overline{\langle \tilde{F}_{\rm{tension,\,contact}} \rangle {_{\rm{max}}}}$', 'FontSize', 28, 'Interpreter', 'latex');
 xlim([0 3.2]); ylim([0 5]); % grid on
 set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
+
+% See the following code: VicFig_Get_fig_data.m
+
 % % saveas(gcf, [figure_mother_save_path, filesep, 'Max. ensemble averaged normalized tension vs. Fiber length.png']);
 
 
@@ -645,7 +684,7 @@ end
 % % % end
 % % % plot((1:beads_num-1)/beads_num, mean(f_tension_magnitude_plotted, 1, 'omitnan'), 'm-', 'LineWidth', 3);
 % % % xlabel('$s/L$', 'FontSize', 28, 'Interpreter', 'latex');
-% % % ylabel('$F_{\rm{tension}}/F_{\rm{bead}}$', 'FontSize', 28, 'Interpreter', 'latex');
+% % % ylabel('$\tilde{F}_{\rm{tension}}$', 'FontSize', 28, 'Interpreter', 'latex');
 % % % xlim([0 1]); ylim([0 8]); grid on
 % % % set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
 % % % set(gcf,'renderer','Painters');
@@ -721,7 +760,7 @@ for ii = picked_snaps_contact
 end
 plot((1:beads_num-1)/beads_num, mean(f_tension_magnitude_plotted, 1, 'omitnan'), 'm-', 'LineWidth', 3);
 xlabel('$s/L$', 'FontSize', 28, 'Interpreter', 'latex');
-ylabel('$F_{\rm{tension}}/F_{\rm{bead}}$', 'FontSize', 28, 'Interpreter', 'latex');
+ylabel('$\tilde{F}_{\rm{tension}}$', 'FontSize', 28, 'Interpreter', 'latex');
 xlim([0 1]); ylim([0 8]); grid on
 set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
 set(gcf,'renderer','Painters');
