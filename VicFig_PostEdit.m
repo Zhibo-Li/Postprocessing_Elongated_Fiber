@@ -87,7 +87,7 @@ for ii = 1: length(C)
     Lattice_in_all(randomNum) = []; Lattice_out_all(randomNum) = []; L_toPlot_all(randomNum) = [];
     scatter(Lattice_in_all, Lattice_out_all, 100, L_toPlot_all, ...
         'MarkerFaceColor','none','Marker','^','LineWidth', 1);
-    cmocean('amp'); clim([0 50]);
+    cmocean('amp'); clim([0 60]);
 
     else
         continue
@@ -157,7 +157,7 @@ end
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['Z:\Processing & Results\' ...
-    'Actin Filaments in Porous Media\Figures\Poincare plots\2025 New\Poincare_', ...
+    'Actin Filaments in Porous Media\Figures\Poincare plots\2025 New neon\Poincare_', ...
     num2str(plot_angle),'deg_Simu_groupTracers.eps']);
 
 
@@ -249,7 +249,7 @@ for ii = 1: length(C)
     Lattice_in_all(randomNum) = []; Lattice_out_all(randomNum) = []; L_toPlot_all(randomNum) = [];
     scatter(Lattice_in_all, Lattice_out_all, 150, L_toPlot_all, ...
         'MarkerFaceColor','none','Marker','^','LineWidth', 1);
-    cmocean('amp'); clim([0 50]);
+    cmocean('amp'); clim([0 60]);
 
     else
         continue
@@ -258,7 +258,7 @@ end
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['Z:\Processing & Results\' ...
-    'Actin Filaments in Porous Media\Figures\Poincare plots\2025 New\Poincare_', ...
+    'Actin Filaments in Porous Media\Figures\Poincare plots\2025 New neon\Poincare_', ...
     num2str(plot_angle),'deg_Exp_groupTracers.eps']);
 
 
@@ -274,6 +274,7 @@ print('-depsc2','-tiff','-r100','-vector',['Z:\Processing & Results\' ...
 clear; close all; clc;
 
 Vic_cmap = slanCM(169); % slanCM169: neon
+Vic_cmap = Vic_cmap(1:224, :); % Cut the color to remove the invisible light green
 % reverse the colormap
 % Vic_cmap = Vic_cmap(end:-1:1, :);
 
@@ -356,10 +357,10 @@ for ii = 1: length(C)
     % randomNum = randperm(numel(Lattice_in_all), round(0.6*numel(Lattice_in_all)));
     randomNum = [];
     Lattice_in_all(randomNum) = []; Lattice_out_all(randomNum) = []; L_toPlot_all(randomNum) = [];
-    scatter(Lattice_in_all, Lattice_out_all, 120, L_toPlot_all, ...
-        'MarkerFaceColor','none','Marker','^','LineWidth', 1);
-    colormap(Vic_cmap); clim([0 50]); 
-    % cmocean('-thermal'); clim([0 50]);
+    scatter(Lattice_in_all, Lattice_out_all, 140, L_toPlot_all, ...
+        'MarkerFaceColor','none','Marker','o','LineWidth', 3);
+    colormap(Vic_cmap); clim([0 60]); 
+    % cmocean('-thermal'); clim([0 60]);
 
     else
         continue
@@ -369,7 +370,7 @@ end
 % colorbar;
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['Z:\Processing & Results\' ...
-    'Actin Filaments in Porous Media\Figures\Poincare plots\2025 New\Poincare_', ...
+    'Actin Filaments in Porous Media\Figures\Poincare plots\2025 New neon\Poincare_', ...
     num2str(plot_angle),'deg_Exp_groupTracers_diffColorbar-neon.eps']);
 
 
@@ -378,13 +379,14 @@ print('-depsc2','-tiff','-r100','-vector',['Z:\Processing & Results\' ...
 clear; close all; clc;
 
 Vic_cmap = slanCM(169); % slanCM169: neon
+Vic_cmap = Vic_cmap(1:224, :); % Cut the color to remove the invisible light green
 % reverse the colormap
 % Vic_cmap = Vic_cmap(end:-1:1, :);
 
 % Get the colormap data
 % cmap = cmocean('-thermal');
 cmap = Vic_cmap;
-max_length = 50;
+max_length = 60;
 min_length = 0;
 shorter_length = 12;
 longer_length = 48;
@@ -395,9 +397,9 @@ color_index_long = round((longer_length - min_length) / (max_length - min_length
 color_value_short = cmap(color_index_short, :);
 color_value_long = cmap(color_index_long, :);
 
-plot_angle = 30;
+plot_angle = 45;
 fig = openfig(['Z:\Processing & Results\Actin Filaments in Porous Media\Figures\' ...
-    'Poincare plots\Simu_poincare_maps_alpha_30.fig']);
+    'Poincare plots\Simu_poincare_maps_alpha_45.fig']);
 
 % change the marker styles, and delete some lines
 h = findobj(fig, 'Type', 'Line');
@@ -431,10 +433,10 @@ for i = fiberSymbols(1):fiberSymbols(end)
     % randomNum = randperm(numel(h(i).XData), round(0.8*numel(h(i).XData)));
     randomNum = [];
     h(i).XData(randomNum) = []; h(i).YData(randomNum) = [];
-    h(i).LineWidth = 1;
+    h(i).LineWidth = 3;
     h(i).Marker = 'o';
     h(i).MarkerFaceColor = 'none';
-    h(i).MarkerSize = 10;
+    h(i).MarkerSize = 12;
     if h(i).Color == [0.85, 0.66, 0.59] % this short fibers
         h(i).Color = color_value_short;
     else
@@ -444,7 +446,7 @@ end
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['Z:\Processing & Results\' ...
-    'Actin Filaments in Porous Media\Figures\Poincare plots\2025 New\Poincare_', ...
+    'Actin Filaments in Porous Media\Figures\Poincare plots\2025 New neon\Poincare_', ...
     num2str(plot_angle),'deg_Simu_groupTracers_diffColorbar-neon.eps']);
 
 
@@ -453,17 +455,19 @@ print('-depsc2','-tiff','-r100','-vector',['Z:\Processing & Results\' ...
 figure('color', 'w'); set(gcf, 'Position', [100 100 200 380]);
 
 Vic_cmap = slanCM(169); % slanCM169: neon
+Vic_cmap = Vic_cmap(1:224, :); % Cut the color to remove the invisible light green
 % reverse the colormap
 % Vic_cmap = Vic_cmap(end:-1:1, :);
-colormap(Vic_cmap); clim([0 50])
+colormap(Vic_cmap); clim([0 2])
 c = colorbar;
-c.Label.String = '$L\ (\mathrm{\mu m})$';
+c.Label.String = '$L/\lambda$';
+% c.Label.FontName = 'Times New Roman';
 c.Label.Interpreter = 'LaTeX';
 c.TickLabelInterpreter = 'LaTeX';
-c.FontSize = 20;
+c.FontSize = 12;
 c.Location = 'west';
 axis off
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',['Z:\Processing & Results\' ...
-    'Actin Filaments in Porous Media\Figures\Poincare plots\2025 New\The_colorbar_Neon.eps']);
+    'Actin Filaments in Porous Media\Figures\Poincare plots\2025 New neon\The_colorbar_Neon.eps']);
