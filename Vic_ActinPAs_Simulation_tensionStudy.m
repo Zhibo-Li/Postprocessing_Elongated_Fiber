@@ -645,8 +645,8 @@ end
 % % % figure('Position', [100, 100, 800, 600], 'Color', 'w');
 % % % unused_color_ratio = 0.4;
 % % % 
-% % % start_snapshot = 54; end_snapshot = 63; 
-% % % picked_snaps = start_snapshot:end_snapshot;
+% % % start_snapshot = 49; end_snapshot = 68; 
+% % % picked_snaps = start_snapshot:2:end_snapshot;
 % % % logical(sum(ContactBeads_index_current(picked_snaps, :), 2));
 % % % 
 % % % picked_snaps_noncontact = picked_snaps(~logical(sum(ContactBeads_index_current(picked_snaps, :), 2)));
@@ -688,7 +688,7 @@ end
 % % % xlim([0 1]); ylim([0 8]); grid on
 % % % set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
 % % % set(gcf,'renderer','Painters');
-% % % print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Short_fiber_tension_profile_new.eps']);
+% % % print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Short_fiber_tension_profile_new2.eps']);
 % % % 
 % % % % Plot the chronophotography (Short fiber)
 % % % figure('Position', [100, 100, 800, 600], 'Color', 'w');
@@ -712,17 +712,17 @@ end
 % % % XY_pillar_rotated(XY_pillar_rotated(:, 1) > 7e-4, :) = [];
 % % % viscircles(XY_pillar_rotated, R_pillar*ones(size(XY_pillar_rotated, 1), 1), 'Color', 'k', 'LineWidth', 0.2);
 % % % axis equal; axis off
-% % % xlim([4.8 6.2]*1e-4); ylim([0 5]*1e-5);
+% % % xlim([4.5 6.5]*1e-4); ylim([0.5 4.5]*1e-5);
 % % % set(gcf,'renderer','Painters');
-% % % print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Short_fiber_chronophotography_new.eps']);
+% % % print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Short_fiber_chronophotography_new2.eps']);
 
 
 %%%%%% Plot the tension along the fiber (Long fiber) %%%%%%
 figure('Position', [100, 100, 800, 600], 'Color', 'w');
 unused_color_ratio = 0.4;
 
-start_snapshot = 55; end_snapshot = 64; 
-picked_snaps = start_snapshot:end_snapshot;
+start_snapshot = 50; end_snapshot = 69; 
+picked_snaps = start_snapshot:2:end_snapshot;
 logical(sum(ContactBeads_index_current(picked_snaps, :), 2));
 
 picked_snaps_noncontact = picked_snaps(~logical(sum(ContactBeads_index_current(picked_snaps, :), 2)));
@@ -764,7 +764,7 @@ ylabel('$\tilde{F}_{\rm{tension}}$', 'FontSize', 28, 'Interpreter', 'latex');
 xlim([0 1]); ylim([0 8]); grid on
 set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
 set(gcf,'renderer','Painters');
-print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_fiber_tension_profile_new.eps']);
+print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_fiber_tension_profile_new2.eps']);
 
 % Plot the chronophotography (Long fiber)
 figure('Position', [100, 100, 800, 600], 'Color', 'w');
@@ -788,9 +788,9 @@ XY_pillar_rotated(XY_pillar_rotated(:, 1) < 2.5e-4, :) = [];
 XY_pillar_rotated(XY_pillar_rotated(:, 1) > 5.5e-4, :) = [];
 viscircles(XY_pillar_rotated, R_pillar*ones(size(XY_pillar_rotated, 1), 1), 'Color', 'k', 'LineWidth', 0.2);
 axis equal; axis off
-xlim([3.3 4.7]*1e-4); ylim([5.5 9.5]*1e-5);
+xlim([2.7 4.7]*1e-4); ylim([5.5 9.5]*1e-5);
 set(gcf,'renderer','Painters');
-print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_fiber_chronophotography_new.eps']);
+print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_fiber_chronophotography_new2.eps']);
 
 
 % % % Plot the colorbrar
