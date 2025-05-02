@@ -336,6 +336,7 @@ for sub1Path_i = 1:length(sub1_path)
             gamma_noTension(i_snap,attachment_bead) = NaN;
 
             xy(i_snap, :) = complex(r(:,1),r(:,2))';
+            % NOTE: The transpose of a complex number makes the conjugate of the complex number, so the overall transport has been flipped!!! (Z. LI)
 
         end
 
@@ -387,7 +388,7 @@ end
 
 
 
-%% Load saved gamma data and plot the results (in unit cell)
+%% Load saved gamma data and plot the averaged gamma vs. fiber lengths (possible Fig.5 in the paper)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear; close all; clc;
@@ -423,7 +424,7 @@ end
 % Plot the ensemble average of gamma vs. fiber length
 % Plot this after the tension-length with code: Vic_ActinPAs_Simulation_tensionStudy.m
 
-% % figure('Position', [100, 100, 800, 600], 'Color', 'w');
+figure('Position', [100, 100, 800, 600], 'Color', 'w');
 hold on;
 yyaxis right
 ax = gca;  % Get current axis
@@ -440,6 +441,117 @@ print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, ...
     'Max. tension (only contact, sorted) and ave. gamma (non-contact beads, with sign) vs. Fiber length.eps']);
 
 saveas(gcf, [figure_mother_save_path, filesep, 'Max. tension (only contact, sorted) and ave. gamma (non-contact beads, with sign) vs. Fiber length.png']);
+
+
+
+
+
+
+%% Load saved gamma data and plot the averaged gamma ON THE LAST BEAD vs. fiber lengths (possible Fig.5 in the paper)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clear; close all; clc;
+
+% Geometrical properties of the array
+C2C_pillar = 30 * 1e-6; % m (delta_x & delta_y)
+
+theta = 35; % angle in degrees (counterclockwise)
+Rotate_matrix = [cosd(theta) -sind(theta); sind(theta) cosd(theta)]; % rotation matrix
+
+data_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Simulation\Simulations_LubricationModel'];
+saved_data = dir(data_mother_save_path);
+% only keep the .mat files inluding the '_TensionStudy'
+saved_data = saved_data(arrayfun(@(x) contains(x.name, '_GammaStudy.mat'), saved_data)); 
+
+figure_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Figures\Simulation\Gamma analysis'];
+
+L_0_group = zeros(1, length(saved_data));
+average_gamma_lastBead = zeros(1, length(saved_data));
+for ii = 1:length(saved_data)
+
+    load(fullfile(saved_data(ii).folder, saved_data(ii).name));
+
+    XY = cellfun(@(x) x', XY, 'UniformOutput', false);
+    % NOTE: To transpose back!!! (Z. LI)
+
+    L_0_group(ii) = Length;
+
+    gamma_lastBead = [];
+    for case_no = 1: length(GAMMA)
+        XY_first = [real(XY{1, case_no}(1, :)); imag(XY{1, case_no}(1, :))];
+        XY_last = [real(XY{1, case_no}(end, :)); imag(XY{1, case_no}(end, :))];
+
+        XY_first_rotated = Rotate_matrix * XY_first;
+        XY_last_rotated = Rotate_matrix * XY_last;
+
+        If_inOrder = XY_last_rotated(1, :) >= XY_first_rotated(1, :);
+
+        gamma = GAMMA{1, case_no}';
+        gamma_sign = GAMMA_SIGN{1, case_no}';
+        gamma = gamma_sign .* gamma;
+        gamma(:, ~If_inOrder) = flipud(gamma(:, ~If_inOrder));
+        gamma(:, ~any(isnan(gamma), 1)) = []; % Only keep the contact cases
+
+        gamma_lastBead = [gamma_lastBead, gamma(end, :)];
+
+        % % % % Plot the selected fiber
+        % % % figure("Color", "w");
+        % % % X_pillar = 0:C2C_pillar:1e-4; Y_pillar = 0:-C2C_pillar:-1e-4;
+        % % % [X_pillar, Y_pillar] = meshgrid(X_pillar, Y_pillar);
+        % % % viscircles([X_pillar(:), Y_pillar(:)], 8.3*1e-6*ones(length(X_pillar(:)), 1), ...
+        % % %     'Color', [0.3 0.3 0.3], 'LineWidth', 0.3, 'EnhanceVisibility', false);
+        % % % hold on
+        % % % % Pick one fiber to plot
+        % % % for fooo = 1:20
+        % % %     x_coords = real(XY{1, case_no}(:, fooo));
+        % % %     y_coords = imag(XY{1, case_no}(:, fooo));
+        % % %     if If_inOrder(fooo)
+        % % %         plot(x_coords, y_coords, '-om', 'LineWidth', 0.5, 'MarkerSize', 2);
+        % % %     else
+        % % %         x_coords = flipud(x_coords); y_coords = flipud(y_coords);
+        % % %         plot(x_coords, y_coords, '-om', 'LineWidth', 0.5, 'MarkerSize', 2);
+        % % %     end
+        % % %     % Highlight the last bead with a different symbol
+        % % %     hold on;
+        % % %     plot(x_coords(end), y_coords(end), 's', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'k', 'MarkerSize', 8);
+        % % %     axis equal;
+        % % % end
+    end
+
+    average_gamma_lastBead(ii) = mean(gamma_lastBead, 'omitnan');
+
+end
+
+% Plot the ensemble average of gamma ON THE LAST BEAD vs. fiber length
+% Plot this after the tension-length with code: Vic_ActinPAs_Simulation_tensionStudy.m
+
+figure('Position', [100, 100, 800, 600], 'Color', 'w');
+% hold on;
+% yyaxis right
+ax = gca;  % Get current axis
+ax.YColor = [126, 156, 64]/256;  % Change left y-axis color to dark green
+plot(L_0_group / C2C_pillar, average_gamma_lastBead, 'd', ...
+     'MarkerFaceColor', [126, 156, 64]/256, 'MarkerEdgeColor', 'k', 'MarkerSize', 15, 'LineWidth', 1.5);
+xlabel('$L/\lambda$', 'FontSize', 28, 'Interpreter', 'latex');
+ylabel('$\langle\gamma{_{\rm{Last\, bead}}}\rangle$', 'FontSize', 28, 'Interpreter', 'latex');
+xlim([0 3.2]); ylim([-25 20]); grid on
+set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
+
+set(gcf,'renderer','Painters');
+print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, ...
+    'ave. gamma (last bead, with sign) vs. Fiber length.eps']);
+
+saveas(gcf, [figure_mother_save_path, filesep, 'ave. gamma (last bead, with sign) vs. Fiber length.png']);
+
+
+
+
+
+
+
+
 
 
 
