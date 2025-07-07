@@ -468,7 +468,9 @@ figure_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Me
     'Figures\Simulation\Gamma analysis'];
 
 L_0_group = zeros(1, length(saved_data));
+average_gamma_firstBead = zeros(1, length(saved_data));
 average_gamma_lastBead = zeros(1, length(saved_data));
+average_gamma_firstBeadafterPillar = zeros(1, length(saved_data));
 for ii = 1:length(saved_data)
 
     load(fullfile(saved_data(ii).folder, saved_data(ii).name));
@@ -478,7 +480,9 @@ for ii = 1:length(saved_data)
 
     L_0_group(ii) = Length;
 
+    gamma_firstBead = [];
     gamma_lastBead = [];
+    gamma_firstBeadafterPillar = [];
     for case_no = 1: length(GAMMA)
         XY_first = [real(XY{1, case_no}(1, :)); imag(XY{1, case_no}(1, :))];
         XY_last = [real(XY{1, case_no}(end, :)); imag(XY{1, case_no}(end, :))];
@@ -494,6 +498,18 @@ for ii = 1:length(saved_data)
         gamma(:, ~If_inOrder) = flipud(gamma(:, ~If_inOrder));
         gamma(:, ~any(isnan(gamma), 1)) = []; % Only keep the contact cases
 
+        % Find the first non-NaN value after NaN for each column
+        for col = 1:size(gamma, 2)
+            nan_indices = find(isnan(gamma(:, col)));         
+            first_non_nan_index = find(~isnan(gamma(nan_indices(end)+1:end, col)), 1, 'first') + nan_indices(end);
+            if ~isempty(first_non_nan_index)
+                gamma_firstBeadafterPillar = [gamma_firstBeadafterPillar, gamma(first_non_nan_index, col)];
+            else 
+                gamma_firstBeadafterPillar = [gamma_firstBeadafterPillar, NaN];                
+            end
+        end
+
+        gamma_firstBead = [gamma_firstBead, gamma(1, :)];
         gamma_lastBead = [gamma_lastBead, gamma(end, :)];
 
         % % % % Plot the selected fiber
@@ -520,30 +536,42 @@ for ii = 1:length(saved_data)
         % % % end
     end
 
+    average_gamma_firstBead(ii) = mean(gamma_firstBead, 'omitnan');
     average_gamma_lastBead(ii) = mean(gamma_lastBead, 'omitnan');
+    average_gamma_firstBeadafterPillar(ii) = mean(gamma_firstBeadafterPillar, 'omitnan');
 
 end
 
 % Plot the ensemble average of gamma ON THE LAST BEAD vs. fiber length
 % Plot this after the tension-length with code: Vic_ActinPAs_Simulation_tensionStudy.m
 
-figure('Position', [100, 100, 800, 600], 'Color', 'w');
+myColor = cmocean('balance', 10); % colormap
+
+figure('Position', [100, 100, 1200, 600], 'Color', 'w');
 % hold on;
 % yyaxis right
-ax = gca;  % Get current axis
-ax.YColor = [126, 156, 64]/256;  % Change left y-axis color to dark green
-plot(L_0_group / C2C_pillar, average_gamma_lastBead, 'd', ...
-     'MarkerFaceColor', [126, 156, 64]/256, 'MarkerEdgeColor', 'k', 'MarkerSize', 15, 'LineWidth', 1.5);
+% ax = gca;  % Get current axis
+% ax.YColor = [126, 156, 64]/256;  % Change left y-axis color to dark green
+plot(L_0_group / C2C_pillar, average_gamma_firstBead, 'o', ...
+     'MarkerFaceColor', myColor(3, :), 'MarkerEdgeColor', 'k', 'MarkerSize', 15, 'LineWidth', 1.5);
+hold on;
+plot(L_0_group / C2C_pillar, average_gamma_lastBead, 'o', ...
+     'MarkerFaceColor', myColor(6, :), 'MarkerEdgeColor', 'k', 'MarkerSize', 15, 'LineWidth', 1.5);
+hold on;
+plot(L_0_group / C2C_pillar, average_gamma_firstBeadafterPillar, 'o', ...
+     'MarkerFaceColor', myColor(9, :), 'MarkerEdgeColor', 'k', 'MarkerSize', 15, 'LineWidth', 1.5);
 xlabel('$L/\lambda$', 'FontSize', 28, 'Interpreter', 'latex');
-ylabel('$\langle\gamma{_{\rm{Last\, bead}}}\rangle$', 'FontSize', 28, 'Interpreter', 'latex');
-xlim([0 3.2]); ylim([-25 20]); grid on
+ylabel('$\langle\gamma\rangle$', 'FontSize', 28, 'Interpreter', 'latex');
+legend({'${\rm{First\, bead}}$', '${\rm{Last\, bead}}$','${\rm{First\,dsetached\,bead}}$'}, ...
+    'Interpreter', 'latex', 'FontSize', 24, 'Location', 'bestoutside', 'Box', 'off');
+xlim([0 3.2]); ylim([-40 80]); grid on
 set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, ...
     'ave. gamma (last bead, with sign) vs. Fiber length.eps']);
 
-saveas(gcf, [figure_mother_save_path, filesep, 'ave. gamma (last bead, with sign) vs. Fiber length.png']);
+saveas(gcf, [figure_mother_save_path, filesep, 'ave. gamma vs. Fiber length.png']);
 
 
 
