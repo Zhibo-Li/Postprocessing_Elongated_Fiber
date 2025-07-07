@@ -1203,3 +1203,364 @@ xlim([3.4 4.1]*1e-4); ylim([5.6 9.4]*1e-5);
 
 set(gcf,'renderer','Painters');
 print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'theDEMO.eps']);
+
+
+
+
+
+
+
+%% Load saved tension data, plot chronophotography of fiber with tension (Final version of Fig.3)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clear; close all; clc;
+
+dt = 0.1; % time step, unit: s
+
+% Geometrical and mechanical properties of the fiber
+R_fib = 3e-7; % fiber radius, unit: m
+B = 8e-25; % Bending rigidity
+S = 4*B/R_fib^2;
+ks = 100*S/(2*R_fib);
+
+u_max = 200e-6;
+mu = 6.1e-3;
+f_bead = 6*pi*mu*R_fib*u_max;
+
+% Geometrical properties of the array
+R_pillar = 8.3 * 1e-6; % pillar radius, unit: m
+C2C_pillar = 30 * 1e-6; % m (delta_x & delta_y)
+
+time_step = 0.1; % s
+
+X_pillar = 0:C2C_pillar:1e-2; Y_pillar = 0:-C2C_pillar:-1e-2;
+[X_pillar, Y_pillar] = meshgrid(X_pillar, Y_pillar);
+
+theta = -35; % angle in degrees (clockwise)
+Rotate_matrix = [cosd(theta) -sind(theta); sind(theta) cosd(theta)]; % rotation matrix
+
+XY_pillar_rotated = [X_pillar(:), Y_pillar(:)]*Rotate_matrix;
+% % figure('Position', [100, 100, 800, 800], 'Color', 'w');
+% % hold on;
+% % viscircles(XY_pillar_rotated, R_pillar*ones(size(XY_pillar_rotated, 1), 1), 'Color', 'r');
+% % axis equal; axis off
+
+figure_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Figures\Simulation\Tension analysis'];
+
+parent_path = 'E:\Experimental Data (RAW)\Simulation\data';
+sub1_path = dir(parent_path);
+
+% Case: n90, no.1 (Long fiber)
+sub1Path_i = 17; sub2Path_i = 6; picked_snap = [55, 60, 63, 64];
+% % % % Case: n30, no.17 (Short fiber)
+% % % sub1Path_i = 11; sub2Path_i = 14; picked_snap = 54:63;
+
+
+current_beadsNum = sub1_path(sub1Path_i).name;
+beads_num = str2double(current_beadsNum(2:end));
+disp(['Current beads number: ', num2str(beads_num)]);
+
+L_0 = 0.6 * beads_num * 1e-6;
+disp(['Current fiber length: ', num2str(L_0), ' um']);
+
+sub2_path = dir(fullfile(parent_path, current_beadsNum));
+
+current_sim = sub2_path(sub2Path_i).name;
+sim_no = str2double(current_sim(11:end));
+disp(['Current simulation number: ', num2str(sim_no)]);
+
+fileinfo = dir(fullfile(parent_path, current_beadsNum, current_sim, 'output_data\*.vtk'));
+
+figure('Position', [100, 100, 800, 600], 'Color', 'w');
+
+% plot pillar array
+XY_pillar_rotated(XY_pillar_rotated(:, 2) < -0.3e-4, :) = [];
+XY_pillar_rotated(XY_pillar_rotated(:, 2) > 1.3e-4, :) = [];
+XY_pillar_rotated(XY_pillar_rotated(:, 1) < 2.5e-4, :) = [];
+XY_pillar_rotated(XY_pillar_rotated(:, 1) > 8.5e-4, :) = [];
+viscircles(XY_pillar_rotated, R_pillar*ones(size(XY_pillar_rotated, 1), 1), ...
+    'Color', [0.3 0.3 0.3], 'LineWidth', 0.3, 'EnhanceVisibility', false);
+axis equal; axis off
+hold on;
+
+
+for foo = 1:length(picked_snap)
+
+    snapshot = readVTK(fullfile(fileinfo(picked_snap(foo)).folder, fileinfo(picked_snap(foo)).name));
+    XY_current = snapshot.points(:, 1:2);
+    XY_current_rotated = XY_current*Rotate_matrix;
+
+    XY_current_in_lattice = mod(XY_current-C2C_pillar/2, C2C_pillar);
+    dist2origin = sqrt((XY_current_in_lattice(:,1)-C2C_pillar/2).^2 + (XY_current_in_lattice(:,2)-C2C_pillar/2).^2);
+    ContactBeads_index_current = dist2origin < R_pillar + 1.1*R_fib; % Clement's
+
+    XY_tension_rotated = 0.5*(XY_current(1:end-1, :)+XY_current(2:end, :))*Rotate_matrix;
+
+    vec_im = diff(XY_current);
+    l_im = vecnorm(vec_im')';
+    vec_t = vec_im./l_im;
+    f_tension_magnitude_normalized = ks*(l_im - 2*R_fib)/f_bead;
+
+    % plot tension
+    myColormap = cmocean('amp', 1024);
+    x = XY_tension_rotated(:, 1);
+    y = XY_tension_rotated(:, 2);
+    z = zeros(size(x));
+    lineColor = zeros([size(z, 1), 3]);
+    for i = 1:size(XY_tension_rotated, 1)
+        color_idx = max(1, min(size(myColormap, 1), round(f_tension_magnitude_normalized(i) / 5 * size(myColormap, 1))));
+        lineColor(i, :) = myColormap(color_idx, :);
+    end
+    lineColor = repmat(lineColor, 1, 1, 2); % repeat the color for 3D
+    lineColor = permute(lineColor, [1, 3, 2]);  % change the dimension of lineColor to be 3D
+    % use surf to make the curve smoother
+    surf([x,x], [y,y], [z,z], lineColor,'FaceColor', 'none', ...
+        'EdgeColor', 'interp','LineWidth', 4);
+
+    % % for i = 1:size(XY_tension_rotated, 1)-1
+    % %     color_idx = max(1, min(size(myColormap, 1), round(f_tension_magnitude_normalized(i) / 5 * size(myColormap, 1))));
+    % %     plot(XY_tension_rotated(i:i+1, 1), XY_tension_rotated(i:i+1, 2), '-', ...
+    % %         'Color', myColormap(color_idx, :), 'LineWidth', 3);
+    % % end
+    hold on;
+
+end
+
+% plot the leading end of the fiber with different symbols (didn't flip, might need to change)
+for foo = 1:length(picked_snap)
+
+    snapshot = readVTK(fullfile(fileinfo(picked_snap(foo)).folder, fileinfo(picked_snap(foo)).name));
+    XY_current = snapshot.points(:, 1:2);
+    XY_current_rotated = XY_current*Rotate_matrix;
+
+    if XY_current_rotated(1, 1) > XY_current_rotated(end, 1)
+        leading_x = XY_current_rotated(1, 1);
+        leading_y = XY_current_rotated(1, 2);
+    else
+        leading_x = XY_current_rotated(end, 1);
+        leading_y = XY_current_rotated(end, 2);
+    end
+
+    scatter(leading_x, leading_y, 80, 'k', 'filled', 'p', 'MarkerFaceColor', ...
+        'k', 'MarkerEdgeColor', 'k'); hold on;
+    hold on;
+
+end
+
+% add a box around the figure (Long fiber)
+rectangle('Position', [3.3e-4, 5.5e-5, 1.5e-4, 4e-5], 'EdgeColor', 'k', 'LineWidth', 0.2);
+hold on;
+xlim([3.3 4.8]*1e-4); ylim([5.5 9.5]*1e-5);
+set(gcf,'renderer','Painters');
+print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'LongFiberWithTension.eps']);
+
+% % % % add a box around the figure (Short fiber)
+% % % rectangle('Position', [4.8e-4, 0.5e-5, 1.5e-4, 4e-5], 'EdgeColor', 'k', 'LineWidth', 0.2);
+% % % hold on;
+% % % xlim([4.8 6.3]*1e-4); ylim([0.5 4.5]*1e-5);
+% % % set(gcf,'renderer','Painters');
+% % % print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'ShortFiberWithTension.eps']);
+
+
+% only colorbar
+figure('color', 'w'); set(gcf, 'Position', [100 100 650 200]);
+cmocean('amp');
+clim([0 5]);
+c = colorbar;
+c.Label.String = '$\tilde{F}_{\rm{tension}}$';
+c.Label.Interpreter = 'latex';
+c.Label.FontSize = 24;
+c.TickLabelInterpreter = 'latex';
+c.FontSize = 24;
+clim([0 5]);
+c.Location = 'north';
+axis off
+set(gcf,'renderer','Painters');
+print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'ColorBar.eps']);
+
+
+
+%% Load saved tension data, plot max tension over time (newest 20250509 Fig.3 in the paper)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clear; close all; clc;
+
+dt = 0.1; % time step, unit: s
+
+% Geometrical and mechanical properties of the fiber
+R_fib = 3e-7; % fiber radius, unit: m
+B = 8e-25; % Bending rigidity
+S = 4*B/R_fib^2;
+ks = 100*S/(2*R_fib);
+
+u_max = 200e-6;
+mu = 6.1e-3;
+f_bead = 6*pi*mu*R_fib*u_max;
+
+% Geometrical properties of the array
+R_pillar = 8.3 * 1e-6; % pillar radius, unit: m
+C2C_pillar = 30 * 1e-6; % m (delta_x & delta_y)
+
+time_step = 0.1; % s
+
+X_pillar = 0:C2C_pillar:1e-2; Y_pillar = 0:-C2C_pillar:-1e-2;
+[X_pillar, Y_pillar] = meshgrid(X_pillar, Y_pillar);
+
+theta = -35; % angle in degrees (clockwise)
+Rotate_matrix = [cosd(theta) -sind(theta); sind(theta) cosd(theta)]; % rotation matrix
+
+XY_pillar_rotated = [X_pillar(:), Y_pillar(:)]*Rotate_matrix;
+% % figure('Position', [100, 100, 800, 800], 'Color', 'w');
+% % hold on;
+% % viscircles(XY_pillar_rotated, R_pillar*ones(size(XY_pillar_rotated, 1), 1), 'Color', 'r');
+% % axis equal; axis off
+
+figure_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Figures\Simulation\Tension analysis'];
+
+parent_path = 'E:\Experimental Data (RAW)\Simulation\data';
+sub1_path = dir(parent_path);
+
+for case_no = 1:2
+
+    if case_no == 1
+        % Case: n90, no.1 (Long fiber)
+        sub1Path_i = 17; sub2Path_i = 6;
+    elseif case_no == 2
+        % Case: n30, no.17 (Short fiber)
+        sub1Path_i = 11; sub2Path_i = 14;
+    end
+
+    current_beadsNum = sub1_path(sub1Path_i).name;
+    beads_num = str2double(current_beadsNum(2:end));
+    disp(['Current beads number: ', num2str(beads_num)]);
+
+    L_0 = 0.6 * beads_num * 1e-6;
+    disp(['Current fiber length: ', num2str(L_0), ' um']);
+
+    sub2_path = dir(fullfile(parent_path, current_beadsNum));
+
+    current_sim = sub2_path(sub2Path_i).name;
+    sim_no = str2double(current_sim(11:end));
+    disp(['Current simulation number: ', num2str(sim_no)]);
+
+    fileinfo = dir(fullfile(parent_path, current_beadsNum, current_sim, 'output_data\*.vtk'));
+
+    XY = zeros(length(fileinfo), beads_num, 2);
+    ContactBeads_index_current = zeros(length(fileinfo), beads_num);
+    XY_tension = zeros(length(fileinfo), beads_num-1, 2);
+    XY_tension_rotated = zeros(length(fileinfo), beads_num-1, 2);
+    f_tension_magnitude = zeros(length(fileinfo), beads_num-1);
+    for ii = 1:length(fileinfo)
+        snapshot = readVTK(fullfile(fileinfo(ii).folder, fileinfo(ii).name));
+        XY_current = snapshot.points(:, 1:2);
+
+        XY_current_in_lattice = mod(XY_current-C2C_pillar/2, C2C_pillar);
+        dist2origin = sqrt((XY_current_in_lattice(:,1)-C2C_pillar/2).^2 + (XY_current_in_lattice(:,2)-C2C_pillar/2).^2);
+        ContactBeads_index_current(ii, :) = dist2origin < R_pillar + 1.1*R_fib; % Clement's
+
+        XY(ii, :, :) = XY_current;
+        XY_tension(ii, :, :) = 0.5*(XY_current(1:end-1, :)+XY_current(2:end, :));
+        XY_tension_rotated(ii, :, :) = 0.5*(XY_current(1:end-1, :)+XY_current(2:end, :))*Rotate_matrix;
+
+        vec_im = diff(XY_current);
+        l_im = vecnorm(vec_im')';
+        vec_t = vec_im./l_im;
+        f_tension_magnitude(ii, :) = ks*(l_im - 2*R_fib); % Notice the sign
+    end
+
+    markers = {'+', 'x'};
+
+    %%%%%% Plot the average tension vs. time (Long and short fiber) %%%%%%
+    color_noncontact = [44, 160, 44]/256;
+    color_contact = [255, 127, 14]/256;
+    if case_no ==  1
+        figure('Position', [100, 100, 800, 600], 'Color', 'w');
+        % ONLY for legend
+        plot(NaN, NaN, 's', 'MarkerFaceColor', color_contact, 'MarkerEdgeColor', ...
+            'none', 'MarkerSize', 15, 'LineWidth', 1.5, 'Color', 'k');
+        hold on
+        plot(NaN, NaN, 's', 'MarkerFaceColor', color_noncontact, 'MarkerEdgeColor', ...
+            'none', 'MarkerSize', 15, 'LineWidth', 1.5, 'Color', 'k');
+        hold on
+
+        plot(NaN, NaN, markers{1}, 'MarkerFaceColor', 'w', 'MarkerEdgeColor', ...
+            'k', 'MarkerSize', 15, 'LineWidth', 1.5, 'Color', 'k');
+        hold on
+        plot(NaN, NaN, markers{2}, 'MarkerFaceColor', 'w', 'MarkerEdgeColor', ...
+            'k', 'MarkerSize', 15, 'LineWidth', 1.5, 'Color', 'k');
+    end
+
+    if case_no == 1
+        % Case: n90, no.1 (Long fiber)
+        picked_snaps = 55:64;
+        markers_size = 24;
+    elseif case_no == 2
+        % Case: n30, no.17 (Short fiber)
+        picked_snaps = 54:63;
+        markers_size = 24;
+    end
+    logical(sum(ContactBeads_index_current(picked_snaps, :), 2));
+
+    picked_snaps_noncontact = picked_snaps(~logical(sum(ContactBeads_index_current(picked_snaps, :), 2)));
+    f_tension_magnitude_plotted = zeros(numel(picked_snaps), beads_num-1);
+    for ii = picked_snaps_noncontact
+        f_tension_magnitude_to_plot = f_tension_magnitude(ii, :)/f_bead;
+        f_tension_magnitude_to_plot_max = max(f_tension_magnitude_to_plot);
+        % f_tension_magnitude_to_plot_mean = mean(f_tension_magnitude_to_plot);
+        plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+            'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
+        hold on;
+        plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+            'MarkerEdgeColor', color_noncontact, 'MarkerSize', markers_size*0.9, 'LineWidth', 3);
+        hold on;
+        % % % if case_no == 1
+        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+        % % %         'MarkerFaceColor', color_noncontact, ...
+        % % %         'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 1.5, 'Color', 'k');
+        % % %     hold on;
+        % % % else
+        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+        % % %         'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
+        % % %     hold on;
+        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+        % % %         'MarkerEdgeColor', color_noncontact, 'MarkerSize', markers_size*0.8, 'LineWidth', 3);
+        % % %     hold on;
+        % % % end
+    end
+
+    picked_snaps_contact = picked_snaps(logical(sum(ContactBeads_index_current(picked_snaps, :), 2)));
+    for ii = picked_snaps_contact
+        f_tension_magnitude_to_plot = f_tension_magnitude(ii, :)/f_bead;
+        f_tension_magnitude_to_plot_max = max(f_tension_magnitude_to_plot);
+        % f_tension_magnitude_to_plot_mean = mean(f_tension_magnitude_to_plot);
+        plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+            'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
+        hold on;
+        plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+            'MarkerEdgeColor', color_contact, 'MarkerSize', markers_size*0.9, 'LineWidth', 3);
+        hold on;
+        % % % if case_no == 1
+        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+        % % %         'MarkerFaceColor', color_contact, ...
+        % % %         'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 1.5, 'Color', 'k');
+        % % %     hold on
+        % % % else
+        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+        % % %         'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
+        % % %     hold on;
+        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+        % % %         'MarkerEdgeColor', color_contact, 'MarkerSize', markers_size*0.8, 'LineWidth', 3);
+        % % %     hold on;
+        % % % end
+    end
+    % plot((1:beads_num-1)/beads_num, mean(f_tension_magnitude_plotted, 1, 'omitnan'), 'm-', 'LineWidth', 3);
+    xlabel('$\rm{Time\,(s)}$', 'FontSize', 28, 'Interpreter', 'latex');
+    ylabel('$\tilde{F}_{\rm{tension,\,max}}$', 'FontSize', 28, 'Interpreter', 'latex');
+    xlim([0 1]); ylim([0 5]); grid on
+    set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
+    set(gcf,'renderer','Painters');
+
+    legend({'contact','no contact', 'long fiber','short fiber'}, 'Location', 'northeast', 'FontSize', 24, 'FontName', 'Times New Roman')
+end
+
+print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_and_short_fiber_MAX_tension_vs_time_2.eps']);
