@@ -1468,7 +1468,7 @@ for case_no = 1:2
         f_tension_magnitude(ii, :) = ks*(l_im - 2*R_fib); % Notice the sign
     end
 
-    markers = {'+', 'x'};
+    markers = {'^', 'x'};
 
     %%%%%% Plot the average tension vs. time (Long and short fiber) %%%%%%
     color_noncontact = [44, 160, 44]/256;
@@ -1493,7 +1493,7 @@ for case_no = 1:2
     if case_no == 1
         % Case: n90, no.1 (Long fiber)
         picked_snaps = 55:64;
-        markers_size = 24;
+        markers_size = 14;
     elseif case_no == 2
         % Case: n30, no.17 (Short fiber)
         picked_snaps = 54:63;
@@ -1507,25 +1507,25 @@ for case_no = 1:2
         f_tension_magnitude_to_plot = f_tension_magnitude(ii, :)/f_bead;
         f_tension_magnitude_to_plot_max = max(f_tension_magnitude_to_plot);
         % f_tension_magnitude_to_plot_mean = mean(f_tension_magnitude_to_plot);
-        plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
-            'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
-        hold on;
-        plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
-            'MarkerEdgeColor', color_noncontact, 'MarkerSize', markers_size*0.9, 'LineWidth', 3);
-        hold on;
-        % % % if case_no == 1
-        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
-        % % %         'MarkerFaceColor', color_noncontact, ...
-        % % %         'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 1.5, 'Color', 'k');
-        % % %     hold on;
-        % % % else
-        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
-        % % %         'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
-        % % %     hold on;
-        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
-        % % %         'MarkerEdgeColor', color_noncontact, 'MarkerSize', markers_size*0.8, 'LineWidth', 3);
-        % % %     hold on;
-        % % % end
+        % % % plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+        % % %     'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
+        % % % hold on;
+        % % % plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+        % % %     'MarkerEdgeColor', color_noncontact, 'MarkerSize', markers_size*0.9, 'LineWidth', 3);
+        % % % hold on;
+        if case_no == 1
+            plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+                'MarkerFaceColor', color_noncontact, ...
+                'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 1.5, 'Color', 'k');
+            hold on;
+        else
+            plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+                'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
+            hold on;
+            plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+                'MarkerEdgeColor', color_noncontact, 'MarkerSize', markers_size*0.9, 'LineWidth', 3);
+            hold on;
+        end
     end
 
     picked_snaps_contact = picked_snaps(logical(sum(ContactBeads_index_current(picked_snaps, :), 2)));
@@ -1533,34 +1533,34 @@ for case_no = 1:2
         f_tension_magnitude_to_plot = f_tension_magnitude(ii, :)/f_bead;
         f_tension_magnitude_to_plot_max = max(f_tension_magnitude_to_plot);
         % f_tension_magnitude_to_plot_mean = mean(f_tension_magnitude_to_plot);
-        plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
-            'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
-        hold on;
-        plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
-            'MarkerEdgeColor', color_contact, 'MarkerSize', markers_size*0.9, 'LineWidth', 3);
-        hold on;
-        % % % if case_no == 1
-        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
-        % % %         'MarkerFaceColor', color_contact, ...
-        % % %         'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 1.5, 'Color', 'k');
-        % % %     hold on
-        % % % else
-        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
-        % % %         'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
-        % % %     hold on;
-        % % %     plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
-        % % %         'MarkerEdgeColor', color_contact, 'MarkerSize', markers_size*0.8, 'LineWidth', 3);
-        % % %     hold on;
-        % % % end
+        % % % plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+        % % %     'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
+        % % % hold on;
+        % % % plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+        % % %     'MarkerEdgeColor', color_contact, 'MarkerSize', markers_size*0.9, 'LineWidth', 3);
+        % % % hold on;
+        if case_no == 1
+            plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+                'MarkerFaceColor', color_contact, ...
+                'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 1.5, 'Color', 'k');
+            hold on
+        else
+            plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+                'MarkerEdgeColor', 'k', 'MarkerSize', markers_size, 'LineWidth', 5);
+            hold on;
+            plot((ii-picked_snaps(1))*dt, f_tension_magnitude_to_plot_max, markers{case_no}, ...
+                'MarkerEdgeColor', color_contact, 'MarkerSize', markers_size*0.9, 'LineWidth', 3);
+            hold on;
+        end
     end
     % plot((1:beads_num-1)/beads_num, mean(f_tension_magnitude_plotted, 1, 'omitnan'), 'm-', 'LineWidth', 3);
-    xlabel('$\rm{Time\,(s)}$', 'FontSize', 28, 'Interpreter', 'latex');
-    ylabel('$\tilde{F}_{\rm{tension,\,max}}$', 'FontSize', 28, 'Interpreter', 'latex');
+    xlabel('$\rm{Time\,(s)}$', 'FontSize', 24, 'Interpreter', 'latex');
+    ylabel('$\tilde{T}_{\rm{max}}$', 'FontSize', 24, 'Interpreter', 'latex');
     xlim([0 1]); ylim([0 5]); grid on
-    set(gca, 'FontSize', 28, 'FontName', 'Times New Roman');
+    set(gca, 'FontSize', 24, 'FontName', 'Times New Roman');
     set(gcf,'renderer','Painters');
 
     legend({'contact','no contact', 'long fiber','short fiber'}, 'Location', 'northeast', 'FontSize', 24, 'FontName', 'Times New Roman')
 end
 
-print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_and_short_fiber_MAX_tension_vs_time_2.eps']);
+print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_and_short_fiber_MAX_tension_vs_time_3.eps']);
