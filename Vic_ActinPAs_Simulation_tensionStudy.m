@@ -1251,9 +1251,9 @@ parent_path = 'E:\Experimental Data (RAW)\Simulation\data';
 sub1_path = dir(parent_path);
 
 % Case: n90, no.1 (Long fiber)
-sub1Path_i = 17; sub2Path_i = 6; picked_snap = [55, 60, 63, 64];
+sub1Path_i = 17; sub2Path_i = 6; picked_snap = [55, 61, 64];
 % % % % Case: n30, no.17 (Short fiber)
-% % % sub1Path_i = 11; sub2Path_i = 14; picked_snap = 54:63;
+% % % sub1Path_i = 11; sub2Path_i = 14; picked_snap = 54:3:63;
 
 
 current_beadsNum = sub1_path(sub1Path_i).name;
@@ -1352,14 +1352,14 @@ rectangle('Position', [3.3e-4, 5.5e-5, 1.5e-4, 4e-5], 'EdgeColor', 'k', 'LineWid
 hold on;
 xlim([3.3 4.8]*1e-4); ylim([5.5 9.5]*1e-5);
 set(gcf,'renderer','Painters');
-print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'LongFiberWithTension.eps']);
+print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'LongFiberWithTension_20250724.eps']);
 
 % % % % add a box around the figure (Short fiber)
 % % % rectangle('Position', [4.8e-4, 0.5e-5, 1.5e-4, 4e-5], 'EdgeColor', 'k', 'LineWidth', 0.2);
 % % % hold on;
 % % % xlim([4.8 6.3]*1e-4); ylim([0.5 4.5]*1e-5);
 % % % set(gcf,'renderer','Painters');
-% % % print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'ShortFiberWithTension.eps']);
+% % % print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'ShortFiberWithTension_20250724.eps']);
 
 
 % only colorbar
@@ -1564,3 +1564,263 @@ for case_no = 1:2
 end
 
 print('-depsc2','-tiff','-r100','-vector',[figure_mother_save_path, filesep, 'Long_and_short_fiber_MAX_tension_vs_time_3.eps']);
+
+
+
+
+
+
+
+%% Load saved tension data, plot ensemble average results for each length, and best metric parameter vs. fiber length (new Fig.5 @20250707)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clear; close all; clc;
+
+% Geometrical properties of the array
+R_pillar = 8.3 * 1e-6; % pillar radius, unit: m
+C2C_pillar = 30 * 1e-6; % m (delta_x & delta_y)
+delta_t = 0.1; % s
+
+R_fib = 3e-7; % fiber radius, unit: m
+u_max = 200e-6;
+mu = 6.1e-3;
+f_bead = 6*pi*mu*R_fib*u_max;
+
+Xedges = 0:0.02:1; Yedges = 0:0.02:1; % for the histogram
+
+data_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Simulation\Simulations_LubricationModel'];
+saved_data = dir(data_mother_save_path);
+% only keep the .mat files inluding the '_TensionStudy'
+saved_data = saved_data(arrayfun(@(x) contains(x.name, '_TensionStudy.mat'), saved_data)); 
+
+figure_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Figures\Simulation\Tension analysis'];
+
+L_0_group = zeros(1, length(saved_data));
+max_ensemble_tension = zeros(1, length(saved_data));
+max_ensemble_tension_std = zeros(1, length(saved_data));
+for ii = 1:length(saved_data)
+
+    load(fullfile(saved_data(ii).folder, saved_data(ii).name));
+
+    L_0 = extractBetween(saved_data(ii).name, 'FiberLength=', 'um_TensionStudy.mat'); % unit: um
+    bead_num = size(XY{1, 1}, 1);
+
+    f_tension_XY = cellfun(@(x) 0.5*(x(1:end-1, :)+x(2:end, :)), XY, 'UniformOutput', false);
+
+    %%%%%%%%%%%%%%%%%%%%% To select the contact cases %%%%%%%%%%%%%%%%%%%%%
+    if_only_select_contact_case = 0;
+    if if_only_select_contact_case
+        If_contact_all = cellfun(@(x) any(x), ContactBeads_index);
+        % Choose only the contact cases
+        f_tension_magnitude_Contact = f_tension_magnitude(If_contact_all);
+        f_tension_XY_Contact = f_tension_XY(If_contact_all);
+        ContactBeads_index_Contact = ContactBeads_index(If_contact_all);
+    else
+        f_tension_magnitude_Contact = f_tension_magnitude;
+        f_tension_XY_Contact = f_tension_XY;
+        ContactBeads_index_Contact = ContactBeads_index;
+    end
+    %%%%%%%%%%%%%%%%%%%%% To select the contact cases %%%%%%%%%%%%%%%%%%%%%
+
+
+    %%%%%%%%%%%%%%%%%%%%% To check the order of the beads in the fiber %%%%%%%%%%%%%%%%%%%%%
+    theta = 35; % angle in degrees (counterclockwise)
+    R = [cosd(theta) -sind(theta); sind(theta) cosd(theta)]; % rotation matrix
+
+    f_tension_XY_Contact_rotated = cellfun(@(x) (R * x')', f_tension_XY_Contact, 'UniformOutput', false);
+    f_tension_X_Contact_rotated = cellfun(@(x) x(:, 1), f_tension_XY_Contact_rotated, 'UniformOutput', false);
+
+    beads_order_indicator = cellfun(@(x) x(end)-x(1), f_tension_X_Contact_rotated, 'UniformOutput', false);
+    If_inOrder = cellfun(@(x) x>=0, beads_order_indicator, 'UniformOutput', false);
+    %%%%%%%%%%%%%%%%%%%%% To check the order of the beads in the fiber %%%%%%%%%%%%%%%%%%%%%
+
+
+    % Prepare for flip the bead order
+    If_inOrder_all = cell2mat(If_inOrder);
+    f_tension_magnitude_Contact_all = reshape(cell2mat(f_tension_magnitude_Contact), [], numel(f_tension_magnitude_Contact));
+    ContactBeads_index_Contact_all = reshape(cell2mat(ContactBeads_index_Contact), [], numel(ContactBeads_index_Contact));
+    ContactBeads_index_Contact_all(end, :) = []; % remove the last row (to align with the f_tension_magnitude_Contact_all)
+
+    % Flip the order of f_tension_magnitude_Contact_all based on If_inOrder_all
+    f_tension_magnitude_Contact_all(:, ~If_inOrder_all) = flipud(f_tension_magnitude_Contact_all(:, ~If_inOrder_all));
+    ContactBeads_index_Contact_all(:, ~If_inOrder_all) = flipud(ContactBeads_index_Contact_all(:, ~If_inOrder_all));
+
+    % set the f_tension_magnitude to NaN for the beads that are in contact with the pillars
+    f_tension_magnitude_Contact_all(ContactBeads_index_Contact_all == 1) = NaN;
+
+    % % f_tension_magnitude_Contact_average = mean(f_tension_magnitude_Contact_all, 2, 'omitnan');
+    % % f_tension_magnitude_Contact_std = std(f_tension_magnitude_Contact_all, 0, 2, 'omitnan');
+
+  
+    f_tension_X_Contact_rotated_all = reshape(cell2mat(f_tension_X_Contact_rotated), [], numel(f_tension_X_Contact_rotated));
+    x_position = mean(f_tension_X_Contact_rotated_all);
+    % determine the trajectories based on the x-position by finding the sudden drops in the x-position
+    x_diff = diff(x_position);
+    sudden_drops = find(x_diff < -10*C2C_pillar); % threshold for sudden drop
+    start_idx = 1;
+    average_of_Max_current_f_tension_magnitude = zeros(numel(sudden_drops), 1);
+    for jj = 1:length(sudden_drops)
+
+        end_idx = sudden_drops(jj);
+
+        current_f_tension_magnitude = f_tension_magnitude_Contact_all(:, start_idx:end_idx);
+        % maximum tension at different times
+        Max_current_f_tension_magnitude = max(current_f_tension_magnitude, [], 1);
+        % average of the maximums (over trajectories)
+        average_of_Max_current_f_tension_magnitude(jj) = mean(Max_current_f_tension_magnitude, 2, 'omitnan')/f_bead;
+        
+        start_idx = end_idx + 1;
+    end
+
+    L_0_group(ii) = str2double(L_0{1});
+    max_ensemble_tension(ii) = mean(average_of_Max_current_f_tension_magnitude);
+    max_ensemble_tension_std(ii) = std(average_of_Max_current_f_tension_magnitude);
+
+    close all
+    clearvars XY f_tension ContactBeads_index
+end
+
+% Plot the max. normalized tension vs. fiber length
+figure('Position', [100, 100, 793, 600], 'Color', 'w');
+yyaxis left
+ax = gca; 
+ax.YColor = [231, 138, 195]/256;
+errorbar(L_0_group*1e-6/C2C_pillar, max_ensemble_tension, max_ensemble_tension_std, 'o', ...
+     'MarkerFaceColor', [231, 138, 195]/256, 'MarkerEdgeColor', 'k', ...
+     'MarkerSize', 15, 'LineWidth', 1.5, 'Color', 'k');
+xlabel('$L/\lambda$', 'FontSize', 20, 'Interpreter', 'latex');
+ylabel('$\left\langle {  \overline{ \tilde{T}_{\rm{max}}}  }^{\rm{traj.}} \right\rangle$', 'FontSize', 20, 'Interpreter', 'latex');
+xlim([0 3.2]); ylim([1 4]); % grid on 
+set(gca, 'YTick', [1, 2, 3, 4]); % Set the x-ticks to only show 0, 1, 2, 3
+set(gca, 'FontSize', 20, 'FontName', 'Times New Roman');
+
+% See the following code: VicFig_Get_fig_data.m
+% % saveas(gcf, [figure_mother_save_path, filesep, 'Ensemble average of the average of maximum normalized tension on fiber over one trajectory vs. Fiber length.png']);
+
+
+
+
+%% Load saved tension data, plot ensemble average results for each length, and best metric parameter vs. fiber length (new Fig.5 @20250707 2)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clear; close all; clc;
+
+% Geometrical properties of the array
+R_pillar = 8.3 * 1e-6; % pillar radius, unit: m
+C2C_pillar = 30 * 1e-6; % m (delta_x & delta_y)
+delta_t = 0.1; % s
+
+R_fib = 3e-7; % fiber radius, unit: m
+u_max = 200e-6;
+mu = 6.1e-3;
+f_bead = 6*pi*mu*R_fib*u_max;
+
+Xedges = 0:0.02:1; Yedges = 0:0.02:1; % for the histogram
+
+data_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Simulation\Simulations_LubricationModel'];
+saved_data = dir(data_mother_save_path);
+% only keep the .mat files inluding the '_TensionStudy'
+saved_data = saved_data(arrayfun(@(x) contains(x.name, '_TensionStudy.mat'), saved_data)); 
+
+figure_mother_save_path = ['E:\Processing & Results\Actin Filaments in Porous Media\' ...
+    'Figures\Simulation\Tension analysis'];
+
+L_0_group = zeros(1, length(saved_data));
+max_ensemble_tension = zeros(1, length(saved_data));
+max_ensemble_tension_std = zeros(1, length(saved_data));
+for ii = 1:length(saved_data)
+
+    load(fullfile(saved_data(ii).folder, saved_data(ii).name));
+
+    L_0 = extractBetween(saved_data(ii).name, 'FiberLength=', 'um_TensionStudy.mat'); % unit: um
+    bead_num = size(XY{1, 1}, 1);
+
+    f_tension_XY = cellfun(@(x) 0.5*(x(1:end-1, :)+x(2:end, :)), XY, 'UniformOutput', false);
+
+    %%%%%%%%%%%%%%%%%%%%% To select the contact cases %%%%%%%%%%%%%%%%%%%%%
+    if_only_select_contact_case = 0;
+    if if_only_select_contact_case
+        If_contact_all = cellfun(@(x) any(x), ContactBeads_index);
+        % Choose only the contact cases
+        f_tension_magnitude_Contact = f_tension_magnitude(If_contact_all);
+        f_tension_XY_Contact = f_tension_XY(If_contact_all);
+        ContactBeads_index_Contact = ContactBeads_index(If_contact_all);
+    else
+        f_tension_magnitude_Contact = f_tension_magnitude;
+        f_tension_XY_Contact = f_tension_XY;
+        ContactBeads_index_Contact = ContactBeads_index;
+    end
+    %%%%%%%%%%%%%%%%%%%%% To select the contact cases %%%%%%%%%%%%%%%%%%%%%
+
+
+    %%%%%%%%%%%%%%%%%%%%% To check the order of the beads in the fiber %%%%%%%%%%%%%%%%%%%%%
+    theta = 35; % angle in degrees (counterclockwise)
+    R = [cosd(theta) -sind(theta); sind(theta) cosd(theta)]; % rotation matrix
+
+    f_tension_XY_Contact_rotated = cellfun(@(x) (R * x')', f_tension_XY_Contact, 'UniformOutput', false);
+    f_tension_X_Contact_rotated = cellfun(@(x) x(:, 1), f_tension_XY_Contact_rotated, 'UniformOutput', false);
+
+    beads_order_indicator = cellfun(@(x) x(end)-x(1), f_tension_X_Contact_rotated, 'UniformOutput', false);
+    If_inOrder = cellfun(@(x) x>=0, beads_order_indicator, 'UniformOutput', false);
+    %%%%%%%%%%%%%%%%%%%%% To check the order of the beads in the fiber %%%%%%%%%%%%%%%%%%%%%
+
+    
+    % Prepare for flip the bead order
+    If_inOrder_all = cell2mat(If_inOrder);
+    f_tension_magnitude_Contact_all = reshape(cell2mat(f_tension_magnitude_Contact), [], numel(f_tension_magnitude_Contact));
+    ContactBeads_index_Contact_all = reshape(cell2mat(ContactBeads_index_Contact), [], numel(ContactBeads_index_Contact));
+    ContactBeads_index_Contact_all(end, :) = []; % remove the last row (to align with the f_tension_magnitude_Contact_all)
+
+    % Flip the order of f_tension_magnitude_Contact_all based on If_inOrder_all
+    f_tension_magnitude_Contact_all(:, ~If_inOrder_all) = flipud(f_tension_magnitude_Contact_all(:, ~If_inOrder_all));
+    ContactBeads_index_Contact_all(:, ~If_inOrder_all) = flipud(ContactBeads_index_Contact_all(:, ~If_inOrder_all));
+
+    % set the f_tension_magnitude to NaN for the beads that are in contact with the pillars
+    f_tension_magnitude_Contact_all(ContactBeads_index_Contact_all == 1) = NaN;
+
+  
+    f_tension_X_Contact_rotated_all = reshape(cell2mat(f_tension_X_Contact_rotated), [], numel(f_tension_X_Contact_rotated));
+    x_position = mean(f_tension_X_Contact_rotated_all);
+    % determine the trajectories based on the x-position by finding the sudden drops in the x-position
+    x_diff = diff(x_position);
+    sudden_drops = find(x_diff < -10*C2C_pillar); % threshold for sudden drop
+    start_idx = 1;
+    max_ensemble_tension_per_case = zeros(numel(sudden_drops), 1);
+    for jj = 1:length(sudden_drops)
+
+        end_idx = sudden_drops(jj);
+
+        current_f_tension_magnitude = f_tension_magnitude_Contact_all(:, start_idx:end_idx);
+        current_f_tension_magnitude_average = mean(current_f_tension_magnitude, 2, 'omitnan');
+
+        max_ensemble_tension_per_case(jj) = max(current_f_tension_magnitude_average)/f_bead;
+        
+        start_idx = end_idx + 1;
+    end
+
+    L_0_group(ii) = str2double(L_0{1});
+    max_ensemble_tension(ii) = mean(max_ensemble_tension_per_case);
+    max_ensemble_tension_std(ii) = std(max_ensemble_tension_per_case);
+
+    close all
+    clearvars XY f_tension ContactBeads_index
+end
+
+% Plot the max. normalized tension vs. fiber length
+figure('Position', [100, 100, 800, 600], 'Color', 'w');
+yyaxis left
+ax = gca; 
+ax.YColor = [231, 138, 195]/256;
+errorbar(L_0_group*1e-6/C2C_pillar, max_ensemble_tension, max_ensemble_tension_std, 'o', ...
+     'MarkerFaceColor', [231, 138, 195]/256, 'MarkerEdgeColor', 'k', ...
+     'MarkerSize', 15, 'LineWidth', 1.5, 'Color', 'k');
+xlabel('$L/\lambda$', 'FontSize', 20, 'Interpreter', 'latex');
+ylabel('$ {\overline{ \langle \tilde{T} \rangle_{\rm{max}}}  }^{\rm{traj.}}$', 'FontSize', 20, 'Interpreter', 'latex');
+xlim([0 3.2]); ylim([0.8 3.2]); % grid on
+set(gca, 'YTick', [1, 2, 3]); % Set the y-ticks to only show 1, 2, 3
+set(gca, 'FontSize', 20, 'FontName', 'Times New Roman');
+
+% See the following code: VicFig_Get_fig_data.m
