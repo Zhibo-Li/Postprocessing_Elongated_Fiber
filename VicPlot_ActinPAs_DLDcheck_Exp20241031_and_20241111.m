@@ -72,11 +72,9 @@ for exp_date = 1: 2
     fiber_Ys_max = fiber_Ys;
     fiber_Ys_min = fiber_Ys - flowfocusing_bandwidth;
     if exp_date == 1
-        fiber_Ys_max(end-data_num+1:end) = fiber_Ys(end-data_num+1:end) + 200; 
-        % different initial bandwidth for 'longfibers': 200 um
+        fiber_Ys_max(end-data_num+1:end) = fiber_Ys(end-data_num+1:end) + 200;
+        fiber_Ys_min(end-data_num+1:end) = fiber_Ys(end-data_num+1:end) - 200;
     end
-    fiber_Ys_min(end-data_num+1:end) = fiber_Ys(end-data_num+1:end) - 200; 
-    % different initial bandwidth for 'longfibers': 200 um
     fiber_Ys_min(fiber_Ys_min < 0) = 0; % set value to zeros if it's negative
     beta_max{exp_date} = atand(fiber_Ys_max./fiber_Xs);
     beta_min{exp_date} = atand(fiber_Ys_min./fiber_Xs);
