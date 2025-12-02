@@ -537,3 +537,123 @@ Summary = table(conc_vals, Z_vals, n_low, mean_low, std_low_deg, sem_low, n_high
     'VariableNames', {'Concentration','Z','N_low','Mean_low_deg','Std_low_deg','SEM_low_deg','N_high','Mean_high_deg','Std_high_deg','SEM_high_deg'});
 save(fullfile(exp2proc, 'MeanOrientation_Summary.mat'), 'Summary');
 writetable(Summary, fullfile(exp2proc, 'MeanOrientation_Summary.csv'));
+
+
+
+
+
+
+%% Create a colorcoded plot (color based on the orientation of the whole fiber)
+% Create a colorcoded plot for each combined condition
+close all
+
+for gg = 1:num_groups
+    
+    % Get data for this group
+    fiber_spl = Combined_info(gg).fiber_spl;
+    Chi_all = Combined_info(gg).Chi_all;
+    susp_conc = Combined_info(gg).susp_conc;
+    Z_pos = Combined_info(gg).Z;
+    CoM_y_all_normalized = Combined_info(gg).CoM_y_all_normalized;
+    
+    % plot the colorcoded fibers
+    figure("Color", "white", "Position", [100, 100, 800, 600]);
+
+    plot(CoM_y_all_normalized, Chi_all, 'o', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'k', 'MarkerSize', 2);
+    xlabel('$y$','Interpreter', 'latex');
+    ylabel('$\theta$', 'Interpreter','latex');
+    title('CoM_y vs fiber orientation', 'FontName', 'Arial');
+    xlim([0 1]);
+    ylim([-30 30]);
+    grid on;
+    set(gca, 'FontSize', 14, 'LineWidth', 1.5, 'TickLabelInterpreter', 'latex');
+    
+    % Bin CoM_y_all_normalized and calculate the average Chi_all in each bin
+    edges_y = 0:0.04:1;
+    bin_centers_y = edges_y(1:end-1) + diff(edges_y)/2;
+    avg_Chi = zeros(1, length(bin_centers_y));
+    std_Chi = zeros(1, length(bin_centers_y));
+    number_Chi = zeros(1, length(bin_centers_y));
+    for b = 1:length(bin_centers_y)
+        idx = CoM_y_all_normalized >= edges_y(b) & CoM_y_all_normalized < edges_y(b+1);
+        if any(idx)
+            avg_Chi(b) = mean(Chi_all(idx));
+            std_Chi(b) = std(Chi_all(idx));
+            number_Chi(b) = sum(idx);
+        else
+            avg_Chi(b) = NaN;
+            std_Chi(b) = NaN;
+        end
+    end
+    hold on;
+    errorbar(bin_centers_y, avg_Chi, std_Chi, 'ks-', 'LineWidth', 2, 'MarkerFaceColor', 'k', 'MarkerSize', 10);
+
+    % Fit avg_Chi vs bin_centers_y with model y = a * tanh((x - 0.5)/b)
+    valid = number_Chi > round(numel(CoM_y_all_normalized) / numel(edges_y) / 1.5) & ~isnan(avg_Chi) & ~isnan(std_Chi);
+    if sum(valid) >= round(numel(edges_y)/2)
+
+        fit_func = @(p, x) - p(1) * tanh((x - 0.5)/p(2));
+        initial_params = [1, 0.1];
+        lb = [0, 0];
+        ub = [10, 0.5];
+        options = optimset('Display', 'off');
+        % Fit parameters
+        fitted_params = lsqcurvefit(fit_func, initial_params, bin_centers_y(valid), avg_Chi(valid), lb, ub, options);
+
+        % Goodness-of-fit estimates
+        y_model = fit_func(fitted_params, bin_centers_y(valid));
+        resid = avg_Chi(valid) - y_model;
+        SSR = sum(resid.^2);
+        SST = sum((avg_Chi(valid) - mean(avg_Chi(valid))).^2);
+        if SST > 0
+            R2 = 1 - SSR / SST;
+        else
+            R2 = NaN;
+        end
+        RMSE = sqrt(mean(resid.^2));
+
+        % Weighted chi-square / reduced chi-square (use std_Chi as sigma if available)
+        sigma = std_Chi(valid);
+        sigma(~isfinite(sigma) | sigma <= 0) = eps;
+        chi2 = sum((resid ./ sigma).^2);
+        dof = max(1, numel(resid) - numel(fitted_params));
+        reduced_chi2 = chi2 / dof;
+
+        % Store GOF in a struct for later use or saving
+        fitted_gof = struct('R2', R2, 'RMSE', RMSE, 'chi2', chi2, 'reduced_chi2', reduced_chi2, 'N', numel(resid), 'dof', dof);
+
+        % Print to command window
+        fprintf('Fit: Phi=%.4g, deltaz=%.4g | R^2=%.4f, RMSE=%.4f, red-chi2=%.4f, N=%d\n', ...
+            fitted_params(1), fitted_params(2), R2, RMSE, reduced_chi2, fitted_gof.N);
+
+        % Add a small annotation to the plot (placed below the existing parameter text)
+        hold on;
+        % txt = sprintf('R^2=%.3f, RMSE=%.3f, red-\\chi^2=%.2f', R2, RMSE, reduced_chi2);
+        txt = sprintf('R^2=%.3f', R2);
+        text(0.80, 23, txt, 'FontSize', 18, 'FontName', 'Times New Roman');
+
+        x_fit = linspace(0, 1, 200);
+        y_fit = fit_func(fitted_params, x_fit);
+
+        hold on;
+        errorbar(bin_centers_y(~valid), avg_Chi(~valid), std_Chi(~valid), 's', 'LineStyle', 'none',  'MarkerFaceColor', [0.7 0.7 0.7], 'MarkerSize', 10);
+
+        hold on
+        plot(x_fit, y_fit, 'm-', 'LineWidth', 2);
+
+        legend('Original Data', 'Binned Average', '', 'Fit', 'FontName','Times New Roman', 'location', 'southeast');
+        text(0.66, 27, sprintf('\\Phi=%.2f, \\deltaz=%.2f', fitted_params(1), fitted_params(2)), 'FontSize', 18, 'FontName','Times New Roman');
+    end
+
+    xlabel('Normalized Y-Position', 'FontName','Times New Roman');
+    ylabel('Mean Orientation (deg)', 'FontName','Times New Roman');
+    title(sprintf('Fiber in-plane orientation and fitting\nConcentration: %.2f%%, Z: %.1f um', susp_conc, Z_pos), 'FontName','Times New Roman');
+    xlim([0 1]);
+    ylim([-30 30]);
+    grid on
+    set(gca, 'FontSize', 18, 'LineWidth', 1.5, 'TickLabelInterpreter', 'latex');
+    
+    % Save the figure
+    saveas(gcf, fullfile(exp2proc, sprintf('FibersInPlaneOrientation_Conc%.2f_Z%.1f.png', susp_conc, Z_pos)));
+
+end
